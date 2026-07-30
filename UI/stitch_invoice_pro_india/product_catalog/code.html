@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bharat Ledger - Product Catalog</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-on-surface": "#ecf1ff",
+                    "on-surface": "#111c2d",
+                    "on-tertiary-container": "#fafff9",
+                    "on-secondary-container": "#004b75",
+                    "on-primary-fixed-variant": "#004786",
+                    "primary-fixed": "#d4e3ff",
+                    "secondary-fixed-dim": "#94ccff",
+                    "tertiary-container": "#00865c",
+                    "surface-container-highest": "#d8e3fb",
+                    "on-surface-variant": "#414752",
+                    "primary-fixed-dim": "#a5c8ff",
+                    "primary": "#005dac",
+                    "background": "#f9f9ff",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "surface-dim": "#cfdaf2",
+                    "surface-bright": "#f9f9ff",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "surface-container": "#e7eeff",
+                    "on-secondary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "secondary-container": "#6cbdfe",
+                    "primary-container": "#1976d2",
+                    "secondary": "#006398",
+                    "on-error": "#ffffff",
+                    "on-background": "#111c2d",
+                    "on-tertiary-fixed": "#002113",
+                    "on-secondary-fixed-variant": "#004b74",
+                    "surface-container-high": "#dee8ff",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#f0f3ff",
+                    "outline-variant": "#c1c6d4",
+                    "inverse-surface": "#263143",
+                    "tertiary-fixed": "#6ffbbe",
+                    "surface-variant": "#d8e3fb",
+                    "on-error-container": "#93000a",
+                    "surface": "#f9f9ff",
+                    "on-primary-container": "#fffdff",
+                    "on-primary-fixed": "#001c3a",
+                    "outline": "#717783",
+                    "on-secondary-fixed": "#001d32",
+                    "tertiary": "#006a48",
+                    "surface-tint": "#005faf",
+                    "secondary-fixed": "#cde5ff",
+                    "inverse-primary": "#a5c8ff",
+                    "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "base": "8px",
+                    "md": "16px",
+                    "xs": "4px",
+                    "margin-mobile": "16px",
+                    "xl": "32px",
+                    "lg": "24px",
+                    "sm": "8px",
+                    "margin-tablet": "24px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "title-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "title-lg": ["Inter"],
+                    "headline-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "title-md": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "500"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500"}],
+                    "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fab-shadow {
+            box-shadow: 0px 10px 15px -3px rgba(30, 41, 59, 0.1);
+        }
+        .card-shadow {
+            box-shadow: 0px 1px 3px rgba(30, 41, 59, 0.12);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen pb-32">
+<!-- Top App Bar -->
+<header class="bg-surface sticky top-0 z-40 flex items-center justify-between px-margin-mobile h-16 w-full">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional corporate logo for an Indian SME fintech brand named Bharat Ledger. The logo is minimalist, featuring a stylized blue 'B' inside a clean white circle, surrounded by a soft primary blue glow. The aesthetic is modern, reliable, and uses high-end vector graphics against a bright light-mode background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuChGyXKAUDYygZQRtZF8PLZkDQLyKaDStp9nRRDdHdBLTroJf3438qpsX16s9ACjhcH-GFZS0YFAonppL8bvrIMfqNzGceGumJiBiTTp87SDlvWRJ9UNeDNWkze4_xuArbhVPYKdw61VY512KgxXrFe91bLfuoGTrki9hjKw3dqDVbeCkqmrQyTNh4TmFTH4xpAi9aegCatKjW7C52mwuyWVnkFQMSm_SJY0vzmrf2QmLT1vPR3_dSA"/>
+</div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Invoicer</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors duration-200">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+</button>
+</header>
+<!-- Main Content -->
+<main class="px-margin-mobile pt-4 space-y-lg">
+<!-- Search & Filter Area -->
+<section class="space-y-md">
+<div class="relative group">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline">search</span>
+</div>
+<input class="w-full h-14 pl-12 pr-4 bg-surface-container-lowest border border-outline-variant rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md text-body-md shadow-sm" placeholder="Search products, SKUs..." type="text"/>
+</div>
+<!-- Category Chips -->
+<div class="flex overflow-x-auto no-scrollbar gap-sm pb-1">
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-secondary-container text-on-secondary-container font-label-lg text-label-lg transition-all active:scale-95">All</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-highest transition-all active:scale-95 border border-outline-variant">Electronics</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-highest transition-all active:scale-95 border border-outline-variant">Groceries</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-highest transition-all active:scale-95 border border-outline-variant">Services</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-highest transition-all active:scale-95 border border-outline-variant">Office</button>
+</div>
+</section>
+<!-- Product List -->
+<section class="space-y-md">
+<div class="flex items-center justify-between">
+<h2 class="font-title-lg text-title-lg text-on-surface">Inventory (12)</h2>
+<button class="text-primary font-label-lg text-label-lg flex items-center gap-1">
+                    Sort <span class="material-symbols-outlined text-sm">swap_vert</span>
+</button>
+</div>
+<div class="grid grid-cols-1 gap-md">
+<!-- Product Card 1: Low Stock Example -->
+<div class="bg-surface-container-lowest p-md rounded-xl card-shadow border border-outline-variant flex gap-md relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="w-20 h-20 rounded-lg bg-surface-container-high flex-shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A crisp, studio-lit photograph of a high-end ergonomic computer mouse against a soft gray background. The lighting is diffused and professional, showcasing the product's sleek matte finish and modern curves. The aesthetic is clean and corporate, fitting for a premium electronics catalog in an Indian SME software application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4Lke83-_BQMe5MgoGBMSJvnUx0LVcISOxvvSzgQMNdaA5n0n8_VVN1t-VTMNudIh7rA12nUbnXRRjfmbAy2MZXnzJrwUKSSFuPTWAIJwNg5g_e5bK2c4f1CcwsHbJVo7iol_gG9SnRHZ9MSrfShNBNlstiX1MzQ2jI003r6Kn92oppJPEVirRjAjZkenl6eEX2rWpXYJhfXlDJYflHTfHiEfcxSa34rhtD1MfRS0Bc0a4Epi-0VOh"/>
+</div>
+<div class="flex-1 space-y-1">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-title-md text-title-md text-on-surface">Logitech MX Master 3S</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">SKU: EL-LOGI-882</p>
+</div>
+<span class="bg-error-container text-on-error-container px-2 py-0.5 rounded font-label-md text-[10px] uppercase tracking-wider font-bold">Low Stock</span>
+</div>
+<div class="flex justify-between items-end pt-1">
+<div>
+<p class="font-headline-md text-headline-md text-primary font-bold">₹8,499</p>
+<p class="font-label-md text-label-md text-outline">GST: 18% inclusive</p>
+</div>
+<div class="text-right">
+<p class="font-label-md text-label-md text-error font-semibold">Only 3 left</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Units: Pcs</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="bg-surface-container-lowest p-md rounded-xl card-shadow border border-outline-variant flex gap-md relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="w-20 h-20 rounded-lg bg-surface-container-high flex-shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional product shot of a pack of sustainable, organic coffee beans in a minimalist brown kraft paper packaging. The scene is bright and airy with soft shadows, placed on a white marble countertop. The overall feel is premium, natural, and highly detailed, representing a grocery category item in a modern digital ledger app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-WgfQm-U29aEhNg1t4VVlD1b6eb5ucMICa5xDv0fD5p1SvFKODeEcxNiKUjhTcgZYlAeGMHe3HJVYlFjsbBr_WrYZxpMZYgwdkY6bAOv1eh4WspQsmFlzEBjSLePBIBs6e0rjdAf2d8bTMpW_WuSj6ZPK8KfqJkzVkyolqPwhS4_iNKDFr5rKDpAr1oGpvoU3FPXVFoSCJGFGGh_FPHxyUgcOL395GBh5BgRmTVnqHpAUgTLq2eJS"/>
+</div>
+<div class="flex-1 space-y-1">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-title-md text-title-md text-on-surface">Premium Arabica Beans</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">SKU: GR-COF-001</p>
+</div>
+</div>
+<div class="flex justify-between items-end pt-1">
+<div>
+<p class="font-headline-md text-headline-md text-primary font-bold">₹450</p>
+<p class="font-label-md text-label-md text-outline">GST: 5% inclusive</p>
+</div>
+<div class="text-right">
+<p class="font-label-md text-label-md text-tertiary font-semibold">45 in stock</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Units: Kg</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="bg-surface-container-lowest p-md rounded-xl card-shadow border border-outline-variant flex gap-md relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="w-20 h-20 rounded-lg bg-surface-container-high flex-shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A clean illustration of a set of office stationery, including a notebook, a sleek pen, and a desk organizer. The colors are muted blues and grays, presented in a minimalist, flat-lay style. The lighting is bright and even, evoking a sense of productivity and professional order within a modern business environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsdtE30yBJ5nXwI2dyl1HvmqmFi1qLut2zirpz2perBuGJ7lTLV1Jkh9VqF0AvEAY7pge4znbMVdF9HYS9kBmCAQ2bCM542E2Jo5EphJYFLt0Mkm0nEulCaBQ5HXSKE6UPz5uw3oJ4ezxBhsuuAEWkSC7x6wS8TfHAweb1brbGCCpY3V5SHAN1HI6C7HTtCUeFhzvBK59lM7fUuYXdy3UC1BS064VdH5D2D43QxTbFJwI5wgaIyZBI"/>
+</div>
+<div class="flex-1 space-y-1">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-title-md text-title-md text-on-surface">Executive Planner 2024</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">SKU: OF-STA-105</p>
+</div>
+</div>
+<div class="flex justify-between items-end pt-1">
+<div>
+<p class="font-headline-md text-headline-md text-primary font-bold">₹1,200</p>
+<p class="font-label-md text-label-md text-outline">GST: 12% inclusive</p>
+</div>
+<div class="text-right">
+<p class="font-label-md text-label-md text-tertiary font-semibold">12 in stock</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Units: Pcs</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Product Card 4: Another Low Stock -->
+<div class="bg-surface-container-lowest p-md rounded-xl card-shadow border border-outline-variant flex gap-md relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="w-20 h-20 rounded-lg bg-surface-container-high flex-shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A studio-quality image of a sleek, black wireless charging pad with a modern LED indicator ring. The object is centered in a high-key, minimalist setting with soft, clean shadows. The aesthetic is focused on high-tech efficiency and digital precision, matching a sophisticated enterprise inventory interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAY4w84MwJ_onh7shVp5Ls-O9gIbumg0Kqb-9HyPkiwfN85RHA3ld4t_BywmbaoJDgxUFO9dPEOrR5N3WWI4X44GM2GXnUnLIvfoz8cWcMevsjLpJoWaULroTbcAMFuRCZs_wugWvX94wwY7tkVf9fxogZFoPEJME0iSOJa7Scb64w2n0rdFk5g2kDXs2HFQUwfXHqEn4R46siZIzSjew47LESjxEYInwdjBPZW90fTpAT6pfN6jSK6"/>
+</div>
+<div class="flex-1 space-y-1">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-title-md text-title-md text-on-surface">Qi Wireless Charger Pro</h3>
+<p class="font-label-md text-label-md text-on-surface-variant">SKU: EL-CHA-920</p>
+</div>
+<span class="bg-error-container text-on-error-container px-2 py-0.5 rounded font-label-md text-[10px] uppercase tracking-wider font-bold">Low Stock</span>
+</div>
+<div class="flex justify-between items-end pt-1">
+<div>
+<p class="font-headline-md text-headline-md text-primary font-bold">₹2,999</p>
+<p class="font-label-md text-label-md text-outline">GST: 18% inclusive</p>
+</div>
+<div class="text-right">
+<p class="font-label-md text-label-md text-error font-semibold">Only 2 left</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Units: Pcs</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-24 right-6 bg-primary-container text-on-primary-container flex items-center gap-2 px-6 h-14 rounded-2xl fab-shadow transition-transform active:scale-95 z-40">
+<span class="material-symbols-outlined">add</span>
+<span class="font-label-lg text-label-lg font-bold">Add Product</span>
+</button>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center pt-2 pb-safe px-2 bg-surface-container shadow-lg rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1 transition-all duration-300 ease-in-out scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md mt-1">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1 transition-all duration-300 ease-in-out scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-md text-label-md mt-1">Invoices</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1 transition-all duration-300 ease-in-out scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md mt-1">Customers</span>
+</a>
+<!-- Active Item: Products -->
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-5 py-1 transition-all duration-300 ease-in-out scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined fill-icon">inventory_2</span>
+<span class="font-label-md text-label-md mt-1">Products</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1 transition-all duration-300 ease-in-out scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">menu</span>
+<span class="font-label-md text-label-md mt-1">More</span>
+</a>
+</nav>
+<!-- Subtle Scroll micro-interaction -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const productCards = document.querySelectorAll('.card-shadow');
+            
+            const observerOptions = {
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('opacity-100', 'translate-y-0');
+                        entry.target.classList.remove('opacity-0', 'translate-y-4');
+                    }
+                });
+            }, observerOptions);
+
+            productCards.forEach(card => {
+                card.classList.add('transition-all', 'duration-500', 'opacity-0', 'translate-y-4');
+                observer.observe(card);
+            });
+        });
+    </script>
+</body></html>

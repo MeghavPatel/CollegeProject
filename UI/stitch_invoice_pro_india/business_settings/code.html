@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Business Settings - BillFast India</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .filled-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Custom scrollbar for better UI */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#001c3a",
+                        "tertiary-container": "#00865c",
+                        "on-secondary-fixed": "#001d32",
+                        "on-secondary-fixed-variant": "#004b74",
+                        "on-secondary-container": "#004b75",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-background": "#111c2d",
+                        "surface-bright": "#f9f9ff",
+                        "surface-container-low": "#f0f3ff",
+                        "outline-variant": "#c1c6d4",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#d8e3fb",
+                        "inverse-primary": "#a5c8ff",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "tertiary-fixed": "#6ffbbe",
+                        "surface": "#f9f9ff",
+                        "background": "#f9f9ff",
+                        "primary": "#005dac",
+                        "surface-container": "#e7eeff",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#006398",
+                        "surface-container-highest": "#d8e3fb",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-primary-fixed-variant": "#004786",
+                        "tertiary": "#006a48",
+                        "primary-fixed": "#d4e3ff",
+                        "on-tertiary-container": "#fafff9",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#414752",
+                        "outline": "#717783",
+                        "primary-fixed-dim": "#a5c8ff",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#94ccff",
+                        "surface-container-high": "#dee8ff",
+                        "surface-tint": "#005faf",
+                        "secondary-fixed": "#cde5ff",
+                        "secondary-container": "#6cbdfe",
+                        "inverse-surface": "#263143",
+                        "on-primary-container": "#fffdff",
+                        "on-tertiary-fixed": "#002113",
+                        "on-surface": "#111c2d",
+                        "surface-dim": "#cfdaf2",
+                        "inverse-on-surface": "#ecf1ff",
+                        "primary-container": "#1976d2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "32px",
+                        "xs": "4px",
+                        "margin-tablet": "24px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "gutter": "16px",
+                        "base": "8px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "label-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "title-md": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500"}],
+                        "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "title-md": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky bg-surface shadow-sm z-40 flex justify-between items-center px-margin-mobile h-16 w-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-[28px]">account_balance_wallet</span>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">BillFast India</h1>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container transition-transform active:scale-95">
+<img class="w-full h-full object-cover" data-alt="A professional studio portrait of a young Indian male entrepreneur with a friendly smile, wearing a modern blue business casual shirt, set against a clean minimalist office background with soft bokeh lighting and a premium corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5DkRRK1tNTN-jtWK8VcYR7rmp1PFvzjAoXwj3UC44u-kYxcmDaqdViz25CyVtEZuOfdAm5fqrpIjITCp9qK0mBZt6rxBu5lMqk9ovZYcuxLq3pVb4mSt64Ow3CEIneFZr62S_axA3TKO6M3nehrbFOTcpFaXjxkUc21BJnilDqbtKo6fzyAgFYtYryltsIQLsZwzma1DMODLB-w6tvxyDpsO0-84aRyijARocKet1uHp1AAccMKyz"/>
+</div>
+</header>
+<main class="max-w-2xl mx-auto px-margin-mobile py-lg">
+<div class="mb-lg">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Settings</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Manage your business profile and app preferences</p>
+</div>
+<!-- Section 1: Business Profile -->
+<section class="mb-lg">
+<div class="bg-surface-container-low rounded-xl shadow-sm border border-outline-variant/30 overflow-hidden">
+<div class="px-md py-sm border-b border-outline-variant/20 flex justify-between items-center">
+<h3 class="font-title-md text-title-md text-primary">Business Profile</h3>
+<button class="text-primary font-label-lg hover:bg-primary-container/10 px-sm py-xs rounded-lg transition-colors">Edit</button>
+</div>
+<div class="p-md space-y-md">
+<div class="flex items-center gap-md">
+<div class="w-16 h-16 rounded-xl bg-primary-fixed flex items-center justify-center text-primary border border-primary/20">
+<span class="material-symbols-outlined text-[32px] filled-icon">store</span>
+</div>
+<div>
+<p class="font-title-md text-title-md text-on-surface">Bharat Ledger Enterprises</p>
+<p class="font-body-md text-body-md text-on-surface-variant">MSME Registered • Mumbai, MH</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-sm">
+<div class="flex items-center gap-sm p-sm bg-surface-container rounded-lg">
+<span class="material-symbols-outlined text-outline text-md">mail</span>
+<span class="font-body-md text-body-md">contact@bharatledger.in</span>
+</div>
+<div class="flex items-center gap-sm p-sm bg-surface-container rounded-lg">
+<span class="material-symbols-outlined text-outline text-md">call</span>
+<span class="font-body-md text-body-md">+91 98765 43210</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Tax & GST -->
+<section class="mb-lg">
+<div class="bg-surface-container-low rounded-xl shadow-sm border border-outline-variant/30 overflow-hidden">
+<div class="px-md py-sm border-b border-outline-variant/20">
+<h3 class="font-title-md text-title-md text-primary">Tax & GST</h3>
+</div>
+<div class="divide-y divide-outline-variant/10">
+<div class="p-md flex items-center justify-between hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant">fact_check</span>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">GSTIN Configuration</p>
+<p class="font-label-md text-label-md text-on-surface-variant">27AAAAA0000A1Z5</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+<div class="p-md flex items-center justify-between hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant">percent</span>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Tax Rates & HSN/SAC</p>
+<p class="font-label-md text-label-md text-on-surface-variant">Default: 18% IGST / 9% + 9% GST</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Invoicing Preferences -->
+<section class="mb-lg">
+<div class="bg-surface-container-low rounded-xl shadow-sm border border-outline-variant/30 overflow-hidden">
+<div class="px-md py-sm border-b border-outline-variant/20">
+<h3 class="font-title-md text-title-md text-primary">Invoicing Preferences</h3>
+</div>
+<div class="divide-y divide-outline-variant/10">
+<div class="p-md flex items-center justify-between hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant">description</span>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Invoice Numbering</p>
+<p class="font-label-md text-label-md text-on-surface-variant">Prefix: BL/24/ • Suffix: -MUM</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+<div class="p-md flex items-center justify-between hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant">account_balance</span>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Payment Instructions</p>
+<p class="font-label-md text-label-md text-on-surface-variant">Bank A/C, UPI ID, QR Code</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+<div class="p-md flex items-center justify-between hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant">gavel</span>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Terms & Conditions</p>
+<p class="font-label-md text-label-md text-on-surface-variant">Default policies for all invoices</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 4: App Settings -->
+<section class="mb-lg">
+<div class="bg-surface-container-low rounded-xl shadow-sm border border-outline-variant/30 overflow-hidden">
+<div class="px-md py-sm border-b border-outline-variant/20">
+<h3 class="font-title-md text-title-md text-primary">App Settings</h3>
+</div>
+<div class="divide-y divide-outline-variant/10">
+<div class="p-md flex items-center justify-between">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant">language</span>
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">App Language</p>
+<p class="font-label-md text-label-md text-on-surface-variant">English (India)</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">expand_more</span>
+</div>
+<div class="p-md flex items-center justify-between">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant">dark_mode</span>
+<p class="font-label-lg text-label-lg text-on-surface">Dark Mode</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" id="dark-toggle" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="p-md flex items-center justify-between hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<p class="font-label-lg text-label-lg text-on-surface">Notification Preferences</p>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 5: Security & Data -->
+<section class="mb-lg">
+<div class="bg-surface-container-low rounded-xl shadow-sm border border-outline-variant/30 overflow-hidden">
+<div class="px-md py-sm border-b border-outline-variant/20">
+<h3 class="font-title-md text-title-md text-primary">Security & Data</h3>
+</div>
+<div class="divide-y divide-outline-variant/10">
+<div class="p-md flex items-center justify-between hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant">fingerprint</span>
+<p class="font-label-lg text-label-lg text-on-surface">Biometric Lock</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="p-md flex items-center justify-between hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant">cloud_upload</span>
+<p class="font-label-lg text-label-lg text-on-surface">Automatic Backup</p>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+<div class="p-md flex items-center justify-between hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant">database</span>
+<p class="font-label-lg text-label-lg text-on-surface">Data Export (JSON/CSV)</p>
+</div>
+<span class="material-symbols-outlined text-outline">download</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 6: Support & Info -->
+<section class="mb-lg">
+<div class="bg-surface-container-low rounded-xl shadow-sm border border-outline-variant/30 overflow-hidden">
+<div class="px-md py-sm border-b border-outline-variant/20">
+<h3 class="font-title-md text-title-md text-primary">Support & Info</h3>
+</div>
+<div class="divide-y divide-outline-variant/10">
+<div class="p-md flex items-center justify-between hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant">help</span>
+<p class="font-label-lg text-label-lg text-on-surface">Help Center & FAQ</p>
+</div>
+<span class="material-symbols-outlined text-outline">open_in_new</span>
+</div>
+<div class="p-md flex items-center justify-between hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant">policy</span>
+<p class="font-label-lg text-label-lg text-on-surface">Privacy Policy</p>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+<div class="p-md flex items-center justify-between hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant">info</span>
+<div class="flex items-center gap-xs">
+<p class="font-label-lg text-label-lg text-on-surface">About Bharat Ledger</p>
+<span class="bg-primary-container text-primary font-label-md text-[10px] px-1 rounded">v2.4.1</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Danger Zone -->
+<div class="mt-xl pt-lg">
+<button class="w-full py-md flex items-center justify-center gap-md bg-error-container text-on-error-container rounded-xl font-title-md hover:bg-error/10 transition-colors border border-error/20 active:scale-[0.98]">
+<span class="material-symbols-outlined">logout</span>
+                Logout from Device
+            </button>
+<p class="text-center mt-md font-label-md text-outline">Managed by BillFast India Technologies Private Limited</p>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-6 bg-surface-container border-t border-outline-variant/20 rounded-t-xl shadow-lg">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1 hover:bg-surface-container-highest transition-all active:scale-90">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1 hover:bg-surface-container-highest transition-all active:scale-90">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-md text-label-md">Invoices</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1 hover:bg-surface-container-highest transition-all active:scale-90">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-md text-label-md">Customers</span>
+</button>
+<!-- Reports is considered the closest match for "Settings" in this specific JSON mapping, or we treat "Profile" logic -->
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-5 py-1 active:scale-90">
+<span class="material-symbols-outlined filled-icon">analytics</span>
+<span class="font-label-md text-label-md">Reports</span>
+</button>
+</nav>
+<script>
+        // Simple micro-interaction for the dark mode toggle
+        const darkToggle = document.getElementById('dark-toggle');
+        darkToggle.addEventListener('change', () => {
+            if (darkToggle.checked) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // Add active states to all list items
+        document.querySelectorAll('section .divide-y > div').forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.add('scale-[0.99]');
+                setTimeout(() => item.classList.remove('scale-[0.99]'), 100);
+            });
+        });
+    </script>
+</body></html>

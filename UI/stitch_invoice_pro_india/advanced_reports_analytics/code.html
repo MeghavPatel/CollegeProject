@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Reports &amp; Analytics | Invoicer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-primary": "#a5c8ff",
+                    "inverse-on-surface": "#ecf1ff",
+                    "secondary": "#006398",
+                    "on-secondary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "secondary-container": "#6cbdfe",
+                    "secondary-fixed-dim": "#94ccff",
+                    "on-error": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed": "#001d32",
+                    "surface-bright": "#f9f9ff",
+                    "on-primary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "surface-variant": "#d8e3fb",
+                    "surface": "#f9f9ff",
+                    "on-secondary-container": "#004b75",
+                    "tertiary-fixed": "#6ffbbe",
+                    "outline-variant": "#c1c6d4",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "primary-fixed-dim": "#a5c8ff",
+                    "on-primary-fixed": "#001c3a",
+                    "on-tertiary-fixed": "#002113",
+                    "surface-dim": "#cfdaf2",
+                    "on-primary-fixed-variant": "#004786",
+                    "background": "#f9f9ff",
+                    "primary": "#005dac",
+                    "surface-container-high": "#dee8ff",
+                    "surface-container": "#e7eeff",
+                    "primary-container": "#1976d2",
+                    "surface-tint": "#005faf",
+                    "tertiary-container": "#00865c",
+                    "on-background": "#111c2d",
+                    "inverse-surface": "#263143",
+                    "tertiary": "#006a48",
+                    "on-secondary-fixed-variant": "#004b74",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "outline": "#717783",
+                    "on-surface-variant": "#414752",
+                    "on-surface": "#111c2d",
+                    "on-primary-container": "#fffdff",
+                    "error-container": "#ffdad6",
+                    "primary-fixed": "#d4e3ff",
+                    "secondary-fixed": "#cde5ff",
+                    "on-tertiary-container": "#fafff9",
+                    "surface-container-highest": "#d8e3fb",
+                    "surface-container-low": "#f0f3ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "sm": "8px",
+                    "md": "16px",
+                    "xl": "32px",
+                    "xs": "4px",
+                    "margin-tablet": "24px",
+                    "margin-mobile": "16px",
+                    "lg": "24px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "title-lg": ["Inter"],
+                    "title-md": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "title-md": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; min-height: 100dvh; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .chart-grid {
+            background-image: linear-gradient(to right, #e7eeff 1px, transparent 1px),
+                              linear-gradient(to bottom, #e7eeff 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .progress-bar-glow {
+            box-shadow: 0 0 8px rgba(0, 93, 172, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- Top AppBar -->
+<header class="bg-surface sticky top-0 z-40 flex items-center justify-between px-margin-mobile h-16 w-full">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold overflow-hidden">
+<img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAn1OejNM6Jci5McYFNDb5HM2YSpag_BTL-fydP0D6zAtgxjuSucrwFSw_tQCsCiDQc6-lHlevVWDJL0uiOLUfRnnA62rS6LxX3ws2XTOlxipty_onSNvlgdqEZaOuN35uSdqowODxIJoG9lNRQSY2LF_lZgKezEeUlot4R6yr3MNNX6RGamE7KyZ3KdJt2Jn1o0zHSE3QMk6lRATNmyPkD7qn3YXmXCu3WDiIrlP75Opxa4-yQ18po"/>
+</div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Invoicer</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors duration-200">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="search">search</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors duration-200">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<main class="px-margin-mobile md:px-margin-tablet pb-32 max-w-7xl mx-auto">
+<!-- Header & Interactive Filters -->
+<div class="py-6 flex flex-col gap-4">
+<div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background">Reports &amp; Analytics</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Business performance at a glance.</p>
+</div>
+<div class="flex flex-wrap items-center gap-3">
+<div class="relative">
+<select class="appearance-none bg-surface-container-high border-none rounded-lg px-4 py-2 pr-10 font-label-lg text-label-lg text-on-surface focus:ring-2 focus:ring-primary">
+<option>Last 30 Days</option>
+<option>Last 7 Days</option>
+<option>This Month</option>
+<option>Custom Range</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+<div class="relative">
+<select class="appearance-none bg-surface-container-high border-none rounded-lg px-4 py-2 pr-10 font-label-lg text-label-lg text-on-surface focus:ring-2 focus:ring-primary">
+<option>All Categories</option>
+<option>Products</option>
+<option>Services</option>
+<option>Digital Goods</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">filter_list</span>
+</div>
+<button class="ml-auto flex items-center gap-2 px-5 py-2 bg-primary text-on-primary rounded-full shadow-md hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="ios_share">ios_share</span>
+<span class="font-label-lg text-label-lg">Export</span>
+</button>
+</div>
+</div>
+<!-- Key Metrics Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-lg">
+<div class="bg-primary-container p-lg rounded-2xl shadow-sm text-on-primary-container flex flex-col">
+<span class="font-label-md text-label-md uppercase opacity-80 mb-1">Total Sales</span>
+<h3 class="font-headline-lg text-headline-lg">₹ 4,82,900</h3>
+<div class="mt-4 flex items-center gap-1 text-on-primary-container bg-white/10 w-fit px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span class="font-label-md">12.5%</span>
+</div>
+</div>
+<div class="bg-tertiary-container p-lg rounded-2xl shadow-sm text-on-tertiary-container flex flex-col">
+<span class="font-label-md text-label-md uppercase opacity-80 mb-1">Net Profit</span>
+<h3 class="font-headline-lg text-headline-lg">₹ 1,24,350</h3>
+<div class="mt-4 flex items-center gap-1 text-on-tertiary-container bg-white/10 w-fit px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span class="font-label-md">8.4%</span>
+</div>
+</div>
+<div class="bg-surface-container-highest p-lg rounded-2xl shadow-sm border border-outline-variant flex flex-col justify-between">
+<div>
+<span class="font-label-md text-label-md text-on-surface-variant uppercase mb-1">Tax Liability</span>
+<h3 class="font-headline-lg text-headline-lg text-on-surface">₹ 86,922</h3>
+</div>
+<div class="mt-4 flex items-center gap-2">
+<span class="px-2 py-1 bg-primary/10 text-primary rounded-md font-label-md">Due: 20th Oct</span>
+</div>
+</div>
+</div>
+<!-- Revenue Trend Chart -->
+<div class="bg-surface-container-lowest p-lg rounded-2xl shadow-sm border border-surface-container mb-lg">
+<div class="flex items-center justify-between mb-lg">
+<div>
+<h4 class="font-title-lg text-title-lg text-on-surface">Revenue Trend</h4>
+<p class="text-label-md text-on-surface-variant">Revenue vs Expenses (Last 6 Months)</p>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-primary"></div>
+<span class="text-label-md">Revenue</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-error"></div>
+<span class="text-label-md">Expenses</span>
+</div>
+</div>
+</div>
+<div class="relative h-64 w-full flex items-end gap-2 pt-6">
+<!-- Y-Axis Mock -->
+<div class="absolute left-0 top-0 bottom-8 flex flex-col justify-between text-label-md text-on-surface-variant pr-2 text-right w-12 border-r border-outline-variant">
+<span>5L</span>
+<span>2.5L</span>
+<span>0</span>
+</div>
+<!-- Chart Area -->
+<div class="ml-14 flex-1 h-full flex items-end justify-between gap-4 relative">
+<!-- Grid Lines -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
+<div class="border-t border-surface-container-high w-full"></div>
+<div class="border-t border-surface-container-high w-full"></div>
+<div class="border-t border-surface-container-high w-full"></div>
+</div>
+<!-- Bars Group -->
+<div class="flex-1 flex flex-col items-center gap-1 group relative">
+<div class="flex items-end gap-1 w-full max-w-[40px]">
+<div class="flex-1 bg-primary rounded-t-sm transition-all hover:opacity-80" style="height: 60%;"></div>
+<div class="flex-1 bg-error/40 rounded-t-sm transition-all" style="height: 40%;"></div>
+</div>
+<span class="text-label-md text-on-surface-variant">Apr</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-1 group relative">
+<div class="flex items-end gap-1 w-full max-w-[40px]">
+<div class="flex-1 bg-primary rounded-t-sm transition-all hover:opacity-80" style="height: 45%;"></div>
+<div class="flex-1 bg-error/40 rounded-t-sm transition-all" style="height: 35%;"></div>
+</div>
+<span class="text-label-md text-on-surface-variant">May</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-1 group relative">
+<div class="flex items-end gap-1 w-full max-w-[40px]">
+<div class="flex-1 bg-primary rounded-t-sm transition-all hover:opacity-80" style="height: 75%;"></div>
+<div class="flex-1 bg-error/40 rounded-t-sm transition-all" style="height: 45%;"></div>
+</div>
+<span class="text-label-md text-on-surface-variant">Jun</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-1 group relative">
+<div class="flex items-end gap-1 w-full max-w-[40px]">
+<div class="flex-1 bg-primary rounded-t-sm transition-all hover:opacity-80" style="height: 90%;"></div>
+<div class="flex-1 bg-error/40 rounded-t-sm transition-all" style="height: 50%;"></div>
+</div>
+<span class="text-label-md text-on-surface-variant">Jul</span>
+<!-- Tooltip Mock -->
+<div class="absolute -top-12 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 shadow-lg">
+                        Rev: ₹4.5L | Exp: ₹2.5L
+                    </div>
+</div>
+<div class="flex-1 flex flex-col items-center gap-1 group relative">
+<div class="flex items-end gap-1 w-full max-w-[40px]">
+<div class="flex-1 bg-primary rounded-t-sm transition-all hover:opacity-80" style="height: 55%;"></div>
+<div class="flex-1 bg-error/40 rounded-t-sm transition-all" style="height: 40%;"></div>
+</div>
+<span class="text-label-md text-on-surface-variant">Aug</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-1 group relative">
+<div class="flex items-end gap-1 w-full max-w-[40px]">
+<div class="flex-1 bg-primary rounded-t-sm transition-all hover:opacity-80" style="height: 100%;"></div>
+<div class="flex-1 bg-error/40 rounded-t-sm transition-all" style="height: 45%;"></div>
+</div>
+<span class="text-label-md font-bold text-primary">Sep</span>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter mb-lg">
+<!-- Sales by Category Breakdown -->
+<div class="bg-surface-container-lowest p-lg rounded-2xl shadow-sm border border-surface-container">
+<h4 class="font-title-lg text-title-lg text-on-surface mb-lg">Sales by Category</h4>
+<div class="flex flex-col sm:flex-row items-center gap-8">
+<div class="relative w-40 h-40 shrink-0">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36">
+<circle class="stroke-surface-container-high" cx="18" cy="18" fill="none" r="16" stroke-width="4"></circle>
+<circle class="stroke-primary" cx="18" cy="18" fill="none" r="16" stroke-dasharray="64, 100" stroke-width="4"></circle>
+<circle class="stroke-secondary-container" cx="18" cy="18" fill="none" r="16" stroke-dasharray="20, 100" stroke-dashoffset="-64" stroke-width="4"></circle>
+<circle class="stroke-tertiary" cx="18" cy="18" fill="none" r="16" stroke-dasharray="10, 100" stroke-dashoffset="-84" stroke-width="4"></circle>
+<circle class="stroke-secondary-fixed-dim" cx="18" cy="18" fill="none" r="16" stroke-dasharray="6, 100" stroke-dashoffset="-94" stroke-width="4"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-title-md text-title-md">₹ 4.8L</span>
+<span class="font-label-md opacity-60">Total</span>
+</div>
+</div>
+<div class="flex-1 space-y-3 w-full">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="text-body-md">Physical Products</span>
+</div>
+<div class="text-right">
+<span class="text-label-lg font-bold">64%</span>
+<p class="text-[10px] text-tertiary">+4% ↑</p>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-secondary-container"></div>
+<span class="text-body-md">Services</span>
+</div>
+<div class="text-right">
+<span class="text-label-lg font-bold">20%</span>
+<p class="text-[10px] text-error">-2% ↓</p>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-tertiary"></div>
+<span class="text-body-md">Digital Goods</span>
+</div>
+<div class="text-right">
+<span class="text-label-lg font-bold">10%</span>
+<p class="text-[10px] text-tertiary">+12% ↑</p>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-secondary-fixed-dim"></div>
+<span class="text-body-md">Subscriptions</span>
+</div>
+<div class="text-right">
+<span class="text-label-lg font-bold">6%</span>
+<p class="text-[10px] text-on-surface-variant">Stable</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Top Selling Products -->
+<div class="bg-surface-container-lowest p-lg rounded-2xl shadow-sm border border-surface-container">
+<h4 class="font-title-lg text-title-lg text-on-surface mb-lg">Top Products</h4>
+<div class="space-y-6">
+<div>
+<div class="flex justify-between mb-1">
+<span class="text-label-lg">Corporate Website Design</span>
+<span class="text-label-lg font-bold">₹ 1,12,000</span>
+</div>
+<div class="h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 85%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-1">
+<span class="text-label-lg">Cloud Storage Subscription</span>
+<span class="text-label-lg font-bold">₹ 82,450</span>
+</div>
+<div class="h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 65%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between mb-1">
+<span class="text-label-lg">SEO Optimization Package</span>
+<span class="text-label-lg font-bold">₹ 45,900</span>
+</div>
+<div class="h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 40%;"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Tax Summary & Filing Section -->
+<div class="bg-surface-container-lowest p-lg rounded-2xl shadow-sm border border-surface-container mb-lg">
+<div class="flex items-center justify-between mb-lg">
+<h4 class="font-title-lg text-title-lg text-on-surface">Tax Summary (GST)</h4>
+<div class="flex items-center gap-2 text-error font-label-md">
+<span class="material-symbols-outlined text-base">timer</span>
+<span>Filing in 8 days</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="p-md rounded-xl bg-surface-container-low border border-outline-variant">
+<p class="text-label-md text-on-surface-variant uppercase mb-2">CGST (9%)</p>
+<p class="text-title-lg font-bold">₹ 28,974.00</p>
+<div class="mt-3 flex items-center justify-between text-xs">
+<span class="text-on-surface-variant">Output tax</span>
+<span class="text-tertiary">Paid</span>
+</div>
+</div>
+<div class="p-md rounded-xl bg-surface-container-low border border-outline-variant">
+<p class="text-label-md text-on-surface-variant uppercase mb-2">SGST (9%)</p>
+<p class="text-title-lg font-bold">₹ 28,974.00</p>
+<div class="mt-3 flex items-center justify-between text-xs">
+<span class="text-on-surface-variant">Output tax</span>
+<span class="text-tertiary">Paid</span>
+</div>
+</div>
+<div class="p-md rounded-xl bg-surface-container-low border border-outline-variant">
+<p class="text-label-md text-on-surface-variant uppercase mb-2">IGST (18%)</p>
+<p class="text-title-lg font-bold">₹ 28,974.00</p>
+<div class="mt-3 flex items-center justify-between text-xs">
+<span class="text-on-surface-variant">Output tax</span>
+<span class="text-error">Pending</span>
+</div>
+</div>
+</div>
+<div class="mt-lg pt-lg border-t border-surface-container-high flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div>
+<p class="text-label-md text-on-surface-variant">Total GST Payable for Q3</p>
+<p class="text-headline-md text-primary">₹ 86,922.00</p>
+</div>
+<button class="px-8 py-3 bg-secondary text-on-secondary rounded-xl font-label-lg shadow-sm hover:opacity-90">
+                Generate GST-3B Report
+            </button>
+</div>
+</div>
+<!-- Outstanding & Reminders -->
+<div class="bg-surface-container-lowest p-lg rounded-2xl shadow-sm border border-surface-container">
+<div class="flex items-center justify-between mb-md">
+<h4 class="font-title-lg text-title-lg text-on-surface">Outstanding Balances</h4>
+<span class="px-3 py-1 bg-error-container text-on-error-container rounded-full font-label-md">14 Overdue</span>
+</div>
+<div class="flex flex-col md:flex-row gap-8 items-center">
+<div class="text-center md:text-left flex-1">
+<h5 class="font-headline-lg text-headline-lg text-error">₹ 1,12,040</h5>
+<p class="text-body-md text-on-surface-variant mt-1">Collect payments from regular clients.</p>
+<div class="mt-6 flex flex-col gap-3">
+<div class="flex justify-between text-label-md">
+<span class="text-error">Overdue (&gt;30 days)</span>
+<span class="font-bold">₹ 72,000</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full">
+<div class="bg-error h-full rounded-full" style="width: 65%;"></div>
+</div>
+</div>
+</div>
+<div class="w-full md:w-auto shrink-0 flex flex-col gap-3">
+<button class="w-full md:w-64 py-3 bg-primary text-on-primary rounded-xl font-label-lg transition-transform active:scale-95">
+                    Send All Reminders
+                </button>
+<button class="w-full md:w-64 py-3 border border-outline text-on-surface rounded-xl font-label-lg hover:bg-surface-container transition-colors">
+                    View Aging Report
+                </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Shell -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center pt-2 pb-safe px-2 bg-surface-container dark:bg-surface-container-lowest shadow-lg rounded-t-xl">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1 transition-all duration-300 ease-in-out scale-95 active:scale-90">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1 transition-all duration-300 ease-in-out scale-95 active:scale-90">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-md text-label-md">Invoices</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1 transition-all duration-300 ease-in-out scale-95 active:scale-90">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Customers</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1 transition-all duration-300 ease-in-out scale-95 active:scale-90">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-md text-label-md">Products</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-5 py-1 transition-all duration-300 ease-in-out scale-95 active:scale-90">
+<span class="material-symbols-outlined" data-icon="menu" style="font-variation-settings: 'FILL' 1;">menu</span>
+<span class="font-label-md text-label-md">More</span>
+</button>
+</nav>
+<script>
+    // Simple entry animation for chart elements
+    document.addEventListener('DOMContentLoaded', () => {
+        const bars = document.querySelectorAll('.bg-primary, .bg-error\\/40, .h-full');
+        bars.forEach((bar, index) => {
+            const finalH = bar.style.height || bar.style.width;
+            if (bar.style.height) bar.style.height = '0';
+            if (bar.style.width) bar.style.width = '0';
+            
+            setTimeout(() => {
+                if (bar.style.height !== undefined) bar.style.height = finalH;
+                if (bar.style.width !== undefined) bar.style.width = finalH;
+            }, 100 + (index * 20));
+        });
+    });
+</script>
+</body></html>

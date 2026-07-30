@@ -1,0 +1,336 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Create New Invoice | Invoicer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#fffdff",
+                        "secondary-container": "#6cbdfe",
+                        "primary-fixed": "#d4e3ff",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "tertiary": "#006a48",
+                        "surface-container-highest": "#d8e3fb",
+                        "secondary": "#006398",
+                        "background": "#f9f9ff",
+                        "on-tertiary-container": "#fafff9",
+                        "on-tertiary-fixed": "#002113",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#cde5ff",
+                        "inverse-surface": "#263143",
+                        "surface": "#f9f9ff",
+                        "on-primary-fixed": "#001c3a",
+                        "outline-variant": "#c1c6d4",
+                        "inverse-primary": "#a5c8ff",
+                        "on-secondary-fixed-variant": "#004b74",
+                        "surface-tint": "#005faf",
+                        "on-background": "#111c2d",
+                        "surface-bright": "#f9f9ff",
+                        "error": "#ba1a1a",
+                        "surface-container": "#e7eeff",
+                        "primary-fixed-dim": "#a5c8ff",
+                        "on-surface": "#111c2d",
+                        "surface-variant": "#d8e3fb",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#1976d2",
+                        "on-surface-variant": "#414752",
+                        "secondary-fixed-dim": "#94ccff",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f0f3ff",
+                        "inverse-on-surface": "#ecf1ff",
+                        "on-primary": "#ffffff",
+                        "primary": "#005dac",
+                        "outline": "#717783",
+                        "on-error-container": "#93000a",
+                        "on-secondary-container": "#004b75",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#dee8ff",
+                        "surface-dim": "#cfdaf2",
+                        "tertiary-container": "#00865c",
+                        "on-primary-fixed-variant": "#004786",
+                        "on-secondary-fixed": "#001d32",
+                        "tertiary-fixed": "#6ffbbe"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "xl": "32px",
+                        "margin-tablet": "24px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "lg": "24px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "title-lg": ["Inter"],
+                        "label-lg": ["Inter"],
+                        "title-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "500"}],
+                        "title-md": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f9ff; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .outlined-input-group:focus-within label { color: #005dac; transform: translateY(-1.5rem) scale(0.85); background: #ffffff; padding: 0 4px; }
+        .outlined-input-group label { transition: all 0.2s ease-out; pointer-events: none; }
+        .input-filled label { transform: translateY(-1.5rem) scale(0.85); background: #ffffff; padding: 0 4px; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen pb-24">
+<!-- Top App Bar -->
+<header class="bg-surface sticky top-0 z-40 flex items-center justify-between px-margin-mobile h-16 w-full shadow-sm transition-colors duration-200">
+<div class="flex items-center gap-4">
+<button aria-label="Go back" class="p-2 rounded-full hover:bg-surface-container-low transition-colors duration-200">
+<span class="material-symbols-outlined text-on-surface-variant">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">New Invoice</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-full hover:bg-surface-container-low transition-colors duration-200">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A clean, professional corporate headshot of a business executive in a well-lit modern office. The image has a high-end light-mode aesthetic with soft shadows and a blue and white color palette to match the financial software theme. The lighting is flattering and bright, emphasizing a reliable and efficient professional identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRf2aa0SsXKKM2-iUBwaLNVT08Xi2JDFm41475vGXK7QQd7nB9C43zXYZpYoW44mXco6UJf46KQEXFWHR06VDLEV2rG3Qdoob8N_7m9KjlR1dPQS50apDwKAkityUDAoBF0BwrNuI9SFPBfLicfK-4s7GQ_ZfP8Q0HzQvMYKL2bgN7oJfgaPu1uZV-F7OahUccimfVdn3adN6TdJUlRH1aFEfmn-T9kMf6_DhechUQzZCYBrywzjqF">
+</div>
+</div>
+</header>
+<main class="max-w-4xl mx-auto px-margin-mobile py-lg space-y-lg">
+<!-- Customer & Date Section -->
+<section class="bg-surface-container-lowest rounded-xl p-md shadow-[0px_1px_3px_rgba(30,41,59,0.12)] space-y-md">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Customer Autocomplete -->
+<div class="relative outlined-input-group">
+<label class="absolute left-3 top-3 text-on-surface-variant font-label-lg transition-all duration-200">Customer Name</label>
+<input class="w-full h-12 border border-outline rounded-lg px-3 pt-2 text-body-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-transparent" oninput="this.parentElement.classList.add('input-filled')" placeholder="Type name or GSTIN..." type="text">
+<div class="absolute right-3 top-3">
+<span class="material-symbols-outlined text-on-surface-variant">person_search</span>
+</div>
+</div>
+<!-- Dates Grid -->
+<div class="grid grid-cols-2 gap-md">
+<div class="relative outlined-input-group input-filled">
+<label class="absolute left-3 top-3 text-on-surface-variant font-label-lg">Invoice Date</label>
+<input class="w-full h-12 border border-outline rounded-lg px-3 pt-2 text-body-lg focus:outline-none focus:border-primary bg-transparent" type="date" value="2023-10-24">
+</div>
+<div class="relative outlined-input-group input-filled">
+<label class="absolute left-3 top-3 text-on-surface-variant font-label-lg">Due Date</label>
+<input class="w-full h-12 border border-outline rounded-lg px-3 pt-2 text-body-lg focus:outline-none focus:border-primary bg-transparent" type="date" value="2023-11-08">
+</div>
+</div>
+</div>
+</section>
+<!-- Items Section -->
+<section class="bg-surface-container-lowest rounded-xl p-md shadow-[0px_1px_3px_rgba(30,41,59,0.12)] space-y-md">
+<div class="flex items-center justify-between">
+<h2 class="font-title-lg text-title-lg text-primary">Line Items</h2>
+<div class="flex gap-2">
+<span class="bg-tertiary-container/15 text-on-tertiary-fixed-variant px-3 py-1 rounded-full text-label-md font-label-md flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">check_circle</span> GST Registered
+                    </span>
+</div>
+</div>
+<div class="space-y-4" id="items-container">
+<!-- Item Header (Desktop) -->
+<div class="hidden md:grid grid-cols-12 gap-2 text-label-md font-label-md text-on-surface-variant px-2">
+<div class="col-span-5">Product/Service Description</div>
+<div class="col-span-2">Quantity</div>
+<div class="col-span-2">Rate (₹)</div>
+<div class="col-span-2">Amount (₹)</div>
+<div class="col-span-1"></div>
+</div>
+<!-- Item Row -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-2 p-3 bg-surface-container-low md:bg-transparent rounded-lg border border-outline-variant md:border-0 relative">
+<div class="md:col-span-5 space-y-1">
+<input class="w-full h-10 border-b border-outline-variant md:border md:rounded-lg px-2 text-body-md focus:outline-none focus:border-primary bg-transparent pr-10" placeholder="Enter product name..." type="text"><button class="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-surface-container-low text-on-surface-variant active:opacity-80 transition-all" aria-label="Scan Barcode">
+  <span class="material-symbols-outlined text-[20px]">barcode_scanner</span>
+</button>
+</div>
+<div class="grid grid-cols-3 md:contents gap-2">
+<div class="md:col-span-2">
+<input class="w-full h-10 border-b border-outline-variant md:border md:rounded-lg px-2 text-body-md focus:outline-none focus:border-primary bg-transparent" placeholder="Qty" type="number" value="1">
+</div>
+<div class="md:col-span-2">
+<input class="w-full h-10 border-b border-outline-variant md:border md:rounded-lg px-2 text-body-md focus:outline-none focus:border-primary bg-transparent" placeholder="Rate" type="number" value="1200.00">
+</div>
+<div class="md:col-span-2 flex items-center justify-end font-title-md text-primary">
+                            ₹ 1,200.00
+                        </div>
+</div>
+<div class="md:col-span-1 flex items-center justify-end">
+<button class="p-1 text-error hover:bg-error-container/20 rounded-full transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+<button class="w-full py-3 flex items-center justify-center gap-2 border-2 border-dashed border-primary/30 rounded-xl text-primary font-label-lg hover:bg-primary/5 transition-all" onclick="addItem()">
+<span class="material-symbols-outlined">add_circle</span> Add Another Item
+            </button>
+</section>
+<!-- Summary & Totals -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- GST & Calculations -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-[0px_1px_3px_rgba(30,41,59,0.12)] space-y-4">
+<h3 class="font-title-md text-title-md text-on-surface">GST Settings</h3>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-2 rounded-full border border-primary bg-primary text-on-primary text-label-md font-label-md">18% (Standard)</button>
+<button class="px-4 py-2 rounded-full border border-outline text-on-surface-variant text-label-md font-label-md hover:bg-surface-container">12%</button>
+<button class="px-4 py-2 rounded-full border border-outline text-on-surface-variant text-label-md font-label-md hover:bg-surface-container">5%</button>
+<button class="px-4 py-2 rounded-full border border-outline text-on-surface-variant text-label-md font-label-md hover:bg-surface-container">0% (Exempt)</button>
+</div>
+<div class="pt-4 border-t border-outline-variant space-y-2">
+<div class="flex justify-between text-body-md">
+<span class="text-on-surface-variant">Subtotal</span>
+<span class="">₹ 1,200.00</span>
+</div>
+<div class="flex justify-between text-body-md">
+<span class="text-on-surface-variant">CGST (9%)</span>
+<span class="">₹ 108.00</span>
+</div>
+<div class="flex justify-between text-body-md">
+<span class="text-on-surface-variant">SGST (9%)</span>
+<span class="">₹ 108.00</span>
+</div>
+<div class="flex justify-between font-headline-md text-headline-md text-primary pt-2">
+<span class="">Total</span>
+<span class="">₹ 1,416.00</span>
+</div>
+</div>
+</div>
+<!-- Additional Details & QR -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-[0px_1px_3px_rgba(30,41,59,0.12)] space-y-4">
+<div class="flex items-center gap-3 p-3 bg-secondary-container/10 rounded-xl border border-secondary/20">
+<div class="w-12 h-12 bg-white rounded-lg p-1">
+<img class="w-full h-full object-contain" data-alt="A clean, minimalist QR code graphic with a small blue central logo representing a business identity. The QR code is presented in a high-resolution, sharp digital format against a white background, symbolizing fast UPI digital payments in the modern Indian financial landscape." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqF69o0ylmxq1kvLoWlaqQYEOQnS7za-hFkuA2ZI5SyH2SUtIjT0ZoxkrNzYekPbnBv82eomNinQMwPDCfWtVJbkxWAuoXXJct65MObS1kdOFiX-h41uXFor0r9OzoUVwRllZAdg5hVXpF-mQCjO6uPESwObVLH4TzhC59VGaJ7khHcvYAbxK5MFEWdzjSGo7idN5qb_J-CkGTynS2jfmJrRhO_2AVyXvzvZpgE-xRuGPlbvfD97F1">
+</div>
+<div>
+<p class="font-label-lg text-secondary">Pay via UPI</p>
+<p class="text-xs text-on-surface-variant">Scan to pay ₹ 1,416.00 instantly</p>
+</div>
+</div>
+<div class="relative outlined-input-group">
+<label class="absolute left-3 top-3 text-on-surface-variant font-label-lg">Notes / Terms</label>
+<textarea class="w-full border border-outline rounded-lg px-3 pt-2 text-body-md focus:outline-none focus:border-primary bg-transparent" placeholder="Payment within 15 days..." rows="3"></textarea>
+</div>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="flex flex-col md:flex-row gap-4 pt-lg">
+<button class="flex-1 h-14 rounded-full border border-primary text-primary font-title-md flex items-center justify-center gap-2 hover:bg-primary/5 transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined">description</span> Preview PDF
+            </button>
+<button class="flex-1 h-14 rounded-full border border-outline text-on-surface-variant font-title-md flex items-center justify-center gap-2 hover:bg-surface-container transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined">draft</span> Save as Draft
+            </button>
+<button class="flex-[1.5] h-14 rounded-full bg-primary text-on-primary font-title-md flex items-center justify-center gap-2 hover:shadow-lg transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span> Finalize &amp; Send
+            </button>
+</div>
+</main>
+<!-- Floating Action Button (FAB) - For quick access -->
+<button class="fixed bottom-24 right-margin-mobile w-14 h-14 bg-primary-container text-on-primary-container rounded-2xl shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 md:hidden z-30">
+<span class="material-symbols-outlined">add</span>
+</button>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center pt-2 pb-safe px-2 bg-surface-container shadow-lg rounded-t-xl md:hidden">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1 transition-all duration-300 scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-5 py-1 transition-all duration-300 scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
+<span class="font-label-md text-label-md">Invoices</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1 transition-all duration-300 scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">Customers</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1 transition-all duration-300 scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">menu</span>
+<span class="font-label-md text-label-md">More</span>
+</a>
+</nav>
+<script>
+        function addItem() {
+            const container = document.getElementById('items-container');
+            const newRow = document.createElement('div');
+            newRow.className = 'grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-2 p-3 bg-surface-container-low md:bg-transparent rounded-lg border border-outline-variant md:border-0 relative opacity-0 translate-y-4 transition-all duration-300';
+            newRow.innerHTML = `
+                <div class="md:col-span-5 space-y-1">
+                    <input type="text" placeholder="Enter product name..." class="w-full h-10 border-b border-outline-variant md:border md:rounded-lg px-2 text-body-md focus:outline-none focus:border-primary bg-transparent">
+                </div>
+                <div class="grid grid-cols-3 md:contents gap-2">
+                    <div class="md:col-span-2">
+                        <input type="number" placeholder="Qty" value="1" class="w-full h-10 border-b border-outline-variant md:border md:rounded-lg px-2 text-body-md focus:outline-none focus:border-primary bg-transparent">
+                    </div>
+                    <div class="md:col-span-2">
+                        <input type="number" placeholder="Rate" value="0.00" class="w-full h-10 border-b border-outline-variant md:border md:rounded-lg px-2 text-body-md focus:outline-none focus:border-primary bg-transparent">
+                    </div>
+                    <div class="md:col-span-2 flex items-center justify-end font-title-md text-primary">
+                        ₹ 0.00
+                    </div>
+                </div>
+                <div class="md:col-span-1 flex items-center justify-end">
+                    <button onclick="this.closest('.grid').remove()" class="p-1 text-error hover:bg-error-container/20 rounded-full transition-colors">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                </div>
+            `;
+            container.appendChild(newRow);
+            setTimeout(() => {
+                newRow.classList.remove('opacity-0', 'translate-y-4');
+            }, 10);
+        }
+
+        // Initialize autocomplete interaction simulation
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('input-filled');
+            });
+            input.addEventListener('blur', () => {
+                if(input.value === '') {
+                    input.parentElement.classList.remove('input-filled');
+                }
+            });
+        });
+    </script>
+
+
+</body></html>

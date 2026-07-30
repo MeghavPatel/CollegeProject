@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bharat Ledger - Professional Onboarding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#fffdff",
+                        "secondary-container": "#6cbdfe",
+                        "primary-fixed": "#d4e3ff",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "tertiary": "#006a48",
+                        "surface-container-highest": "#d8e3fb",
+                        "secondary": "#006398",
+                        "background": "#f9f9ff",
+                        "on-tertiary-container": "#fafff9",
+                        "on-tertiary-fixed": "#002113",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#cde5ff",
+                        "inverse-surface": "#263143",
+                        "surface": "#f9f9ff",
+                        "on-primary-fixed": "#001c3a",
+                        "outline-variant": "#c1c6d4",
+                        "inverse-primary": "#a5c8ff",
+                        "on-secondary-fixed-variant": "#004b74",
+                        "surface-tint": "#005faf",
+                        "on-background": "#111c2d",
+                        "surface-bright": "#f9f9ff",
+                        "error": "#ba1a1a",
+                        "surface-container": "#e7eeff",
+                        "primary-fixed-dim": "#a5c8ff",
+                        "on-surface": "#111c2d",
+                        "surface-variant": "#d8e3fb",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#1976d2",
+                        "on-surface-variant": "#414752",
+                        "secondary-fixed-dim": "#94ccff",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f0f3ff",
+                        "inverse-on-surface": "#ecf1ff",
+                        "on-primary": "#ffffff",
+                        "primary": "#005dac",
+                        "outline": "#717783",
+                        "on-error-container": "#93000a",
+                        "on-secondary-container": "#004b75",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#dee8ff",
+                        "surface-dim": "#cfdaf2",
+                        "tertiary-container": "#00865c",
+                        "on-primary-fixed-variant": "#004786",
+                        "on-secondary-fixed": "#001d32",
+                        "tertiary-fixed": "#6ffbbe"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "xl": "32px",
+                        "margin-tablet": "24px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "lg": "24px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "title-lg": ["Inter"],
+                        "label-lg": ["Inter"],
+                        "title-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "title-lg": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "500"}],
+                        "title-md": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bento-glow {
+            background: radial-gradient(circle at 50% 50%, rgba(108, 189, 254, 0.15) 0%, transparent 70%);
+        }
+        .invoice-card-shadow {
+            box-shadow: 0px 10px 15px -3px rgba(30, 41, 59, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col items-center overflow-x-hidden">
+<!-- Top App Bar (Simplified for Onboarding) -->
+<header class="w-full flex items-center justify-between px-margin-mobile h-16 bg-surface z-50">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+</div>
+<span class="font-headline-md text-headline-md font-bold text-primary">Invoicer</span>
+</div>
+<button class="text-primary font-label-lg px-4 py-2 hover:bg-surface-container-low rounded-full transition-colors">
+            Support
+        </button>
+</header>
+<main class="flex-1 w-full max-w-screen-xl px-margin-mobile md:px-margin-tablet lg:px-xl py-lg flex flex-col md:flex-row items-center justify-center gap-12 lg:gap-24">
+<!-- Left Column: Visuals/Illustration (Bento Style) -->
+<div class="relative w-full md:w-1/2 flex items-center justify-center">
+<div class="absolute inset-0 bento-glow pointer-events-none"></div>
+<div class="relative z-10 w-full max-w-[420px] aspect-[4/5] bg-surface-container-lowest border border-outline-variant rounded-xl invoice-card-shadow p-md transform rotate-2 hover:rotate-0 transition-transform duration-500">
+<!-- Mock Invoice Header -->
+<div class="flex justify-between items-start mb-lg">
+<div class="space-y-1">
+<div class="h-4 w-24 bg-surface-container-highest rounded"></div>
+<div class="h-3 w-16 bg-surface-container-low rounded"></div>
+</div>
+<div class="h-10 w-10 rounded-full bg-primary-container"></div>
+</div>
+<!-- Mock Invoice Body -->
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<div class="h-5 w-32 bg-on-surface-variant/20 rounded"></div>
+<div class="h-5 w-12 bg-on-surface-variant/20 rounded"></div>
+</div>
+<div class="border-t border-outline-variant pt-4 space-y-3">
+<div class="flex justify-between">
+<div class="h-3 w-40 bg-surface-container-high rounded"></div>
+<div class="h-3 w-10 bg-surface-container-high rounded"></div>
+</div>
+<div class="flex justify-between">
+<div class="h-3 w-32 bg-surface-container-high rounded"></div>
+<div class="h-3 w-10 bg-surface-container-high rounded"></div>
+</div>
+<div class="flex justify-between">
+<div class="h-3 w-36 bg-surface-container-high rounded"></div>
+<div class="h-3 w-10 bg-surface-container-high rounded"></div>
+</div>
+</div>
+</div>
+<!-- GST & Total Mockup -->
+<div class="mt-xl pt-lg border-t-2 border-dashed border-outline-variant space-y-2">
+<div class="flex justify-between">
+<span class="font-label-md text-on-surface-variant">CGST (9%)</span>
+<span class="font-label-md text-on-surface">₹ 810.00</span>
+</div>
+<div class="flex justify-between">
+<span class="font-label-md text-on-surface-variant">SGST (9%)</span>
+<span class="font-label-md text-on-surface">₹ 810.00</span>
+</div>
+<div class="flex justify-between items-center pt-2">
+<span class="font-title-md text-on-surface">Total Amount</span>
+<span class="font-title-lg text-primary">₹ 10,620.00</span>
+</div>
+</div>
+<!-- UPI QR Badge (Floating) -->
+<div class="absolute -bottom-6 -right-6 w-32 h-32 bg-surface-container-lowest p-2 rounded-xl shadow-lg border border-outline-variant transform -rotate-6">
+<img class="w-full h-full object-cover rounded-lg" data-alt="A clean, minimalist high-contrast QR code for a digital payment portal, displayed as a sharp vector graphic on a white card. The surrounding aesthetic is corporate and modern, featuring soft blue secondary tones and professional typography in an Indian fintech context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1yebIq3sE8qo3ufHaZkSSNIEBSKCit3bzLM0Ug1eyyRPFuE8Bq5ZNOGRu7C36JPrLjMnlBnZPZGvUTRAd0EPXLwDwYjl7CmlkjjU8zfq4AGOUBJHE5r_fLDWba7ZRStHCThkVa9pf8gDGf4FJgVaZUNEikfNb6pQIphq6HM40jnM-UoPGc-cGeBnBAnMXzz4Op7wWZsqnU9_xTkf7WxlvPSvhuVFECIAhmidDYZpDtyAXbhm-emSt"/>
+<div class="absolute -top-3 -left-3 bg-tertiary text-on-tertiary text-[10px] px-2 py-1 rounded-full font-bold">SCAN TO PAY</div>
+</div>
+</div>
+<!-- Decorative Elements -->
+<div class="absolute -top-10 -left-10 w-24 h-24 bg-secondary-container/20 rounded-full blur-3xl"></div>
+<div class="absolute bottom-20 right-0 w-32 h-32 bg-primary-container/10 rounded-full blur-3xl"></div>
+</div>
+<!-- Right Column: Content & Call to Action -->
+<div class="w-full md:w-1/2 flex flex-col text-center md:text-left">
+<div class="space-y-4 mb-lg">
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface leading-tight">
+                    Professional Invoices <br class="hidden lg:block"/> <span class="text-primary">in Seconds</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-md mx-auto md:mx-0">
+                    Manage GST, Payments &amp; Inventory with India's most trusted digital ledger. Scale your business effortlessly.
+                </p>
+</div>
+<!-- Benefit Chips -->
+<div class="flex flex-wrap justify-center md:justify-start gap-2 mb-xl">
+<div class="flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-high rounded-full border border-outline-variant">
+<span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+<span class="font-label-md text-on-surface">GST Compliant</span>
+</div>
+<div class="flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-high rounded-full border border-outline-variant">
+<span class="material-symbols-outlined text-tertiary text-[18px]">bolt</span>
+<span class="font-label-md text-on-surface">Instant UPI</span>
+</div>
+<div class="flex items-center gap-1.5 px-3 py-1.5 bg-surface-container-high rounded-full border border-outline-variant">
+<span class="material-symbols-outlined text-secondary text-[18px]">inventory</span>
+<span class="font-label-md text-on-surface">Live Stock Tracking</span>
+</div>
+</div>
+<!-- Onboarding Actions -->
+<div class="space-y-4 w-full max-w-md mx-auto md:mx-0">
+<button class="w-full bg-primary text-on-primary font-title-md py-4 rounded-xl shadow-lg hover:bg-primary-container transition-all active:scale-95 flex items-center justify-center gap-2 group">
+                    Get Started
+                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<div class="relative py-4 flex items-center justify-center">
+<div class="flex-grow border-t border-outline-variant"></div>
+<span class="flex-shrink mx-4 font-label-md text-on-surface-variant">OR CONTINUE WITH</span>
+<div class="flex-grow border-t border-outline-variant"></div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<button class="flex items-center justify-center gap-3 border border-outline-variant py-3 rounded-xl hover:bg-surface-container-low transition-colors font-label-lg text-on-surface">
+<svg class="w-5 h-5" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+                        Google
+                    </button>
+<button class="flex items-center justify-center gap-3 border border-outline-variant py-3 rounded-xl hover:bg-surface-container-low transition-colors font-label-lg text-on-surface">
+<span class="material-symbols-outlined text-on-surface-variant">phone_iphone</span>
+                        Phone
+                    </button>
+</div>
+<button class="w-full text-center font-label-lg text-on-surface-variant hover:text-primary transition-colors py-2">
+                    Already have an account? <span class="text-primary font-bold">Log In</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Footer Trust Badges -->
+<footer class="w-full bg-surface-container-low py-8 mt-lg">
+<div class="max-w-screen-xl mx-auto px-margin-mobile flex flex-col md:flex-row items-center justify-between gap-6 opacity-60">
+<p class="font-label-md text-on-surface-variant text-center md:text-left">
+                Trusted by 10,000+ Small Businesses across India. Securely encrypted.
+            </p>
+<div class="flex gap-8 items-center">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">security</span>
+<span class="font-label-md uppercase tracking-widest font-bold">256-bit SSL</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">verified_user</span>
+<span class="font-label-md uppercase tracking-widest font-bold">ISO Certified</span>
+</div>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interaction for the invoice card
+        document.addEventListener('mousemove', (e) => {
+            const card = document.querySelector('.invoice-card-shadow');
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            if (x > 0 && x < rect.width && y > 0 && y < rect.height) {
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const deltaX = (x - centerX) / 15;
+                const deltaY = (y - centerY) / 15;
+                
+                card.style.transform = `perspective(1000px) rotateX(${-deltaY}deg) rotateY(${deltaX}deg) scale3d(1.02, 1.02, 1.02)`;
+            } else {
+                card.style.transform = `rotate(2deg)`;
+            }
+        });
+
+        // Toggle Dark Mode (Optional if needed by user, default is Light as per guidance)
+        const toggleTheme = () => {
+            document.documentElement.classList.toggle('dark');
+        };
+    </script>
+</body></html>
