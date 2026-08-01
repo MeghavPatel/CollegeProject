@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Employee Directory - InvTrack Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Plus+Jakarta+Sans:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .row-hover:hover {
+            background: rgba(37, 99, 235, 0.04);
+            transform: translateY(-1px);
+            transition: all 0.2s ease;
+        }
+        body {
+            background-color: #f8f9fa;
+            color: #191c1d;
+            font-family: 'Inter', sans-serif;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface": "#f8f9fa",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "surface-variant": "#e1e3e4",
+                      "on-secondary-fixed-variant": "#38485d",
+                      "surface-bright": "#f8f9fa",
+                      "outline-variant": "#c3c6d7",
+                      "surface-container-highest": "#e1e3e4",
+                      "surface-dim": "#d9dadb",
+                      "on-secondary": "#ffffff",
+                      "secondary": "#505f76",
+                      "on-error-container": "#93000a",
+                      "secondary-container": "#d0e1fb",
+                      "primary-container": "#2563eb",
+                      "on-surface-variant": "#434655",
+                      "primary": "#004ac6",
+                      "on-surface": "#191c1d",
+                      "on-error": "#ffffff",
+                      "inverse-primary": "#b4c5ff",
+                      "primary-fixed-dim": "#b4c5ff",
+                      "tertiary-fixed": "#6ffbbe",
+                      "secondary-fixed-dim": "#b7c8e1",
+                      "on-primary-container": "#eeefff",
+                      "on-tertiary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "tertiary": "#006242",
+                      "error": "#ba1a1a",
+                      "tertiary-fixed-dim": "#4edea3",
+                      "surface-container-high": "#e7e8e9",
+                      "secondary-fixed": "#d3e4fe",
+                      "on-secondary-fixed": "#0b1c30",
+                      "on-primary-fixed": "#00174b",
+                      "on-background": "#191c1d",
+                      "tertiary-container": "#007d55",
+                      "background": "#f8f9fa",
+                      "on-tertiary-fixed-variant": "#005236",
+                      "surface-tint": "#0053db",
+                      "primary-fixed": "#dbe1ff",
+                      "surface-container-low": "#f3f4f5",
+                      "outline": "#737686",
+                      "on-tertiary-container": "#bdffdb",
+                      "surface-container": "#edeeef",
+                      "on-secondary-container": "#54647a",
+                      "inverse-surface": "#2e3132",
+                      "on-tertiary-fixed": "#002113",
+                      "on-primary-fixed-variant": "#003ea8",
+                      "inverse-on-surface": "#f0f1f2"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sm": "8px",
+                      "md": "16px",
+                      "xl": "40px",
+                      "gutter": "24px",
+                      "base": "4px",
+                      "container-max": "1440px",
+                      "xs": "4px",
+                      "lg": "24px"
+              },
+              "fontFamily": {
+                      "body-md": ["Inter"],
+                      "label-md": ["Inter"],
+                      "headline-md": ["Plus Jakarta Sans"],
+                      "headline-xl": ["Plus Jakarta Sans"],
+                      "body-sm": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "mono-md": ["JetBrains Mono"],
+                      "headline-lg": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-md": ["13px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "mono-md": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface overflow-x-hidden pb-24">
+<!-- TopAppBar Injection -->
+<header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl docked full-width top-0 sticky shadow-sm z-40 flex justify-between items-center w-full px-md h-16">
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-primary hover:bg-primary-container/10 transition-colors p-2 rounded-full" data-icon="menu">menu</button>
+<h1 class="font-headline-lg text-headline-lg font-bold text-primary dark:text-primary-fixed">InvTrack Pro</h1>
+</div>
+<div class="flex items-center">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden border border-outline-variant/30">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a high-growth enterprise administrator with a clean, minimalist background. The lighting is bright and modern, matching the light-mode UI aesthetic of InvTrack Pro. The subject is wearing business casual attire in shades of deep blue and neutral grey, reflecting a precise and authoritative corporate personality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCximlc-NSLHpIn5bKDFhplknq9qUb6fcf_4GIHycKFqM4UNU6G4XRLSvlhRPeUIw0Ke2TWNIRC4_aTUhIuCkD8FdpsRvUnUIzX7GZYSqNizeOUXpdnuZc9ZeCBVDoPudumEnZQp57K686IIC9wGYjO9vCMHp5yJDVv2rqzz6jMz8dWyijyaCf_tYWBC2wrWxm55kpTVuKg0bW1qZL136_J8J1Zfido_M2F9YiUHYRMkT1URl9ssChCnw"/>
+</div>
+</div>
+</header>
+<main class="px-md pt-6 max-w-lg mx-auto">
+<!-- Search & Filter Section -->
+<div class="space-y-4 mb-8">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-12 pr-4 py-4 rounded-xl border-none glass-card focus:ring-2 focus:ring-primary shadow-sm text-body-lg font-body-lg placeholder:text-outline-variant" placeholder="Search staff members..." type="text"/>
+</div>
+<div class="flex gap-sm overflow-x-auto hide-scrollbar pb-2">
+<button class="px-6 py-2 rounded-full bg-primary text-on-primary font-label-md text-label-md whitespace-nowrap shadow-md">All Staff</button>
+<button class="px-6 py-2 rounded-full glass-card text-on-surface-variant font-label-md text-label-md whitespace-nowrap hover:bg-primary-container/10 transition-colors">Warehouse</button>
+<button class="px-6 py-2 rounded-full glass-card text-on-surface-variant font-label-md text-label-md whitespace-nowrap hover:bg-primary-container/10 transition-colors">Sales</button>
+<button class="px-6 py-2 rounded-full glass-card text-on-surface-variant font-label-md text-label-md whitespace-nowrap hover:bg-primary-container/10 transition-colors">Admin</button>
+</div>
+</div>
+<!-- Employee List -->
+<div class="space-y-3">
+<h2 class="font-headline-md text-headline-md text-on-surface px-1 mb-2">Team Directory</h2>
+<!-- Employee Card 1 -->
+<div class="glass-card rounded-xl p-4 flex flex-col gap-4 row-hover">
+<div class="flex items-center gap-4">
+<div class="relative">
+<div class="w-14 h-14 rounded-full overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A studio portrait of a warehouse supervisor in a modern logistic facility environment. The background is soft-focused with subtle industrial elements and warm, even lighting. The overall style is clean and professional, using a sophisticated color palette of white, light grey, and primary blue accents to align with the InvTrack Pro brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsmAc5P3nwDstcHEExpjlfHdSbTzjbYiJJOLTUC49csJICiHtQsmwav_pqOy22ckW06foOcb-2k2Uv2rE2pBBBrgWwAQvbU6pN5lxHpNf4q5aFwGauhlEpMCHCTbHHSqv7Q_pALrMN1EFmAJ6g-FMjPyCEg2pOk517czR3JtqW-6bf_4Pl1rhW-hsVWaq_6YmiY9Tih5RZM3KlV_PRUNCBCMJDKsegxv4wxlAmFTBzVDkxISPQI3VtfQ"/>
+</div>
+<span class="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-tertiary border-2 border-surface-container-lowest" title="Active"></span>
+</div>
+<div class="flex-1">
+<h3 class="font-headline-md text-headline-md text-on-surface leading-tight">Marcus Thorne</h3>
+<p class="text-body-sm font-body-sm text-outline uppercase tracking-wider">Warehouse Manager</p>
+</div>
+<div class="flex flex-col items-end">
+<span class="px-2 py-1 rounded bg-tertiary-container/10 text-tertiary-fixed-variant text-[10px] font-bold uppercase tracking-tighter">Active</span>
+</div>
+</div>
+<div class="flex items-center justify-between border-t border-outline-variant/20 pt-3">
+<div class="flex gap-2">
+<button class="flex items-center gap-1 text-primary hover:bg-primary-container/10 px-3 py-1 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="payments">payments</span>
+<span class="text-label-md font-label-md">Salary</span>
+</button>
+<button class="flex items-center gap-1 text-primary hover:bg-primary-container/10 px-3 py-1 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="person">person</span>
+<span class="text-label-md font-label-md">Profile</span>
+</button>
+</div>
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors" data-icon="more_vert">more_vert</button>
+</div>
+</div>
+<!-- Employee Card 2 -->
+<div class="glass-card rounded-xl p-4 flex flex-col gap-4 row-hover opacity-80">
+<div class="flex items-center gap-4">
+<div class="relative">
+<div class="w-14 h-14 rounded-full overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a female sales executive in a light-filled modern office. The image has a refined glassmorphism aesthetic with soft background blurs and high-key lighting. The style is authoritative and precise, with a color palette that emphasizes clean whites and corporate blues, perfectly fitting a sophisticated SaaS interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAk34p24zsCikBTTtMWoFhxbD9z3ZKGO_haQmD3S9rzTUeI-MvYUbacK95YJfdakP4ikyTSr7b_HTDYmh72P20h841FXx9PK_awpnzWqz6LeLcyFYkCtbTr14NuM57M2BPWmVhQ0R2wDXmzes_owu85sc7z30WOm8_6zi30ESjUL5_IVLV7yQxQmoitjOy_A4osld_0rrt6MFAIZ_rX3S6KHklTMBrtngJ2p2bCTsmwRrqpZ00ZDatnw"/>
+</div>
+<span class="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-outline-variant border-2 border-surface-container-lowest" title="Away"></span>
+</div>
+<div class="flex-1">
+<h3 class="font-headline-md text-headline-md text-on-surface leading-tight">Elena Rodriguez</h3>
+<p class="text-body-sm font-body-sm text-outline uppercase tracking-wider">Senior Sales Lead</p>
+</div>
+<div class="flex flex-col items-end">
+<span class="px-2 py-1 rounded bg-surface-variant/30 text-outline text-[10px] font-bold uppercase tracking-tighter">Away</span>
+</div>
+</div>
+<div class="flex items-center justify-between border-t border-outline-variant/20 pt-3">
+<div class="flex gap-2">
+<button class="flex items-center gap-1 text-primary hover:bg-primary-container/10 px-3 py-1 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="payments">payments</span>
+<span class="text-label-md font-label-md">Salary</span>
+</button>
+<button class="flex items-center gap-1 text-primary hover:bg-primary-container/10 px-3 py-1 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="person">person</span>
+<span class="text-label-md font-label-md">Profile</span>
+</button>
+</div>
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors" data-icon="more_vert">more_vert</button>
+</div>
+</div>
+<!-- Employee Card 3 -->
+<div class="glass-card rounded-xl p-4 flex flex-col gap-4 row-hover">
+<div class="flex items-center gap-4">
+<div class="relative">
+<div class="w-14 h-14 rounded-full overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A portrait of a male administrative assistant in a clean, minimalist workspace. The lighting is airy and soft, creating a sense of professionalism and focus. The visual direction follows a modern SaaS aesthetic with a balanced use of white space and subtle grey tones, reflecting a sophisticated and functional enterprise environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuANoe_ao-nCtL_WG20IOxHaP1CFJYcXMEH2B-8hSiHgFTY-nifm72AJjAzXgkapcvrMXx-zWqJY1vxQcrUGEIgRbV7jt1VXPeUxLdliL5hOEt4o13cED6Zhcob6NlKLHeKNe5Dfe17OCwxv1qAJJZ_mOs-OWdlIZn3KGEQrK5oBkzzA0B4wi5WwqNGRoCmsnH2iFqKXlwDcTiC0w0cG6cvG3i45f8f0nNBh2IOXZPScAPgiYktl1JEbfg"/>
+</div>
+<span class="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-tertiary border-2 border-surface-container-lowest" title="Active"></span>
+</div>
+<div class="flex-1">
+<h3 class="font-headline-md text-headline-md text-on-surface leading-tight">Sarah Jenkins</h3>
+<p class="text-body-sm font-body-sm text-outline uppercase tracking-wider">HR Administrator</p>
+</div>
+<div class="flex flex-col items-end">
+<span class="px-2 py-1 rounded bg-tertiary-container/10 text-tertiary-fixed-variant text-[10px] font-bold uppercase tracking-tighter">Active</span>
+</div>
+</div>
+<div class="flex items-center justify-between border-t border-outline-variant/20 pt-3">
+<div class="flex gap-2">
+<button class="flex items-center gap-1 text-primary hover:bg-primary-container/10 px-3 py-1 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="payments">payments</span>
+<span class="text-label-md font-label-md">Salary</span>
+</button>
+<button class="flex items-center gap-1 text-primary hover:bg-primary-container/10 px-3 py-1 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="person">person</span>
+<span class="text-label-md font-label-md">Profile</span>
+</button>
+</div>
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors" data-icon="more_vert">more_vert</button>
+</div>
+</div>
+<!-- Employee Card 4 -->
+<div class="glass-card rounded-xl p-4 flex flex-col gap-4 row-hover">
+<div class="flex items-center gap-4">
+<div class="relative">
+<div class="w-14 h-14 rounded-full overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A corporate headshot of a logistical specialist working in a high-tech warehouse. The setting is bright and orderly, lit by high-key architectural lighting. The style is professional and authoritative, utilizing a primary blue and white color scheme to maintain brand consistency for an enterprise logistics platform like InvTrack Pro." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBunZqIiYtNj1e_M2w2lvXABeEFNsfELLfMmGqO4rC-W_cftVdkpdPQmziua_Lv2nF7mKQlhm3f9wH7_F6pirVAX5QDXbT50Y_D8Ef7ENpCpALg7D-yxoPGJzt86aozYAms1bX6DiDQQ9FvbrPM_DQqjo8ZIpTkL6_jbFoy6bxsHD3zShkb8U3aFhSQL9BlYLwMvWuxsuGDKdzPp96sVqp5y8kGEPnl8es3IG92UMCECPCVx0kkLldC8Q"/>
+</div>
+<span class="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-tertiary border-2 border-surface-container-lowest" title="Active"></span>
+</div>
+<div class="flex-1">
+<h3 class="font-headline-md text-headline-md text-on-surface leading-tight">David Wu</h3>
+<p class="text-body-sm font-body-sm text-outline uppercase tracking-wider">Inventory Specialist</p>
+</div>
+<div class="flex flex-col items-end">
+<span class="px-2 py-1 rounded bg-tertiary-container/10 text-tertiary-fixed-variant text-[10px] font-bold uppercase tracking-tighter">Active</span>
+</div>
+</div>
+<div class="flex items-center justify-between border-t border-outline-variant/20 pt-3">
+<div class="flex gap-2">
+<button class="flex items-center gap-1 text-primary hover:bg-primary-container/10 px-3 py-1 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="payments">payments</span>
+<span class="text-label-md font-label-md">Salary</span>
+</button>
+<button class="flex items-center gap-1 text-primary hover:bg-primary-container/10 px-3 py-1 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="person">person</span>
+<span class="text-label-md font-label-md">Profile</span>
+</button>
+</div>
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors" data-icon="more_vert">more_vert</button>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB -->
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-all duration-200 z-[60]">
+<span class="material-symbols-outlined text-[28px]" data-icon="person_add">person_add</span>
+</button>
+<!-- BottomNavBar Injection -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-2 pb-safe bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl border-t border-outline-variant/30 z-50 rounded-t-xl shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-md text-label-md">Products</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="point_of_sale">point_of_sale</span>
+<span class="font-label-md text-label-md">POS</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 transition-all active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+<script>
+        // Micro-interaction for search focus
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('scale-[1.01]');
+            searchInput.parentElement.classList.add('transition-transform');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('scale-[1.01]');
+        });
+
+        // Filter button toggle logic (Simplified)
+        const filterButtons = document.querySelectorAll('.flex.gap-sm button');
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterButtons.forEach(b => {
+                    b.classList.remove('bg-primary', 'text-on-primary', 'shadow-md');
+                    b.classList.add('glass-card', 'text-on-surface-variant');
+                });
+                btn.classList.add('bg-primary', 'text-on-primary', 'shadow-md');
+                btn.classList.remove('glass-card', 'text-on-surface-variant');
+            });
+        });
+    </script>
+</body></html>

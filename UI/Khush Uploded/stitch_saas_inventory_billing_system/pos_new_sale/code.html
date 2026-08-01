@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>InvTrack Pro - POS Billing</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Design System Tokens -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "on-secondary-fixed-variant": "#38485d",
+                "primary-fixed-dim": "#b4c5ff",
+                "primary-fixed": "#dbe1ff",
+                "surface-container-highest": "#e1e3e4",
+                "on-secondary": "#ffffff",
+                "tertiary-container": "#007d55",
+                "surface-container-low": "#f3f4f5",
+                "background": "#f8f9fa",
+                "surface-container-lowest": "#ffffff",
+                "on-primary-fixed": "#00174b",
+                "inverse-on-surface": "#f0f1f2",
+                "error": "#ba1a1a",
+                "error-container": "#ffdad6",
+                "secondary": "#505f76",
+                "inverse-surface": "#2e3132",
+                "on-secondary-fixed": "#0b1c30",
+                "tertiary": "#006242",
+                "surface": "#f8f9fa",
+                "surface-dim": "#d9dadb",
+                "tertiary-fixed": "#6ffbbe",
+                "surface-bright": "#f8f9fa",
+                "on-tertiary-fixed": "#002113",
+                "on-primary": "#ffffff",
+                "on-background": "#191c1d",
+                "on-error-container": "#93000a",
+                "secondary-container": "#d0e1fb",
+                "on-primary-container": "#eeefff",
+                "outline-variant": "#c3c6d7",
+                "on-tertiary": "#ffffff",
+                "on-secondary-container": "#54647a",
+                "outline": "#737686",
+                "on-error": "#ffffff",
+                "primary-container": "#2563eb",
+                "on-surface": "#191c1d",
+                "surface-variant": "#e1e3e4",
+                "on-surface-variant": "#434655",
+                "primary": "#004ac6",
+                "secondary-fixed": "#d3e4fe",
+                "surface-tint": "#0053db",
+                "inverse-primary": "#b4c5ff",
+                "on-primary-fixed-variant": "#003ea8",
+                "secondary-fixed-dim": "#b7c8e1",
+                "surface-container-high": "#e7e8e9",
+                "on-tertiary-container": "#bdffdb",
+                "tertiary-fixed-dim": "#4edea3",
+                "on-tertiary-fixed-variant": "#005236",
+                "surface-container": "#edeeef"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "md": "16px",
+                "base": "4px",
+                "xs": "4px",
+                "sm": "8px",
+                "lg": "24px",
+                "xl": "40px",
+                "container-max": "1440px",
+                "gutter": "24px"
+            },
+            "fontFamily": {
+                "headline-md": ["Plus Jakarta Sans"],
+                "mono-md": ["JetBrains Mono"],
+                "body-lg": ["Inter"],
+                "body-md": ["Inter"],
+                "label-md": ["Inter"],
+                "body-sm": ["Inter"],
+                "headline-xl": ["Plus Jakarta Sans"],
+                "headline-lg": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                "mono-md": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                "label-md": ["13px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f8f9fa;
+            color: #191c1d;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-surface {
+            backdrop-filter: blur(20px);
+            background-color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        /* Custom scrollbar for cart */
+        .cart-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .cart-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .cart-scroll::-webkit-scrollbar-thumb {
+            background: #e1e3e4;
+            border-radius: 10px;
+        }
+        /* Fast transition */
+        .tap-scale {
+            transition: transform 0.1s ease-out;
+        }
+        .tap-scale:active {
+            transform: scale(0.96);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="h-screen overflow-hidden flex flex-col font-body-md">
+<!-- TopAppBar Component (from JSON) -->
+<header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl flex justify-between items-center w-full px-md h-16 z-40 docked full-width top-0 sticky shadow-sm bg-surface-container-low/50">
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:bg-primary-container/10 transition-colors p-2 rounded-full">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-lg text-headline-lg font-bold text-primary dark:text-primary-fixed">InvTrack Pro</h1>
+</div>
+<!-- Desktop Nav Items -->
+<div class="hidden md:flex items-center space-x-6">
+<div class="flex items-center gap-2 text-primary dark:text-primary-fixed-dim font-semibold">
+<span class="material-symbols-outlined">point_of_sale</span>
+<span class="font-label-md text-label-md">POS TERMINAL</span>
+</div>
+<div class="h-6 w-[1px] bg-outline-variant/30"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="font-label-md text-label-md text-on-surface">Warehouse Alpha</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-widest">Admin User</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a business manager in a crisp white shirt, softly lit with office interior background, high-definition photography style, clean and modern corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD56ARDrAUkILpY9DOEJUO29bHvel8_Qk2lvNvgkR6PA9eUO6kv5JH3YZoqo_c_maJjdjAGC44c3AN6Cc4wV4YNtNH55ksjx613l3Wuiu5c21_dq4JL94ql8s1dgfZYaw9EI7-6fdLhteggkD3T8DDKBOrKWFbnK1XJGNtDI4ek4XGFlsgnWvsK2nKCqqyKMM4SxCKlyZwxTbCetO5oKUOFErJuvRvCAMxxcpKKA-mrwfiOcznmP7XVfw"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Grid -->
+<main class="flex-1 flex flex-col md:flex-row overflow-hidden p-4 gap-4">
+<!-- Left Section: Item Selection & Catalog (Hidden or Minimal for Mobile POS) -->
+<section class="hidden lg:flex flex-col w-1/3 gap-4">
+<div class="glass-surface p-4 rounded-xl flex-1 flex flex-col gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full pl-10 pr-4 py-2 rounded-lg bg-surface-container border-none focus:ring-2 focus:ring-primary/20 font-body-md" placeholder="Search products..." type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-3 overflow-y-auto cart-scroll pr-1">
+<!-- Product Card -->
+<button class="tap-scale group p-3 rounded-xl border border-outline-variant/30 bg-white hover:border-primary transition-all flex flex-col gap-2 text-left">
+<div class="aspect-square w-full rounded-lg bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform" data-alt="A high-end ergonomic mechanical keyboard with RGB lighting, sleek aluminum chassis, and premium keycaps, captured in a clean product photography style with a neutral background and professional studio lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBF0QAKh1QDy5EF-q8MJ3EJMmE43mUg1zZhYpvzpUz8bC_kEcqv5ZhBqrJABajJxyQS9pred67vJJ_pL-LIR3ii6jrafvBrdp1s3b9C5gOBBLZAb5qGNUnP4yf_Xm23IqyOavMrdMQYqY2eOzPkOdH62nhf0sQ14mYPkxTFVIzmDgnyZd0cRRNFuYwnDNOyachXSjeUuWRsP1aPo0gnrTH8IcHYXrfM5W9kj7xTKd9aIVGGiYez43RJQ"/>
+</div>
+<div>
+<p class="font-label-md text-on-surface truncate">Mechanical Keyboard</p>
+<p class="font-mono-md text-primary font-semibold">$129.00</p>
+</div>
+</button>
+<!-- Product Card -->
+<button class="tap-scale group p-3 rounded-xl border border-outline-variant/30 bg-white hover:border-primary transition-all flex flex-col gap-2 text-left">
+<div class="aspect-square w-full rounded-lg bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform" data-alt="A minimalist wireless noise-canceling headphone set in matte black finish, standing on a wooden desk with soft ambient lighting, ultra-modern tech aesthetic, sharp focus and high-end feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhrVkTdeZVX3D970GEloi7Mk9pmcE-ZIaHJN1Wq-L_CKogiRAbjc9_kywAcE7MtnTayt2TO5dNI-jWbYOlV6pMkPNr-JW36GIJ_HKnDsetKTGWbuefXrQWxRpmszRGwbJuscoNwQaXxH0Iu9Kb5QZ11jqbhKClhgVF2vaImbpNnZP9tOqJqtAWjJ1zEx-USKfydQChQ3z-aHQNa7O3mz2xtJjyXtNpWmSMG9vQCfJTTb-B9iDVqJUCAA"/>
+</div>
+<div>
+<p class="font-label-md text-on-surface truncate">Wireless ANC</p>
+<p class="font-mono-md text-primary font-semibold">$249.50</p>
+</div>
+</button>
+<!-- Product Card -->
+<button class="tap-scale group p-3 rounded-xl border border-outline-variant/30 bg-white hover:border-primary transition-all flex flex-col gap-2 text-left">
+<div class="aspect-square w-full rounded-lg bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform" data-alt="A premium 27-inch 4K monitor with ultra-thin bezels and a modern silver stand, displaying a vibrant abstract colorful wallpaper, clean minimalist studio setup, professional lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtMOddLFzstQuO8CH_vX9y3MHMQ-MYDFY5u9DhnXBHK8vIb7yLuKp3rz6A_YSGxmjDAzhR-OfEAsQUSLGh4IrYki4-OfoZxE2GP0HkoGJ_UnULE43exb7ZDNu997UKxDEueCPelJD9o3nycLXkx4IA4kqjIIr_jE0MBEgqqfOOeDTt3eOhULWxWbfF_Bq3C7xrnUNLJBe8u8sj8irsq0PGNqC6Q4E538lMYh3FzPgXeZaoTvG38KTZuQ"/>
+</div>
+<div>
+<p class="font-label-md text-on-surface truncate">4K Studio Monitor</p>
+<p class="font-mono-md text-primary font-semibold">$599.00</p>
+</div>
+</button>
+<!-- Product Card -->
+<button class="tap-scale group p-3 rounded-xl border border-outline-variant/30 bg-white hover:border-primary transition-all flex flex-col gap-2 text-left">
+<div class="aspect-square w-full rounded-lg bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform" data-alt="An ultra-lightweight carbon fiber wireless gaming mouse on a premium grey felt desk pad, moody atmospheric lighting with a hint of blue neon, sleek high-performance tech style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu7aiLUo8Hh11aVwFn2rGdG_ApVgceVgbGuImfVh8kGQZSjhQ0ZbdB_42U7a9rlYaCvnP7gvFO9NRp8Zb27U5S0jdyEaRXUkUR4ozh1pSmIBmaL7of5G9Ycl-3oHJlwuYKD39378Rdj9v9x5HM1tNuSzsHjI63wSrKVTxU2zMGMc7QfNRTU0g7wEspSikBJ6_UAcVX3am8-_qBVFPHsJGdJpX2jTAE1SmtuCM_fLBK7NvhUz1HpObzrw"/>
+</div>
+<div>
+<p class="font-label-md text-on-surface truncate">Pro Gaming Mouse</p>
+<p class="font-mono-md text-primary font-semibold">$89.00</p>
+</div>
+</button>
+</div>
+</div>
+</section>
+<!-- Right Section: Checkout Interface -->
+<section class="flex-1 flex flex-col gap-4">
+<!-- Top: Customer & Scanner Section -->
+<div class="glass-surface p-4 rounded-xl shadow-sm">
+<div class="flex flex-col lg:flex-row gap-4 items-end">
+<div class="flex-1 w-full">
+<label class="block text-[10px] uppercase font-bold text-on-surface-variant mb-1 tracking-widest">Select Customer</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">person</span>
+<select class="w-full pl-10 pr-10 py-3 rounded-lg border-none bg-surface-container-high focus:ring-2 focus:ring-primary/20 font-body-md appearance-none">
+<option>Walk-in Customer</option>
+<option>Johnathan Doe (Premium)</option>
+<option>Sara Williams (Wholesale)</option>
+<option>Corporate Account: TechCorp</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="flex-1 w-full">
+<label class="block text-[10px] uppercase font-bold text-on-surface-variant mb-1 tracking-widest">Add by Code</label>
+<div class="flex gap-2">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">barcode_scanner</span>
+<input class="w-full pl-10 pr-4 py-3 rounded-lg border-none bg-surface-container-high focus:ring-2 focus:ring-primary/20 font-mono-md uppercase" placeholder="Scan or enter barcode" type="text"/>
+</div>
+<button class="bg-primary text-white p-3 rounded-lg tap-scale shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Middle: Cart List -->
+<div class="flex-1 glass-surface rounded-xl flex flex-col overflow-hidden shadow-sm">
+<div class="p-4 bg-surface-container/50 border-b border-outline-variant/30 flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md">Current Transaction</h3>
+<span class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full text-[11px] font-bold tracking-tight">4 ITEMS</span>
+</div>
+<div class="flex-1 overflow-y-auto cart-scroll">
+<!-- Cart Item 1 -->
+<div class="p-4 flex items-center gap-4 hover:bg-surface-container/30 transition-colors border-b border-outline-variant/10">
+<div class="w-12 h-12 rounded-lg bg-surface-container overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Close-up of high-quality mechanical keys, studio lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDu0pRpD-eb8Mba1ZWdclRkypOFQUwgWpL8IERGNcB8IaOdagDDDWLW05wZN4E8uFyBPEyM--aErGM40DsyhZ6eKoSK-w4ftmT6cRBNudZDm589YTh0Sv3xlG6XfCCXP4mSPWl3j52txM6fsGKputQAp6kwclz7MBRrtt1l3QmBrh9JJEa77Ebz1kRa0k7wEVdiTp--1_paLn1rWEtvj_3At1XBYyChL7s3WW-r_W8Rm517ZyV9QIRrhQ"/>
+</div>
+<div class="flex-1">
+<h4 class="font-label-md text-on-surface">Mechanical Keyboard v2</h4>
+<p class="text-body-sm text-on-surface-variant">#SKU-9920</p>
+</div>
+<div class="flex items-center gap-3 bg-surface-container rounded-full p-1 border border-outline-variant/30">
+<button class="w-8 h-8 rounded-full bg-white flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-colors tap-scale">
+<span class="material-symbols-outlined text-[18px]">remove</span>
+</button>
+<span class="font-mono-md font-bold w-6 text-center">1</span>
+<button class="w-8 h-8 rounded-full bg-white flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-colors tap-scale">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+<div class="w-24 text-right">
+<p class="font-mono-md font-bold text-on-surface">$129.00</p>
+</div>
+<button class="text-error/60 hover:text-error transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+<!-- Cart Item 2 -->
+<div class="p-4 flex items-center gap-4 hover:bg-surface-container/30 transition-colors border-b border-outline-variant/10">
+<div class="w-12 h-12 rounded-lg bg-surface-container overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Close-up of premium headphones earcups, professional product lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAo009V2BIKoDrULwf_8tm_KVGZeE1XBNBIKD3v9c3aPwP-cBXPlRFxzm9SsljA0xw4KXw9s4NYZjqnJO6L6dihKqTdjPi0HmmYZOJozpvUrGQHqlU_Y-b3kYzykmK-5vrTRdHe-VhFl2NMeD1g_Semio2gzLDLsP2JETszDisAw2aJ46fp2cszLFx2EkCssPKZ4dsyvGIOIqd4aRqEX3gbmgqku1tmxTgVb2YDUEfR7RTrAHN81NGyag"/>
+</div>
+<div class="flex-1">
+<h4 class="font-label-md text-on-surface">Wireless Headphones</h4>
+<p class="text-body-sm text-on-surface-variant">#SKU-8841</p>
+</div>
+<div class="flex items-center gap-3 bg-surface-container rounded-full p-1 border border-outline-variant/30">
+<button class="w-8 h-8 rounded-full bg-white flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-colors tap-scale">
+<span class="material-symbols-outlined text-[18px]">remove</span>
+</button>
+<span class="font-mono-md font-bold w-6 text-center">2</span>
+<button class="w-8 h-8 rounded-full bg-white flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-colors tap-scale">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+<div class="w-24 text-right">
+<p class="font-mono-md font-bold text-on-surface">$499.00</p>
+</div>
+<button class="text-error/60 hover:text-error transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+<!-- Cart Item 3 -->
+<div class="p-4 flex items-center gap-4 hover:bg-surface-container/30 transition-colors border-b border-outline-variant/10">
+<div class="w-12 h-12 rounded-lg bg-surface-container overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Gaming mouse scroll wheel and button detail, vibrant lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAb4EG4olCKjZnuNtvFiSuMn6N9twhcT7KzkNBlYZyy2hZDLal8n4fCsEb6dTGACd4bZmXcpv5OnLUTstFRwd41k22-9nf0Db0JzOBml8IqW9brPd1p-yMaLSq6iPhCjT2ln-e4Vd6JOOxjg27HRIyivaHprjiUK4IYa19gPM_bkGAFKFg8AIshcwzDNWoMfysEr-nQWH3zr8w05HsrujHz13yOIhePBAmP7Gyukq_7UimTFxDlQpYvsA"/>
+</div>
+<div class="flex-1">
+<h4 class="font-label-md text-on-surface">Precision Mouse</h4>
+<p class="text-body-sm text-on-surface-variant">#SKU-1022</p>
+</div>
+<div class="flex items-center gap-3 bg-surface-container rounded-full p-1 border border-outline-variant/30">
+<button class="w-8 h-8 rounded-full bg-white flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-colors tap-scale">
+<span class="material-symbols-outlined text-[18px]">remove</span>
+</button>
+<span class="font-mono-md font-bold w-6 text-center">1</span>
+<button class="w-8 h-8 rounded-full bg-white flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-colors tap-scale">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+<div class="w-24 text-right">
+<p class="font-mono-md font-bold text-on-surface">$89.00</p>
+</div>
+<button class="text-error/60 hover:text-error transition-colors p-1">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Bottom: Totals & Checkout -->
+<div class="glass-surface p-6 rounded-xl shadow-lg border-t border-primary/10">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+<div class="space-y-3">
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant font-medium">Subtotal</span>
+<span class="font-mono-md font-semibold">$717.00</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="text-on-surface-variant font-medium">Discount</span>
+<button class="text-primary hover:bg-primary/10 px-2 py-0.5 rounded text-[11px] font-bold border border-primary/20">ADD COUPON</button>
+</div>
+<span class="font-mono-md font-semibold text-tertiary">-$35.85 (5%)</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant font-medium">Tax (GST 10%)</span>
+<span class="font-mono-md font-semibold">$68.12</span>
+</div>
+<div class="pt-2 border-t border-outline-variant/30 flex justify-between items-center">
+<span class="font-headline-md text-on-surface">Payable Amount</span>
+<span class="text-headline-lg font-bold text-primary font-headline-lg">$749.27</span>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex gap-2">
+<button class="flex-1 py-3 px-4 rounded-xl border-2 border-outline-variant text-on-surface-variant font-bold tap-scale flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">print</span>
+                                Draft
+                            </button>
+<button class="flex-1 py-3 px-4 rounded-xl border-2 border-outline-variant text-on-surface-variant font-bold tap-scale flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">payments</span>
+                                Split
+                            </button>
+</div>
+<button class="w-full bg-primary text-white py-5 rounded-xl font-bold text-lg shadow-xl shadow-primary/20 flex items-center justify-center gap-3 tap-scale transition-all hover:brightness-110 active:shadow-none">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">shopping_cart_checkout</span>
+                            CHECKOUT &amp; PAY
+                        </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Navigation Shell (BottomNavBar from JSON) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-2 pb-safe bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl border-t border-outline-variant/30 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] md:hidden z-50">
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-md text-label-md">Products</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">point_of_sale</span>
+<span class="font-label-md text-label-md">POS</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-md text-label-md">Reports</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</div>
+</nav>
+<!-- Micro-interaction Script -->
+<script>
+        // Simple visual feedback for barcode scan simulation
+        document.querySelector('input[placeholder*="Scan"]').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const val = this.value;
+                if (val) {
+                    console.log('Scanning code:', val);
+                    this.value = '';
+                    // Trigger a brief flash on the scanner button
+                    const btn = this.nextElementSibling;
+                    btn.classList.add('brightness-150', 'scale-110');
+                    setTimeout(() => {
+                        btn.classList.remove('brightness-150', 'scale-110');
+                    }, 200);
+                }
+            }
+        });
+
+        // Checkout button interaction
+        document.querySelector('button.bg-primary.text-white.py-5').addEventListener('click', function() {
+            const originalContent = this.innerHTML;
+            this.innerHTML = `<span class="material-symbols-outlined animate-spin">refresh</span> PROCESSING...`;
+            this.disabled = true;
+            setTimeout(() => {
+                this.innerHTML = `<span class="material-symbols-outlined">check_circle</span> TRANSACTION COMPLETE`;
+                this.classList.replace('bg-primary', 'bg-tertiary');
+                setTimeout(() => {
+                    this.innerHTML = originalContent;
+                    this.classList.replace('bg-tertiary', 'bg-primary');
+                    this.disabled = false;
+                }, 2000);
+            }, 1200);
+        });
+    </script>
+</body></html>

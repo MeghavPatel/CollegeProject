@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login - InvTrack Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&family=JetBrains+Mono&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Plus+Jakarta+Sans:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#38485d",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "primary-fixed": "#dbe1ff",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-secondary": "#ffffff",
+                        "tertiary-container": "#007d55",
+                        "surface-container-low": "#f3f4f5",
+                        "background": "#f8f9fa",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#00174b",
+                        "inverse-on-surface": "#f0f1f2",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "secondary": "#505f76",
+                        "inverse-surface": "#2e3132",
+                        "on-secondary-fixed": "#0b1c30",
+                        "tertiary": "#006242",
+                        "surface": "#f8f9fa",
+                        "surface-dim": "#d9dadb",
+                        "tertiary-fixed": "#6ffbbe",
+                        "surface-bright": "#f8f9fa",
+                        "on-tertiary-fixed": "#002113",
+                        "on-primary": "#ffffff",
+                        "on-background": "#191c1d",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#d0e1fb",
+                        "on-primary-container": "#eeefff",
+                        "outline-variant": "#c3c6d7",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#54647a",
+                        "outline": "#737686",
+                        "on-error": "#ffffff",
+                        "primary-container": "#2563eb",
+                        "on-surface": "#191c1d",
+                        "surface-variant": "#e1e3e4",
+                        "on-surface-variant": "#434655",
+                        "primary": "#004ac6",
+                        "secondary-fixed": "#d3e4fe",
+                        "surface-tint": "#0053db",
+                        "inverse-primary": "#b4c5ff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "surface-container-high": "#e7e8e9",
+                        "on-tertiary-container": "#bdffdb",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "surface-container": "#edeeef"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "base": "4px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "xl": "40px",
+                        "container-max": "1440px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "mono-md": ["JetBrains Mono"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-xl": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "mono-md": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-md": ["13px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md overflow-x-hidden">
+<!-- Background Decorative Element -->
+<div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+<div class="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px]"></div>
+<div class="absolute top-[60%] -right-[5%] w-[50%] h-[50%] bg-tertiary/5 rounded-full blur-[150px]"></div>
+</div>
+<!-- Header (Shared Identity) -->
+<header class="relative z-10 w-full px-md h-16 flex items-center justify-center md:justify-start lg:px-xl">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-headline-lg text-headline-lg font-bold text-primary tracking-tight">InvTrack Pro</span>
+</div>
+</header>
+<main class="relative z-10 flex-grow flex items-center justify-center p-md">
+<div class="w-full max-w-[440px]">
+<!-- Login Card -->
+<div class="glass-panel rounded-xl shadow-2xl p-lg md:p-xl animate-in fade-in slide-in-from-bottom-4 duration-700">
+<div class="mb-lg text-center md:text-left">
+<h1 class="font-headline-xl text-headline-xl text-on-surface mb-2">Welcome back</h1>
+<p class="font-body-md text-on-surface-variant">Please enter your details to access your warehouse.</p>
+</div>
+<form class="space-y-md" onsubmit="event.preventDefault();">
+<!-- Email Field -->
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider" for="email">Email Address</label>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">mail</span>
+<input class="w-full pl-10 pr-md py-3 bg-white border border-outline-variant/50 rounded-lg text-on-surface font-body-md placeholder:text-outline transition-all focus:border-primary" id="email" placeholder="name@company.com" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-1">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider" for="password">Password</label>
+<a class="text-sm font-semibold text-primary hover:text-primary-container transition-colors" href="#">Forgot Password?</a>
+</div>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">lock</span>
+<input class="w-full pl-10 pr-12 py-3 bg-white border border-outline-variant/50 rounded-lg text-on-surface font-body-md placeholder:text-outline transition-all focus:border-primary" id="password" placeholder="••••••••" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+<!-- Remember Me -->
+<div class="flex items-center gap-2 py-1">
+<input class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary/20" id="remember" type="checkbox"/>
+<label class="font-body-sm text-on-surface-variant cursor-pointer select-none" for="remember">Stay signed in for 30 days</label>
+</div>
+<!-- Submit Button -->
+<button class="w-full bg-primary-container text-on-primary-container py-3 rounded-lg font-semibold text-body-lg shadow-lg shadow-primary/10 hover:shadow-primary/20 hover:scale-[1.01] active:scale-95 transition-all duration-200" type="submit">
+                        Sign In
+                    </button>
+</form>
+<!-- Divider -->
+<div class="relative my-lg">
+<div class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-outline-variant/30"></div>
+</div>
+<div class="relative flex justify-center text-xs uppercase">
+<span class="bg-surface-container-lowest px-2 text-outline font-label-md">Or continue with</span>
+</div>
+</div>
+<!-- Social Logins -->
+<div class="grid grid-cols-2 gap-md">
+<button class="flex items-center justify-center gap-2 py-2.5 px-md bg-white border border-outline-variant/50 rounded-lg font-semibold text-body-md hover:bg-surface-container-low transition-colors group">
+<div class="w-5 h-5 flex items-center justify-center">
+<svg class="w-full h-full" viewbox="0 0 24 24"><path d="M12 5.04c1.64 0 3.11.56 4.27 1.68l3.19-3.19C17.51 1.63 14.97 1 12 1 7.73 1 4.12 3.48 2.38 7.09l3.74 2.91C7.01 7.14 9.3 5.04 12 5.04z" fill="#EA4335"></path><path d="M23.64 12.2c0-.78-.07-1.53-.2-2.25H12v4.26h6.52c-.28 1.48-1.12 2.74-2.38 3.59l3.71 2.88c2.17-2 3.43-4.94 3.43-8.48z" fill="#FBBC05"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.09H2.38C1.4 9.09 1 11.24 1 12.5s.4 3.41 1.38 5.41l3.46-2.82z" fill="#4285F4"></path><path d="M12 23c3.08 0 5.67-1.02 7.56-2.77l-3.71-2.88c-1.04.7-2.38 1.11-3.85 1.11-2.7 0-4.99-1.83-5.81-4.3l-3.74 2.91C4.12 20.52 7.73 23 12 23z" fill="#34A853"></path></svg>
+</div>
+                        Google
+                    </button>
+<button class="flex items-center justify-center gap-2 py-2.5 px-md bg-white border border-outline-variant/50 rounded-lg font-semibold text-body-md hover:bg-surface-container-low transition-colors group">
+<div class="w-5 h-5 flex items-center justify-center">
+<svg class="w-full h-full" fill="currentColor" viewbox="0 0 24 24"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.06.74.78 0 1.95-.87 3.49-.71 1.43.15 2.51.81 3.17 1.81-2.98 1.73-2.5 5.76.51 7.02-.63 1.58-1.39 3.19-2.23 4.11zM12.03 7.25c-.13-2.23 1.74-4.07 3.91-4.25.26 2.51-2.14 4.54-3.91 4.25z"></path></svg>
+</div>
+                        Apple
+                    </button>
+</div>
+</div>
+<!-- Footer Text -->
+<p class="mt-lg text-center font-body-sm text-on-surface-variant">
+                Don't have an account? 
+                <a class="font-semibold text-primary hover:underline underline-offset-4" href="#">Contact your administrator</a>
+</p>
+</div>
+</main>
+<!-- Bottom Legal Info -->
+<footer class="relative z-10 w-full p-md text-center">
+<p class="font-body-sm text-outline opacity-60">
+            © 2024 InvTrack Pro Global Logistics. All rights reserved. Secure terminal v2.4.0
+        </p>
+</footer>
+<!-- Image Generation (Atmospheric Backdrop) -->
+<div class="fixed inset-0 -z-10 pointer-events-none opacity-20 mix-blend-overlay">
+<div class="w-full h-full bg-cover bg-center" data-alt="A highly professional and clean top-down view of a modern logistics dashboard layout on a sleek tablet. The lighting is bright and airy with a light-mode aesthetic, emphasizing deep blues and crisp whites. In the background, there is a softly blurred, high-end industrial warehouse with pristine metal shelving and advanced robotics. The overall mood is sophisticated, efficient, and technologically superior." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCLae7wTHo_nGJGEZcBG6tnwgQgQOb7XHrhstqSeV3f8EeA-K54fgX6dBPYvbfyNJlAwwP-vTzNldhh9sKtjUMVZ2WcaQ9zcr_emGcvdSX9FHjDMpNqJIrO3jklvLqbjLyRFbBnkQvQBsnaB0XHN_SCNnqtV9oRCy5gNQzhGphAzsEsQ--V-ZfG6fjoi1dArMaaD_m4_NHDHethcOEwdKcEnJhOS8J5e96SCw4lGRyePYPubtu8YZyLzA')"></div>
+</div>
+<script>
+        // Micro-interaction for input fields
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('ring-2', 'ring-primary/10');
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.classList.remove('ring-2', 'ring-primary/10');
+            });
+        });
+
+        // Simple visibility toggle logic
+        const toggleBtn = document.querySelector('button span[text="visibility"]');
+        if(toggleBtn) {
+            toggleBtn.parentElement.addEventListener('click', () => {
+                const input = document.getElementById('password');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    toggleBtn.innerText = 'visibility_off';
+                } else {
+                    input.type = 'password';
+                    toggleBtn.innerText = 'visibility';
+                }
+            });
+        }
+    </script>
+</body></html>

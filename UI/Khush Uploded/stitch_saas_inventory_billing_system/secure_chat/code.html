@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>InvTrack Pro | Secure Team Chat</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .message-bubble-sent {
+            background: linear-gradient(135deg, #004ac6 0%, #2563eb 100%);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        @keyframes subtle-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .secure-pulse {
+            animation: subtle-pulse 3s infinite ease-in-out;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#f8f9fa",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e1e3e4",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "surface-bright": "#f8f9fa",
+                        "outline-variant": "#c3c6d7",
+                        "surface-container-highest": "#e1e3e4",
+                        "surface-dim": "#d9dadb",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#505f76",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#d0e1fb",
+                        "primary-container": "#2563eb",
+                        "on-surface-variant": "#434655",
+                        "primary": "#004ac6",
+                        "on-surface": "#191c1d",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#b4c5ff",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "tertiary-fixed": "#6ffbbe",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "on-primary-container": "#eeefff",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "tertiary": "#006242",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "surface-container-high": "#e7e8e9",
+                        "secondary-fixed": "#d3e4fe",
+                        "on-secondary-fixed": "#0b1c30",
+                        "on-primary-fixed": "#00174b",
+                        "on-background": "#191c1d",
+                        "tertiary-container": "#007d55",
+                        "background": "#f8f9fa",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "surface-tint": "#0053db",
+                        "primary-fixed": "#dbe1ff",
+                        "surface-container-low": "#f3f4f5",
+                        "outline": "#737686",
+                        "on-tertiary-container": "#bdffdb",
+                        "surface-container": "#edeeef",
+                        "on-secondary-container": "#54647a",
+                        "inverse-surface": "#2e3132",
+                        "on-tertiary-fixed": "#002113",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "inverse-on-surface": "#f0f1f2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "gutter": "24px",
+                        "base": "4px",
+                        "container-max": "1440px",
+                        "xs": "4px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-xl": ["Plus Jakarta Sans"],
+                        "body-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "mono-md": ["JetBrains Mono"],
+                        "headline-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-md": ["13px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-xl": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "mono-md": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md overflow-hidden">
+<!-- Top AppBar -->
+<header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl shadow-sm fixed top-0 sticky z-40 flex justify-between items-center w-full px-md h-16">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-primary p-2 hover:bg-primary-container/10 transition-colors rounded-full">menu</button>
+<h1 class="font-headline-lg text-headline-lg font-bold text-primary">InvTrack Pro</h1>
+</div>
+<div class="flex items-center gap-3">
+<div class="hidden md:flex flex-col items-end mr-2">
+<span class="text-body-sm font-semibold text-primary">Secure Channel</span>
+<span class="text-[10px] text-tertiary flex items-center gap-1 uppercase tracking-wider">
+<span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+                    End-to-End Encrypted
+                </span>
+</div>
+<img class="w-10 h-10 rounded-full border-2 border-primary-container object-cover" data-alt="A professional headshot of a warehouse manager in a clean, modern office setting. High-key lighting, soft focus background with warehouse blueprints, professional attire, modern tech aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJvI6X0s0-lhhJ6F4PY56JdiIdqxFGADzJo-3cZwNoZoaMLCtF0o8gkOdsoYI_hCk7p_fatksXgR31iYMKOqZClG7ps4y4LBB7oEnGHRuVv4G9GPhaBGadjPieBRHzX7oqosoF5BvTE5yVir76jqC1WqRMCs3m_IBGtvaEsD99gT7IYk_bIUn2F_Hx7Y0rO9Dwt5zbNF_C09PEUaqhqxlILZAItsLTQzZpGCnSqzss7HKlQuC_1hUIYw"/>
+</div>
+</header>
+<div class="flex h-[calc(100vh-64px)] overflow-hidden">
+<!-- Navigation Drawer (Sidebar) -->
+<aside class="hidden lg:flex flex-col w-80 h-full bg-surface-container-lowest border-r border-outline-variant/30 z-30">
+<div class="p-md flex flex-col gap-6 h-full">
+<!-- Profile Header -->
+<div class="flex items-center gap-3 p-2">
+<div class="w-12 h-12 rounded-xl bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container">admin_panel_settings</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-md text-headline-md font-bold text-primary">Admin User</span>
+<span class="text-body-sm text-on-surface-variant">Warehouse Alpha</span>
+</div>
+</div>
+<!-- Chat Lists -->
+<div class="flex-1 overflow-y-auto scrollbar-hide space-y-6">
+<!-- Channels Section -->
+<div>
+<div class="flex justify-between items-center px-2 mb-2">
+<h3 class="text-label-md text-outline uppercase tracking-widest">Channels</h3>
+<button class="material-symbols-outlined text-body-md hover:bg-surface-variant transition-colors rounded-lg p-1">add</button>
+</div>
+<nav class="space-y-1">
+<a class="bg-secondary-container text-on-secondary-container font-semibold rounded-lg mx-2 flex items-center justify-between p-3 transition-all" href="#">
+<div class="flex items-center gap-3">
+<span class="font-mono-md text-primary opacity-60">#</span>
+<span class="text-body-md">Warehouse-Alpha</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-primary secure-pulse"></span>
+</a>
+<a class="text-on-surface-variant hover:bg-surface-container-high mx-2 flex items-center gap-3 p-3 rounded-lg transition-colors" href="#">
+<span class="font-mono-md opacity-40">#</span>
+<span class="text-body-md">Sales-Team</span>
+</a>
+<a class="text-on-surface-variant hover:bg-surface-container-high mx-2 flex items-center gap-3 p-3 rounded-lg transition-colors" href="#">
+<span class="font-mono-md opacity-40">#</span>
+<span class="text-body-md">Logistics-Global</span>
+</a>
+</nav>
+</div>
+<!-- Direct Messages -->
+<div>
+<div class="flex justify-between items-center px-2 mb-2">
+<h3 class="text-label-md text-outline uppercase tracking-widest">Direct Messages</h3>
+<button class="material-symbols-outlined text-body-md hover:bg-surface-variant transition-colors rounded-lg p-1">search</button>
+</div>
+<nav class="space-y-1">
+<a class="text-on-surface-variant hover:bg-surface-container-high mx-2 flex items-center justify-between p-3 rounded-lg transition-colors group" href="#">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img class="w-8 h-8 rounded-full object-cover" data-alt="A portrait of a young professional woman with glasses, smiling warmly. Soft, diffused lighting in a modern workspace environment, light-mode color palette, high-resolution photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaXNeRdlEazv53xT9xaA_5VpoCS-C46pyvfc9EDWuCuHGN3wiT2I0OaAOZMulfh3kqGI_J6u4tjYmCmQ4Yhy7R_nAuiN1J3g3R7VDiuCt7DzOIqshw8kaY9kuQb9fEeKExF4-yy7q3myGJN1cCnXfhfDFe_OaJ22n56QPw2rh2F3ojud4gXHr0UPK40nIDTVdbVpRlAy5CMl93PPBpKtJ7rM70D996eAClvhH7YhyrS7SZNYgSdaWk1w"/>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-tertiary border-2 border-white rounded-full"></span>
+</div>
+<div class="flex flex-col">
+<span class="text-body-md font-medium text-on-surface">Sarah Connor</span>
+<span class="text-[10px] text-outline">Active now</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[16px] text-primary opacity-0 group-hover:opacity-100 transition-opacity" style="font-variation-settings: 'FILL' 1;">lock</span>
+</a>
+<a class="text-on-surface-variant hover:bg-surface-container-high mx-2 flex items-center justify-between p-3 rounded-lg transition-colors group" href="#">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img class="w-8 h-8 rounded-full object-cover" data-alt="A portrait of a professional man with a short beard and smart casual attire. Natural daylighting, clean studio background, modern corporate aesthetic, professional and approachable expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1sfoepJTUV1CVGwc9haV6la_dllnLCLsKdTJO0KaY6cjTUfw7O84Va1_a0E1ipvC0L2WJQiEF2jEhbEJKausqqMdKvsU378LdnnHd4d7AVQQgABqp0RFPt8xr_HIH2I7896jZqQyMd5W92BwIT_WkvCH-ouidGCKn5LL3FVaf-cNQ5raKyWeJA0iEuyRVAImz0w8PcpWyj1qbqpI3M7jcvD6cQDl6yOmH_5oAOo1dwnB5VEr0i6XNww"/>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-outline border-2 border-white rounded-full"></span>
+</div>
+<div class="flex flex-col">
+<span class="text-body-md font-medium text-on-surface">James Wilson</span>
+<span class="text-[10px] text-outline">Offline</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[16px] text-primary opacity-0 group-hover:opacity-100 transition-opacity" style="font-variation-settings: 'FILL' 1;">lock</span>
+</a>
+</nav>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/30 text-[10px] text-outline flex items-center justify-between">
+<span>System Version v2.4.0</span>
+<span class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                        Stable
+                    </span>
+</div>
+</div>
+</aside>
+<!-- Main Chat Canvas -->
+<main class="flex-1 flex flex-col relative bg-surface-container-low min-w-0">
+<!-- Chat Header -->
+<div class="h-16 px-md flex items-center justify-between glass-panel border-b-0 sticky top-0 z-20">
+<div class="flex items-center gap-3">
+<div class="lg:hidden">
+<button class="material-symbols-outlined p-2 hover:bg-surface-variant rounded-full">arrow_back</button>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md text-primary font-bold">#Warehouse-Alpha</span>
+<span class="material-symbols-outlined text-primary text-[18px] secure-pulse" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<span class="text-body-sm text-on-surface-variant flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                            12 Members Online | General discussion for inventory logistics
+                        </span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-surface-variant rounded-full transition-colors">call</button>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-surface-variant rounded-full transition-colors">videocam</button>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-surface-variant rounded-full transition-colors">info</button>
+</div>
+</div>
+<!-- Messages Area -->
+<div class="flex-1 overflow-y-auto p-md space-y-6 scrollbar-hide">
+<!-- Date Separator -->
+<div class="flex items-center gap-4 py-4">
+<div class="flex-1 h-[1px] bg-outline-variant/40"></div>
+<span class="text-[10px] font-bold text-outline uppercase tracking-widest">Today, October 24</span>
+<div class="flex-1 h-[1px] bg-outline-variant/40"></div>
+</div>
+<!-- Message Received -->
+<div class="flex items-start gap-3 group">
+<img class="w-9 h-9 rounded-lg object-cover shadow-sm" data-alt="Close-up portrait of a woman with a confident expression, professional lighting, minimal modern office background with soft bokeh, clear high-resolution details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDr_Cjs-Vq_XUl6Yhr5o7-5-k8tF_TShMEXDfztNbFzXZa3h8yUXuK2pVMTr9LBBkL6khanjKnYr4jyURGoV5jeELIBttxcwAm4USFN2JIjZtthiafktVfj7MuChAwpwG_cjL_Axlj2Q94ZvXuyuqheoosf8lwVpuuMBZKpWCJKgPi9dMYXpa8Hi0Xt0XKh9ao0Z1von6_oYkCmfxw15E-KTDYgNslKavf44pMDKw_SphznBFkmk7XAWQ"/>
+<div class="max-w-[70%] space-y-1">
+<div class="flex items-center gap-2">
+<span class="text-body-sm font-bold text-on-surface">Sarah Connor</span>
+<span class="text-[10px] text-outline">10:42 AM</span>
+</div>
+<div class="glass-panel p-3 rounded-r-xl rounded-bl-xl shadow-sm border-primary/5">
+<p class="text-body-md text-on-surface">The shipment for SKU-4029 has arrived at Gate 4. We need the inventory team to verify the manifest before we start offloading.</p>
+</div>
+</div>
+</div>
+<!-- Message Sent (Encrypted) -->
+<div class="flex items-start gap-3 flex-row-reverse group">
+<div class="w-9 h-9 rounded-lg bg-primary flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-white text-[20px]">person</span>
+</div>
+<div class="max-w-[70%] space-y-1 flex flex-col items-end">
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-outline">10:45 AM</span>
+<span class="text-body-sm font-bold text-primary">You</span>
+</div>
+<div class="message-bubble-sent p-3 rounded-l-xl rounded-br-xl">
+<p class="text-body-md text-white">Understood. I've dispatched Marcus and Julia to Gate 4. They should be there in 5 minutes with the digital scanners. <span class="material-symbols-outlined text-[14px] ml-1 align-middle opacity-80" style="font-variation-settings: 'FILL' 1;">done_all</span></p>
+</div>
+<div class="flex items-center gap-1 px-1 pt-1 text-[10px] text-primary/60 italic">
+<span class="material-symbols-outlined text-[12px]">verified</span>
+                            Encrypted end-to-end
+                        </div>
+</div>
+</div>
+<!-- Attachment Example -->
+<div class="flex items-start gap-3 group">
+<img class="w-9 h-9 rounded-lg object-cover shadow-sm" data-alt="A portrait of a male professional with short dark hair, wearing a navy blue polo shirt. High-end photography, bright clean lighting, corporate style, soft blurred office interior." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKorGi52MeBl-EkWGot_sOkc_IUdUGGxZPJDw8wdBbgOslmjUB4BwwPs2ZhMY09cDelZ_6pdj5JNhkuM0yR9ja0h5xtbmq59H-KYJESwY2w079ji1iW3DYF3zmjeByLITvOwmfQykH-fxDRmpKJqfhPpVUJn3_2ZmewD7BfsTwociGb5wpjWQHtQspdiOQdM6aa1fdhJUJlZbEWQceObqPBxBZEFm4Oqq7w1_mxsnyEBXcWiARauUBpw"/>
+<div class="max-w-[70%] space-y-1">
+<div class="flex items-center gap-2">
+<span class="text-body-sm font-bold text-on-surface">Marcus Reed</span>
+<span class="text-[10px] text-outline">10:51 AM</span>
+</div>
+<div class="glass-panel p-3 rounded-r-xl rounded-bl-xl shadow-sm flex flex-col gap-3">
+<p class="text-body-md text-on-surface">Manifest confirmed. There's a slight discrepancy in the pallet count for the fragile units. Attaching the scan report now.</p>
+<div class="flex items-center gap-3 p-3 bg-surface-container-high rounded-lg border border-outline-variant/30 hover:border-primary transition-colors cursor-pointer group/file">
+<div class="w-10 h-10 bg-error-container/30 rounded flex items-center justify-center text-error">
+<span class="material-symbols-outlined">picture_as_pdf</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-body-sm font-semibold text-on-surface truncate">Manifest_Report_SKU4029.pdf</p>
+<p class="text-[10px] text-outline">1.4 MB • Encrypted PDF</p>
+</div>
+<button class="material-symbols-outlined text-outline group-hover/file:text-primary transition-colors">download</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Message Sent -->
+<div class="flex items-start gap-3 flex-row-reverse group">
+<div class="w-9 h-9 rounded-lg bg-primary flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-white text-[20px]">person</span>
+</div>
+<div class="max-w-[70%] space-y-1 flex flex-col items-end">
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-outline">10:55 AM</span>
+<span class="text-body-sm font-bold text-primary">You</span>
+</div>
+<div class="message-bubble-sent p-3 rounded-l-xl rounded-br-xl">
+<p class="text-body-md text-white">Received. I'm reviewing the report now. Do not offload the fragile units until we verify the insurance claims for those pallets.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Input Area -->
+<div class="p-md bg-surface-container-low/80 backdrop-blur-md">
+<div class="max-w-4xl mx-auto glass-panel p-2 rounded-2xl shadow-lg border-primary/10">
+<div class="flex items-end gap-2">
+<button class="material-symbols-outlined p-2 text-primary hover:bg-primary-container/10 rounded-xl transition-all" title="Attach file">attach_file</button>
+<div class="flex-1 min-h-[44px] max-h-32 overflow-y-auto py-2.5 px-3">
+<textarea class="w-full bg-transparent border-none focus:ring-0 text-body-md placeholder:text-outline p-0 resize-none" id="message-input" placeholder="Type an encrypted message..." rows="1"></textarea>
+</div>
+<div class="flex items-center gap-1">
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-surface-variant rounded-xl transition-all">sentiment_satisfied</button>
+<button class="bg-primary text-white p-2.5 rounded-xl flex items-center justify-center hover:shadow-lg active:scale-95 transition-all shadow-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+</div>
+</div>
+<div class="text-center pt-2">
+<span class="text-[9px] uppercase tracking-[0.2em] text-outline-variant font-bold flex items-center justify-center gap-2">
+<span class="w-1 h-1 rounded-full bg-tertiary"></span>
+                        Military-Grade AES-256 Encryption Active
+                        <span class="w-1 h-1 rounded-full bg-tertiary"></span>
+</span>
+</div>
+</div>
+</main>
+<!-- Rights Detail Sidebar (Hidden on small screens) -->
+<aside class="hidden xl:flex flex-col w-72 h-full bg-surface-container-lowest border-l border-outline-variant/30">
+<div class="p-md space-y-6">
+<div class="text-center space-y-3 py-4">
+<div class="relative inline-block">
+<div class="w-24 h-24 rounded-2xl bg-secondary-container flex items-center justify-center mx-auto overflow-hidden">
+<span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1;">inventory</span>
+</div>
+<span class="absolute -bottom-1 -right-1 bg-tertiary text-white text-[10px] px-2 py-1 rounded-full border-2 border-white font-bold">LIVE</span>
+</div>
+<h2 class="font-headline-md text-headline-md font-bold">#Warehouse-Alpha</h2>
+<p class="text-body-sm text-outline px-4">Primary coordination channel for all Alpha sector inbound logistics.</p>
+</div>
+<div class="space-y-4">
+<h3 class="text-label-md text-outline uppercase tracking-widest px-2">Security Context</h3>
+<div class="glass-panel p-4 rounded-xl space-y-3">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">shield</span>
+<div class="flex flex-col">
+<span class="text-body-sm font-bold">End-to-End</span>
+<span class="text-[10px] text-outline">Encryption active</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary">timer</span>
+<div class="flex flex-col">
+<span class="text-body-sm font-bold">Retention</span>
+<span class="text-[10px] text-outline">30 Days logging</span>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<h3 class="text-label-md text-outline uppercase tracking-widest px-2">Active Media</h3>
+<div class="grid grid-cols-2 gap-2 p-2">
+<div class="aspect-square bg-surface-variant rounded-lg overflow-hidden group relative cursor-pointer">
+<img class="w-full h-full object-cover" data-alt="A clean, minimalist high-tech circuit board design with blue glowing lines and metallic components. Professional industrial style, light-mode background, macro photography focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2dMgDMWHGT56UfTmZpzvIqxE849xprGPUGeRKu21GCgF5GhI5JG8y3_33MzS7wiGm7imdDCZm8lcM7bABF9_uhzDBdbTVKJh0yVN9-X_cRD1mLuew5YxNkXaMQmFQhMOjIp6HQZn7IFbrokxvPGxM147N03IZSHOfN1ofGWMNEL0welv4z5qAVUwhpJ5jTE7iNpRpiD8cd3OJHqH_xXeMx_oIb4fDe6GfYv-g5MifWj97q-w1ux-5Jg"/>
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="aspect-square bg-surface-variant rounded-lg overflow-hidden group relative cursor-pointer">
+<img class="w-full h-full object-cover" data-alt="Aerial view of a highly organized modern warehouse with clean white floors, yellow safety lines, and high-tech automated robots. Soft morning light coming from high windows, airy and professional aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOCi_PY8g6TonYqIX8eFPLhADdsJQGD1MU_APyvtiRAzIHjQCm4PbFCePG1G8ehqwp20yd99mbEdUx-hs-CVVrQL5Ia84PG1tpMcvfTwfinm6ier5oEZnsW9FOKEaK-HxjSDNyDotFjzCsU3npZM_BB0Dn6cEKDbpLcqda0OMoFA_3nnUIJ6EukNttCkl6j6OHihBkrybFdYByxsuJb5yaZcTmjc17tSudbTSuqvEflFCGSSNGtEbhMg"/>
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="aspect-square bg-surface-variant rounded-lg overflow-hidden group relative cursor-pointer">
+<img class="w-full h-full object-cover" data-alt="Close-up of a digital warehouse scanner displaying a detailed green checkmark on a high-resolution screen. Modern industrial design, sleek metallic finish, bright professional lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZ_d7YkiRACkwa2lBR-TldcpA5EPqMKTDoUu7TfpItR1lPsTLuk1-mBmo-mIaWre34RfuVLxqsFJ5sfmM_E9_pRps3w30mURzQ-G0liDnBrbk5XnIvO77rtEfkX9C4AOXJR3izekWxDylHnBcA_BWtZ_osOUlxyhXlyXegyWnqHiRXMW-Ag1ERcdG0RCl5G54qdpE8yBJUwNrreAeYb4vg9u9I_4DmSgZDoR33ZK1bDN6PqjYA4BSD6A"/>
+<div class="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="aspect-square bg-surface-variant rounded-lg flex items-center justify-center hover:bg-outline-variant/30 transition-colors cursor-pointer">
+<span class="text-body-sm font-bold text-outline">+12</span>
+</div>
+</div>
+</div>
+</div>
+</aside>
+</div>
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-2 pb-safe bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl border-t border-outline-variant/30 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] z-50 rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all p-2" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+<span class="text-[10px] font-bold">Chat</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all p-2" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="text-[10px] font-medium">Stock</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all p-2" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-medium">Data</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all p-2" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">Admin</span>
+</a>
+</nav>
+<script>
+        // Auto-expand textarea
+        const textarea = document.getElementById('message-input');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Simple send micro-interaction
+        document.querySelector('.bg-primary.text-white').addEventListener('click', () => {
+            if (textarea.value.trim() !== "") {
+                textarea.value = "";
+                textarea.style.height = 'auto';
+            }
+        });
+    </script>
+</body></html>
