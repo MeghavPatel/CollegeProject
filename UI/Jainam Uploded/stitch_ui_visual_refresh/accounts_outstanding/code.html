@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Accounts Outstanding - Invoice Generator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#002114",
+                    "primary": "#006948",
+                    "secondary-container": "#d6e0f4",
+                    "tertiary-container": "#00855b",
+                    "surface-container-highest": "#e1e3e4",
+                    "error-container": "#ffdad6",
+                    "inverse-primary": "#68dba9",
+                    "primary-fixed": "#85f8c4",
+                    "on-tertiary-container": "#f5fff6",
+                    "secondary": "#555f70",
+                    "surface-tint": "#006c4a",
+                    "on-primary-fixed-variant": "#005137",
+                    "surface-bright": "#f8f9fa",
+                    "inverse-surface": "#2e3132",
+                    "on-secondary-fixed-variant": "#3d4757",
+                    "tertiary": "#006947",
+                    "secondary-fixed": "#d9e3f7",
+                    "on-primary-container": "#f5fff7",
+                    "on-primary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "secondary-fixed-dim": "#bdc7db",
+                    "on-error": "#ffffff",
+                    "on-secondary-fixed": "#121c2a",
+                    "primary-fixed-dim": "#68dba9",
+                    "surface-container-lowest": "#ffffff",
+                    "background": "#f8f9fa",
+                    "on-tertiary": "#ffffff",
+                    "on-surface": "#191c1d",
+                    "inverse-on-surface": "#f0f1f2",
+                    "outline": "#6d7a72",
+                    "error": "#ba1a1a",
+                    "surface-container-high": "#e7e8e9",
+                    "on-background": "#191c1d",
+                    "surface-container-low": "#f3f4f5",
+                    "on-secondary": "#ffffff",
+                    "primary-container": "#00855d",
+                    "tertiary-fixed": "#6ffbbe",
+                    "on-secondary-container": "#596374",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "on-tertiary-fixed": "#002113",
+                    "surface-variant": "#e1e3e4",
+                    "surface-container": "#edeeef",
+                    "surface-dim": "#d9dadb",
+                    "on-surface-variant": "#3d4a42",
+                    "surface": "#f8f9fa",
+                    "outline-variant": "#bccac0"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "max-width": "1280px",
+                    "lg": "24px",
+                    "sm": "8px",
+                    "xl": "48px",
+                    "gutter": "24px",
+                    "margin-mobile": "16px",
+                    "base": "4px",
+                    "margin-desktop": "64px",
+                    "xs": "4px",
+                    "md": "16px"
+            },
+            "fontFamily": {
+                    "mono-stats": [
+                            "Inter"
+                    ],
+                    "headline-lg-mobile": [
+                            "Inter"
+                    ],
+                    "headline-lg": [
+                            "Inter"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "label-md": [
+                            "Inter"
+                    ],
+                    "label-sm": [
+                            "Inter"
+                    ],
+                    "headline-md": [
+                            "Inter"
+                    ],
+                    "display-lg": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {
+                    "mono-stats": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-lg-mobile": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "label-sm": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "56px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #F8F9FA;
+            color: #191c1d;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen pb-safe pb-24 md:pb-0">
+<!-- Top App Bar -->
+<header class="bg-surface dark:bg-background fixed top-0 w-full z-50 border-b border-outline-variant dark:border-outline transition-colors duration-200">
+<div class="flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 w-full max-w-[1280px] mx-auto">
+<div class="flex items-center gap-4">
+<button class="p-2 text-primary hover:bg-surface-container-low rounded-full transition-colors duration-200 md:hidden">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="hidden md:flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed tracking-tight">Invoice Generator</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex gap-1">
+<a class="px-3 py-2 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors font-label-md text-label-md" href="#">Dashboard</a>
+<a class="px-3 py-2 text-primary bg-surface-container-highest rounded-lg transition-colors font-label-md text-label-md" href="#">Unpaid</a>
+</div>
+<button class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant hover:opacity-80 transition-opacity">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A professional headshot of a business person in a modern office, bright natural lighting, corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDCzTwt9q5jOOV64YMiOzm7CYEUqWuw_iht6Xav1MoFpSe5dbX4RyTLPn5Ml2CIoAWeqOd0X-iCjlxQ33_kA1DiOD72AbxCZlk7dCghQOAC88NZohMmJD3wQ4JX7HMQ0i8_bg71xmkY5AQ13PUnyoKHNnv20EsJ6B-kdJ0Zj4Tq6b2DBK1nOdoWwrkNgfOvcyyIpcUnq953nBxzhqnCTIi99UIk-a0khBiWuE-jkLOQMci64beIAgYr"/>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="pt-20 px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
+<!-- Header Section -->
+<div class="flex items-center gap-4 mb-lg md:mb-xl">
+<button class="p-2 -ml-2 text-on-surface hover:bg-surface-container-low rounded-full transition-colors md:hidden">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Accounts Outstanding</h2>
+</div>
+<!-- Summary & Actions Area -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg mb-lg shadow-sm">
+<div class="flex flex-col md:flex-row md:justify-between md:items-end gap-lg">
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant mb-1 uppercase tracking-wider">Total Outstanding</p>
+<div class="flex items-baseline gap-3">
+<span class="font-display-lg text-display-lg text-primary tracking-tight">₹ 7,250.00</span>
+</div>
+</div>
+<div class="flex flex-col items-start md:items-end gap-3">
+<div class="bg-surface-container px-3 py-1 rounded-full font-label-sm text-label-sm text-on-surface-variant inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">group</span>
+                        3 Accounts
+                    </div>
+<button class="bg-primary hover:bg-surface-tint text-on-primary font-label-md text-label-md px-6 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors w-full md:w-auto shadow-sm active:shadow-inner">
+<span class="material-symbols-outlined text-[20px]">picture_as_pdf</span>
+                        Daily PDF Backup
+                    </button>
+</div>
+</div>
+<!-- Search Bar -->
+<div class="mt-lg relative">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+</div>
+<input class="block w-full pl-11 pr-4 py-3 bg-surface border border-outline-variant rounded-lg text-on-surface font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-shadow placeholder-on-surface-variant" placeholder="Search customer name..." type="text"/>
+</div>
+</div>
+<!-- Customer List -->
+<div class="space-y-4">
+<!-- Customer Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-surface-bright transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0 border border-outline-variant">
+<span class="material-symbols-outlined text-secondary text-2xl">person</span>
+</div>
+<div>
+<h3 class="font-headline-md text-body-lg text-on-surface font-semibold">Riya Patel</h3>
+<p class="font-body-md text-label-sm text-on-surface-variant mt-1">Last Activity: 22-Jul-2026</p>
+</div>
+</div>
+<div class="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center w-full sm:w-auto gap-2">
+<span class="font-mono-stats text-mono-stats text-error">- ₹ 7,250.00</span>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary hover:bg-primary-container transition-colors" title="Mark Paid">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-error-container flex items-center justify-center text-on-error-container hover:bg-[#ffb4ab] transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-secondary hover:bg-surface-variant transition-colors" title="Notify">
+<span class="material-symbols-outlined text-[18px]">notifications</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Customer Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-surface-bright transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0 border border-outline-variant">
+<span class="material-symbols-outlined text-secondary text-2xl">person</span>
+</div>
+<div>
+<h3 class="font-headline-md text-body-lg text-on-surface font-semibold">Hh</h3>
+<p class="font-body-md text-label-sm text-on-surface-variant mt-1">Last Activity: 26-Jul-2026</p>
+</div>
+</div>
+<div class="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center w-full sm:w-auto gap-2">
+<span class="font-mono-stats text-mono-stats text-primary">+ ₹ 1,222.00</span>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary hover:bg-primary-container transition-colors" title="Mark Paid">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-error-container flex items-center justify-center text-on-error-container hover:bg-[#ffb4ab] transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-secondary hover:bg-surface-variant transition-colors" title="Notify">
+<span class="material-symbols-outlined text-[18px]">notifications</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Customer Card 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-surface-bright transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center flex-shrink-0 border border-outline-variant">
+<span class="material-symbols-outlined text-secondary text-2xl">person</span>
+</div>
+<div>
+<h3 class="font-headline-md text-body-lg text-on-surface font-semibold">Aman Sharma</h3>
+<p class="font-body-md text-label-sm text-on-surface-variant mt-1">Last Activity: 30-Jul-2026</p>
+</div>
+</div>
+<div class="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center w-full sm:w-auto gap-2">
+<span class="font-mono-stats text-mono-stats text-primary">+ ₹ 800.00</span>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-primary hover:bg-primary-container transition-colors" title="Mark Paid">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-error-container flex items-center justify-center text-on-error-container hover:bg-[#ffb4ab] transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-secondary hover:bg-surface-variant transition-colors" title="Notify">
+<span class="material-symbols-outlined text-[18px]">notifications</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-20 bg-surface dark:bg-background pb-safe z-50 transition-all duration-200">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 transition-all duration-200 active:scale-95" href="#">
+<span class="material-symbols-outlined mb-1">dashboard</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 transition-all duration-200 active:scale-95" href="#">
+<span class="material-symbols-outlined mb-1">add_notes</span>
+<span class="font-label-sm text-label-sm">Invoices</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 transition-all duration-200 active:scale-95" href="#">
+<span class="material-symbols-outlined mb-1">history</span>
+<span class="font-label-sm text-label-sm">History</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-3 py-1 transition-all duration-200 active:scale-95" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">pending_actions</span>
+<span class="font-label-sm text-label-sm">Unpaid</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 transition-all duration-200 active:scale-95" href="#">
+<span class="material-symbols-outlined mb-1">inventory_2</span>
+<span class="font-label-sm text-label-sm">Items</span>
+</a>
+</nav>
+</body></html>

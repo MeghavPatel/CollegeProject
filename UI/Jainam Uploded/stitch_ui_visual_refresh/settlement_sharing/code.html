@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create Invoice - Emerald Ledger</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#002114",
+                        "primary": "#006948",
+                        "secondary-container": "#d6e0f4",
+                        "tertiary-container": "#00855b",
+                        "surface-container-highest": "#e1e3e4",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#68dba9",
+                        "primary-fixed": "#85f8c4",
+                        "on-tertiary-container": "#f5fff6",
+                        "secondary": "#555f70",
+                        "surface-tint": "#006c4a",
+                        "on-primary-fixed-variant": "#005137",
+                        "surface-bright": "#f8f9fa",
+                        "inverse-surface": "#2e3132",
+                        "on-secondary-fixed-variant": "#3d4757",
+                        "tertiary": "#006947",
+                        "secondary-fixed": "#d9e3f7",
+                        "on-primary-container": "#f5fff7",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "secondary-fixed-dim": "#bdc7db",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#121c2a",
+                        "primary-fixed-dim": "#68dba9",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#f8f9fa",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#191c1d",
+                        "inverse-on-surface": "#f0f1f2",
+                        "outline": "#6d7a72",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#e7e8e9",
+                        "on-background": "#191c1d",
+                        "surface-container-low": "#f3f4f5",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#00855d",
+                        "tertiary-fixed": "#6ffbbe",
+                        "on-secondary-container": "#596374",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-tertiary-fixed": "#002113",
+                        "surface-variant": "#e1e3e4",
+                        "surface-container": "#edeeef",
+                        "surface-dim": "#d9dadb",
+                        "on-surface-variant": "#3d4a42",
+                        "surface": "#f8f9fa",
+                        "outline-variant": "#bccac0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "max-width": "1280px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "xl": "48px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "base": "4px",
+                        "margin-desktop": "64px",
+                        "xs": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "mono-stats": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "mono-stats": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background antialiased min-h-screen flex flex-col font-body-md">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant flex justify-between items-center px-margin-mobile h-16 transition-colors duration-200">
+<div class="flex items-center gap-4">
+<button aria-label="Go Back" class="text-on-surface-variant hover:bg-surface-container-low rounded-full p-2 transition-colors active:opacity-80">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary">Invoice Generator</h1>
+</div>
+<div class="flex items-center">
+<button aria-label="User Profile" class="text-on-surface-variant hover:bg-surface-container-low rounded-full p-2 transition-colors active:opacity-80">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-[80px] pb-[100px] px-margin-mobile md:px-margin-desktop w-full max-w-[1280px] mx-auto">
+<!-- Context Header -->
+<div class="bg-primary-container text-on-primary-container rounded-lg p-md mb-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+<h2 class="font-label-md text-label-md uppercase tracking-wider">Emerald Solutions</h2>
+<div class="font-mono-stats text-mono-stats opacity-90">Ref: INV-2026-07-30--0001</div>
+</div>
+<h3 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background mb-md">Settlement &amp; Sharing</h3>
+<!-- Main Card -->
+<div class="bg-surface rounded-xl border border-outline-variant overflow-hidden">
+<div class="p-md md:p-lg border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<h4 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Bill Text Summary</h4>
+<button class="flex items-center gap-2 text-primary hover:text-primary-container transition-colors duration-200" id="copy-btn">
+<span class="material-symbols-outlined text-sm">content_copy</span>
+<span class="font-label-md text-label-md">One-Click Copy</span>
+</button>
+</div>
+<div class="p-md md:p-lg">
+<!-- Text Invoice Preview -->
+<div class="bg-surface-container-low rounded-lg p-md mb-lg font-mono-stats text-sm leading-relaxed overflow-x-auto border border-outline-variant text-secondary whitespace-pre-wrap" id="invoice-text">
+---------------------------------
+             INVOICE
+---------------------------------
+🏪 Store: Emerald Solutions
+📄 Invoice #: INV-2026-07-30--0001
+📅 Date: 30-Jul-2026
+👤 Customer: Aman Sharma
+📱 Phone: +91 9876543210
+---------------------------------
+ITEMS:
+1. Lavender Soap Bar x 10 = Rs. 1,200.00
+---------------------------------
+💰 Total Amount: *Rs. 1,200.00*
+📝 Status: PENDING ⚠️
+---------------------------------
+Thank you for shopping with us! 🙏
+                </div>
+<!-- Action Button -->
+<button class="w-full bg-[#25D366] hover:bg-[#128C7E] text-white rounded-lg py-3 px-4 flex items-center justify-center gap-2 transition-colors duration-200 shadow-sm active:scale-[0.98]">
+<span class="material-symbols-outlined">chat</span>
+<span class="font-label-md text-label-md">Send via WhatsApp Direct</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Bottom Action Bar (Transactional so replacing BottomNavBar with context actions) -->
+<div class="fixed bottom-0 w-full bg-surface border-t border-outline-variant p-margin-mobile flex justify-between items-center z-40 pb-safe">
+<button class="border border-secondary text-secondary hover:bg-surface-container-low rounded-lg py-2 px-6 font-label-md text-label-md transition-colors duration-200">
+            Back
+        </button>
+<button class="bg-primary hover:bg-tertiary-container text-on-primary rounded-lg py-2 px-6 font-label-md text-label-md transition-colors duration-200 shadow-sm active:shadow-inner">
+            Generate Invoice
+        </button>
+</div>
+<script>
+        document.getElementById('copy-btn').addEventListener('click', function() {
+            const textToCopy = document.getElementById('invoice-text').innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const btnText = this.querySelector('span:last-child');
+                const originalText = btnText.innerText;
+                btnText.innerText = 'Copied!';
+                this.classList.add('text-tertiary-container');
+                setTimeout(() => {
+                    btnText.innerText = originalText;
+                    this.classList.remove('text-tertiary-container');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        });
+    </script>
+</body></html>

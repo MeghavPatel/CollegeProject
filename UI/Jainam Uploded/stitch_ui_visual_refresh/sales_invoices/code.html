@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sales Invoices - Emerald Ledger</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#002114",
+                        "primary": "#006948",
+                        "secondary-container": "#d6e0f4",
+                        "tertiary-container": "#00855b",
+                        "surface-container-highest": "#e1e3e4",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#68dba9",
+                        "primary-fixed": "#85f8c4",
+                        "on-tertiary-container": "#f5fff6",
+                        "secondary": "#555f70",
+                        "surface-tint": "#006c4a",
+                        "on-primary-fixed-variant": "#005137",
+                        "surface-bright": "#f8f9fa",
+                        "inverse-surface": "#2e3132",
+                        "on-secondary-fixed-variant": "#3d4757",
+                        "tertiary": "#006947",
+                        "secondary-fixed": "#d9e3f7",
+                        "on-primary-container": "#f5fff7",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "secondary-fixed-dim": "#bdc7db",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#121c2a",
+                        "primary-fixed-dim": "#68dba9",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#f8f9fa",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#191c1d",
+                        "inverse-on-surface": "#f0f1f2",
+                        "outline": "#6d7a72",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#e7e8e9",
+                        "on-background": "#191c1d",
+                        "surface-container-low": "#f3f4f5",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#00855d",
+                        "tertiary-fixed": "#6ffbbe",
+                        "on-secondary-container": "#596374",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-tertiary-fixed": "#002113",
+                        "surface-variant": "#e1e3e4",
+                        "surface-container": "#edeeef",
+                        "surface-dim": "#d9dadb",
+                        "on-surface-variant": "#3d4a42",
+                        "surface": "#f8f9fa",
+                        "outline-variant": "#bccac0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "max-width": "1280px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "xl": "48px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "base": "4px",
+                        "margin-desktop": "64px",
+                        "xs": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "mono-stats": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "mono-stats": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen pt-16 pb-24 md:pb-8 flex justify-center">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant flex justify-between items-center px-margin-mobile h-16 transition-colors duration-200">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-primary hover:bg-surface-container-low p-2 rounded-full transition-colors active:opacity-80">arrow_back</button>
+<h1 class="font-headline-md text-headline-md text-primary">Invoice Generator</h1>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full cursor-pointer">filter_list</span>
+</div>
+</header>
+<main class="w-full max-w-[1280px] px-margin-mobile md:px-margin-desktop py-lg flex flex-col gap-lg">
+<!-- Search Bar -->
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary">search</span>
+<input class="w-full h-12 pl-12 pr-4 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all shadow-sm" placeholder="Search invoice number, customer name..." type="text"/>
+</div>
+<!-- Invoice List -->
+<div class="flex flex-col gap-md">
+<!-- Invoice Item 1 (Unpaid) -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col gap-sm hover:bg-surface-container-low transition-colors duration-200 cursor-pointer group shadow-sm">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary mb-1">INV-2026-07-30--0001</span>
+<span class="font-body-lg text-body-lg font-semibold text-on-surface">Aman Sharma</span>
+</div>
+<span class="bg-error-container text-on-error-container font-label-sm text-label-sm px-2 py-1 rounded-md">UNPAID</span>
+</div>
+<div class="flex flex-col gap-xs text-on-surface-variant font-body-md text-body-md text-sm">
+<span>Mob: 9876543210</span>
+<span>30-Jul-2026 • 09:15 PM</span>
+</div>
+<hr class="border-outline-variant my-2 group-hover:border-outline transition-colors"/>
+<div class="flex justify-between items-end">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Grand Total</span>
+<span class="font-mono-stats text-mono-stats text-on-surface">₹ 1,200.00</span>
+</div>
+<div class="flex gap-4 text-on-surface-variant">
+<button class="material-symbols-outlined text-error hover:opacity-80 transition-opacity" title="Download PDF">picture_as_pdf</button>
+<button class="material-symbols-outlined text-primary hover:opacity-80 transition-opacity" title="Edit">edit</button>
+<button class="material-symbols-outlined text-error hover:opacity-80 transition-opacity" title="Delete">delete</button>
+</div>
+</div>
+</div>
+<!-- Invoice Item 2 (Unpaid) -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col gap-sm hover:bg-surface-container-low transition-colors duration-200 cursor-pointer group shadow-sm">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary mb-1">INV-2026-07-23--0002</span>
+<span class="font-body-lg text-body-lg font-semibold text-on-surface">Riya Patel</span>
+</div>
+<span class="bg-error-container text-on-error-container font-label-sm text-label-sm px-2 py-1 rounded-md">UNPAID</span>
+</div>
+<div class="flex flex-col gap-xs text-on-surface-variant font-body-md text-body-md text-sm">
+<span>Mob: 9812345678</span>
+<span>23-Jul-2026 • 11:40 AM</span>
+</div>
+<hr class="border-outline-variant my-2 group-hover:border-outline transition-colors"/>
+<div class="flex justify-between items-end">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Grand Total</span>
+<span class="font-mono-stats text-mono-stats text-on-surface">₹ 7,250.00</span>
+</div>
+<div class="flex gap-4 text-on-surface-variant">
+<button class="material-symbols-outlined text-error hover:opacity-80 transition-opacity" title="Download PDF">picture_as_pdf</button>
+<button class="material-symbols-outlined text-primary hover:opacity-80 transition-opacity" title="Edit">edit</button>
+<button class="material-symbols-outlined text-error hover:opacity-80 transition-opacity" title="Delete">delete</button>
+</div>
+</div>
+</div>
+<!-- Invoice Item 3 (Paid) -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col gap-sm hover:bg-surface-container-low transition-colors duration-200 cursor-pointer group shadow-sm">
+<div class="flex justify-between items-start">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary mb-1">INV-2026-07-23--0001</span>
+<span class="font-body-lg text-body-lg font-semibold text-on-surface">Aman Sharma</span>
+</div>
+<span class="bg-primary-container text-on-primary-container font-label-sm text-label-sm px-2 py-1 rounded-md">PAID</span>
+</div>
+<div class="flex flex-col gap-xs text-on-surface-variant font-body-md text-body-md text-sm">
+<span>Mob: 9876543210</span>
+<span>23-Jul-2026 • 09:40 AM</span>
+</div>
+<hr class="border-outline-variant my-2 group-hover:border-outline transition-colors"/>
+<div class="flex justify-between items-end">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Grand Total</span>
+<span class="font-mono-stats text-mono-stats text-on-surface">₹ 2,900.00</span>
+</div>
+<div class="flex gap-4 text-on-surface-variant">
+<button class="material-symbols-outlined text-error hover:opacity-80 transition-opacity" title="Download PDF">picture_as_pdf</button>
+<button class="material-symbols-outlined text-primary hover:opacity-80 transition-opacity" title="Edit">edit</button>
+<button class="material-symbols-outlined text-error hover:opacity-80 transition-opacity" title="Delete">delete</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-20 bg-surface border-t border-outline-variant pb-safe z-50">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all duration-200 px-3 py-1" href="#">
+<span class="material-symbols-outlined mb-1">dashboard</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-3 py-1 transition-all duration-200 active:scale-95" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">add_notes</span>
+<span class="font-label-sm text-label-sm">Invoices</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all duration-200 px-3 py-1" href="#">
+<span class="material-symbols-outlined mb-1">history</span>
+<span class="font-label-sm text-label-sm">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all duration-200 px-3 py-1" href="#">
+<span class="material-symbols-outlined mb-1">pending_actions</span>
+<span class="font-label-sm text-label-sm">Unpaid</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all duration-200 px-3 py-1" href="#">
+<span class="material-symbols-outlined mb-1">inventory_2</span>
+<span class="font-label-sm text-label-sm">Items</span>
+</a>
+</nav>
+<!-- SideNav (Desktop Only - hidden on mobile) -->
+<aside class="hidden md:flex flex-col h-full w-80 fixed left-0 top-16 bg-surface shadow-xl z-40 py-lg">
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-4 text-on-surface-variant mx-2 px-4 py-3 hover:bg-surface-container-highest rounded-xl transition-all duration-150" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 bg-secondary-container text-on-secondary-container mx-2 px-4 py-3 rounded-xl transition-all duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_notes</span>
+<span class="font-body-md text-body-md">Invoices</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant mx-2 px-4 py-3 hover:bg-surface-container-highest rounded-xl transition-all duration-150" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-md text-body-md">Clients</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant mx-2 px-4 py-3 hover:bg-surface-container-highest rounded-xl transition-all duration-150" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-body-md text-body-md">Items</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant mx-2 px-4 py-3 hover:bg-surface-container-highest rounded-xl transition-all duration-150" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-2 border-t border-outline-variant pt-4 mx-4">
+<a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 hover:bg-surface-container-highest rounded-xl transition-all duration-150" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-body-md text-body-md">Help</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant px-4 py-3 hover:bg-surface-container-highest rounded-xl transition-all duration-150 text-error" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body-md text-body-md">Logout</span>
+</a>
+</div>
+</aside>
+</body></html>

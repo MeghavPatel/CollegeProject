@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create Invoice - Add Items</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary-fixed": "#002114",
+                        "primary": "#006948",
+                        "secondary-container": "#d6e0f4",
+                        "tertiary-container": "#00855b",
+                        "surface-container-highest": "#e1e3e4",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#68dba9",
+                        "primary-fixed": "#85f8c4",
+                        "on-tertiary-container": "#f5fff6",
+                        "secondary": "#555f70",
+                        "surface-tint": "#006c4a",
+                        "on-primary-fixed-variant": "#005137",
+                        "surface-bright": "#f8f9fa",
+                        "inverse-surface": "#2e3132",
+                        "on-secondary-fixed-variant": "#3d4757",
+                        "tertiary": "#006947",
+                        "secondary-fixed": "#d9e3f7",
+                        "on-primary-container": "#f5fff7",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "secondary-fixed-dim": "#bdc7db",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#121c2a",
+                        "primary-fixed-dim": "#68dba9",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#f8f9fa",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#191c1d",
+                        "inverse-on-surface": "#f0f1f2",
+                        "outline": "#6d7a72",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#e7e8e9",
+                        "on-background": "#191c1d",
+                        "surface-container-low": "#f3f4f5",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#00855d",
+                        "tertiary-fixed": "#6ffbbe",
+                        "on-secondary-container": "#596374",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-tertiary-fixed": "#002113",
+                        "surface-variant": "#e1e3e4",
+                        "surface-container": "#edeeef",
+                        "surface-dim": "#d9dadb",
+                        "on-surface-variant": "#3d4a42",
+                        "surface": "#f8f9fa",
+                        "outline-variant": "#bccac0"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "max-width": "1280px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "xl": "48px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "base": "4px",
+                        "margin-desktop": "64px",
+                        "xs": "4px",
+                        "md": "16px"
+                    },
+                    fontFamily: {
+                        "mono-stats": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    fontSize: {
+                        "mono-stats": ["16px", { lineHeight: "24px", fontWeight: "600" }],
+                        "headline-lg-mobile": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "headline-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "600" }],
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+                        "label-md": ["14px", { lineHeight: "20px", letterSpacing: "0.05em", fontWeight: "500" }],
+                        "label-sm": ["12px", { lineHeight: "16px", fontWeight: "600" }],
+                        "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .progress-bar-fill {
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-sans antialiased">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant flex justify-between items-center px-margin-mobile h-16 transition-colors duration-200">
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors duration-200 active:opacity-80">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary">Invoice Generator</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors duration-200 active:opacity-80">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-16 pb-24 px-margin-mobile md:px-margin-desktop md:max-w-max-width md:mx-auto w-full flex flex-col md:flex-row gap-lg">
+<!-- Left Column: Context & Input -->
+<div class="flex-1 flex flex-col gap-md pt-lg">
+<!-- Context Header -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col gap-sm shadow-sm">
+<div class="flex justify-between items-center">
+<span class="font-label-md text-label-md text-primary uppercase tracking-wider">Draft Invoice</span>
+<span class="font-mono-stats text-mono-stats text-on-surface-variant">INV-2026-07-30--0001</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-1 mt-2 overflow-hidden">
+<div class="bg-primary h-1 rounded-full progress-bar-fill w-1/3"></div>
+</div>
+</div>
+<!-- Instruction Section -->
+<div class="flex flex-col gap-sm mt-md">
+<h2 class="font-headline-md text-headline-md text-on-background">Tap Inventory Item to Add</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Tap any product below to set quantity and rate. Item locks into the bill instantly.</p>
+</div>
+<!-- Inventory Chips Grid -->
+<div class="flex flex-wrap gap-sm mt-sm">
+<button class="px-4 py-2 bg-surface-container-lowest border border-outline text-primary font-label-md text-label-md rounded-lg hover:bg-primary-container hover:text-on-primary-container transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    18mm Premium Ply
+                </button>
+<button class="px-4 py-2 bg-surface-container-lowest border border-outline text-primary font-label-md text-label-md rounded-lg hover:bg-primary-container hover:text-on-primary-container transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    12mm MDF Board
+                </button>
+<button class="px-4 py-2 bg-surface-container-lowest border border-outline text-primary font-label-md text-label-md rounded-lg hover:bg-primary-container hover:text-on-primary-container transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    Teak Wood Plank
+                </button>
+<button class="px-4 py-2 bg-surface-container-lowest border border-outline text-primary font-label-md text-label-md rounded-lg hover:bg-primary-container hover:text-on-primary-container transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    Lavender Soap Bar
+                </button>
+<button class="px-4 py-2 bg-surface-container-lowest border border-outline text-primary font-label-md text-label-md rounded-lg hover:bg-primary-container hover:text-on-primary-container transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    Essential Diffuser
+                </button>
+<button class="px-4 py-2 bg-surface-container-lowest border border-outline border-dashed text-on-surface-variant font-label-md text-label-md rounded-lg hover:bg-surface-container-low transition-colors duration-200 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span> Custom Item
+                </button>
+</div>
+</div>
+<!-- Right Column: Live Feed (Desktop split, Mobile stack) -->
+<div class="flex-1 flex flex-col gap-md pt-lg md:border-l md:border-outline-variant md:pl-lg">
+<h3 class="font-headline-md text-headline-md text-on-background">Live Bill Feed</h3>
+<!-- Empty State -->
+<div class="flex-grow flex flex-col items-center justify-center p-xl text-center bg-surface-container-lowest rounded-xl border border-outline-variant border-dashed min-h-[300px]">
+<span class="material-symbols-outlined text-[64px] text-surface-variant mb-4" data-icon="receipt_long">receipt_long</span>
+<p class="font-body-md text-body-md text-on-surface-variant">No items added to this bill yet.</p>
+<p class="font-label-sm text-label-sm text-secondary mt-2">Tap an item from the list to begin.</p>
+</div>
+</div>
+</main>
+<!-- Bottom Action Bar (Contextual FAB equivalent for this task) -->
+<div class="fixed bottom-0 left-0 w-full bg-surface border-t border-outline-variant p-margin-mobile flex gap-md items-center justify-between z-40 pb-safe pb-6">
+<button class="px-6 py-3 bg-surface-container-lowest border border-outline text-on-surface font-label-md text-label-md rounded-lg hover:bg-surface-container-low transition-colors duration-200 min-w-[120px]">
+            Back
+        </button>
+<button class="flex-grow md:flex-grow-0 px-8 py-3 bg-primary text-on-primary font-label-md text-label-md rounded-lg hover:bg-surface-tint shadow-sm transition-all duration-200 active:scale-95 text-center min-w-[200px]">
+            Continue
+        </button>
+</div>
+</body></html>

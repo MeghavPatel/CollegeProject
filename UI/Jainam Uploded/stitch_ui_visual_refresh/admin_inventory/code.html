@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin &amp; Configuration - Inventory | Invoice Generator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#002114",
+                        "primary": "#006948",
+                        "secondary-container": "#d6e0f4",
+                        "tertiary-container": "#00855b",
+                        "surface-container-highest": "#e1e3e4",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#68dba9",
+                        "primary-fixed": "#85f8c4",
+                        "on-tertiary-container": "#f5fff6",
+                        "secondary": "#555f70",
+                        "surface-tint": "#006c4a",
+                        "on-primary-fixed-variant": "#005137",
+                        "surface-bright": "#f8f9fa",
+                        "inverse-surface": "#2e3132",
+                        "on-secondary-fixed-variant": "#3d4757",
+                        "tertiary": "#006947",
+                        "secondary-fixed": "#d9e3f7",
+                        "on-primary-container": "#f5fff7",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "secondary-fixed-dim": "#bdc7db",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#121c2a",
+                        "primary-fixed-dim": "#68dba9",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#f8f9fa",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#191c1d",
+                        "inverse-on-surface": "#f0f1f2",
+                        "outline": "#6d7a72",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#e7e8e9",
+                        "on-background": "#191c1d",
+                        "surface-container-low": "#f3f4f5",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#00855d",
+                        "tertiary-fixed": "#6ffbbe",
+                        "on-secondary-container": "#596374",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-tertiary-fixed": "#002113",
+                        "surface-variant": "#e1e3e4",
+                        "surface-container": "#edeeef",
+                        "surface-dim": "#d9dadb",
+                        "on-surface-variant": "#3d4a42",
+                        "surface": "#f8f9fa",
+                        "outline-variant": "#bccac0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "max-width": "1280px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "xl": "48px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "base": "4px",
+                        "margin-desktop": "64px",
+                        "xs": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "mono-stats": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "mono-stats": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen pt-16 pb-20 md:pb-0">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant flex justify-between items-center px-margin-mobile h-16 transition-colors duration-200">
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:bg-surface-container-low rounded-full p-2 transition-colors duration-200 active:opacity-80">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary font-bold tracking-tight">Invoice Generator</h1>
+</div>
+<button class="hover:bg-surface-container-low rounded-full transition-colors duration-200 active:opacity-80 overflow-hidden w-8 h-8 flex items-center justify-center bg-surface-variant text-on-surface-variant">
+<span class="material-symbols-outlined">person</span>
+</button>
+</header>
+<main class="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-lg grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Desktop SideNav Placeholder (Hidden on Mobile) -->
+<aside class="hidden md:block col-span-3">
+<!-- Navigation Drawer Component Structure -->
+<div class="bg-surface shadow-xl h-[calc(100vh-6rem)] rounded-xl sticky top-24 overflow-y-auto">
+<div class="p-lg border-b border-outline-variant">
+<h2 class="font-headline-md text-headline-md text-primary truncate">Emerald Solutions</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Free Tier</p>
+</div>
+<nav class="flex flex-col py-md gap-1">
+<a class="text-on-surface-variant mx-2 px-4 py-3 flex items-center gap-3 hover:bg-surface-container-highest transition-all duration-150 rounded-xl" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="text-on-surface-variant mx-2 px-4 py-3 flex items-center gap-3 hover:bg-surface-container-highest transition-all duration-150 rounded-xl" href="#">
+<span class="material-symbols-outlined">post_add</span>
+<span class="font-body-md text-body-md">Create Invoice</span>
+</a>
+<!-- Active State -> Intent Fallback to Items -> Mapping to Inventory -->
+<a class="bg-secondary-container text-on-secondary-container rounded-xl mx-2 px-4 py-3 flex items-center gap-3 transition-all duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-body-md text-body-md font-semibold">Inventory</span>
+</a>
+<a class="text-on-surface-variant mx-2 px-4 py-3 flex items-center gap-3 hover:bg-surface-container-highest transition-all duration-150 rounded-xl" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-md text-body-md">Clients</span>
+</a>
+<a class="text-on-surface-variant mx-2 px-4 py-3 flex items-center gap-3 hover:bg-surface-container-highest transition-all duration-150 rounded-xl mt-auto" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</nav>
+</div>
+</aside>
+<div class="col-span-1 md:col-span-9 flex flex-col gap-lg">
+<!-- Page Header -->
+<div class="flex items-center gap-4 py-sm">
+<a class="md:hidden text-on-surface-variant p-2 rounded-full hover:bg-surface-container-low" href="#">
+<span class="material-symbols-outlined">arrow_back</span>
+</a>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Admin &amp; Configuration</h2>
+</div>
+<!-- Sub Navigation Tabs (Mobile Only) -->
+<div class="md:hidden flex border-b border-outline-variant overflow-x-auto hide-scrollbar">
+<button class="flex-1 py-3 px-4 font-label-md text-label-md text-on-surface-variant whitespace-nowrap flex flex-col items-center gap-1">
+<span class="material-symbols-outlined">storefront</span>
+                    Profile
+                </button>
+<button class="flex-1 py-3 px-4 font-label-md text-label-md text-primary border-b-2 border-primary whitespace-nowrap flex flex-col items-center gap-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+                    Inventory
+                </button>
+<button class="flex-1 py-3 px-4 font-label-md text-label-md text-on-surface-variant whitespace-nowrap flex flex-col items-center gap-1">
+<span class="material-symbols-outlined">cloud_upload</span>
+                    Data Control
+                </button>
+</div>
+<!-- Register New Product Form Card -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md md:p-lg">
+<h3 class="font-label-md text-label-md text-secondary uppercase tracking-wider mb-md">Register New Product</h3>
+<form class="flex flex-col gap-md">
+<!-- Product Name Input -->
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline group-focus-within:text-primary transition-colors">inventory</span>
+</div>
+<input class="w-full pl-10 pr-4 py-3 bg-surface border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 outline-none" placeholder="Product Name" type="text"/>
+</div>
+<!-- Default Price Input -->
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline group-focus-within:text-primary transition-colors">currency_rupee</span>
+</div>
+<input class="w-full pl-10 pr-4 py-3 bg-surface border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 outline-none" placeholder="Default Price (₹)" type="number"/>
+</div>
+<button class="mt-sm w-full bg-primary hover:bg-tertiary-container text-on-primary font-label-md text-label-md py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 shadow-sm active:shadow-inner active:scale-[0.99]" type="button">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">save</span>
+                        Save to Inventory
+                    </button>
+</form>
+</section>
+<!-- Inventory List -->
+<section class="flex flex-col gap-sm md:gap-md">
+<!-- Item Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center justify-between hover:bg-surface-container-low transition-colors duration-150">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container flex-shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">sell</span>
+</div>
+<div>
+<h4 class="font-headline-sm font-semibold text-on-surface">18mm Premium Ply</h4>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1 mt-1">
+                                Base Price: <span class="font-mono-stats text-mono-stats text-on-surface">₹ 1,450.00</span>
+</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-primary hover:bg-primary-container rounded-full transition-colors" title="Edit">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 text-error hover:bg-error-container rounded-full transition-colors" title="Delete">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+<!-- Item Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center justify-between hover:bg-surface-container-low transition-colors duration-150">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container flex-shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">sell</span>
+</div>
+<div>
+<h4 class="font-headline-sm font-semibold text-on-surface">12mm MDF Board</h4>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1 mt-1">
+                                Base Price: <span class="font-mono-stats text-mono-stats text-on-surface">₹ 980.00</span>
+</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-primary hover:bg-primary-container rounded-full transition-colors" title="Edit">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 text-error hover:bg-error-container rounded-full transition-colors" title="Delete">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+<!-- Item Card 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center justify-between hover:bg-surface-container-low transition-colors duration-150">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container flex-shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">sell</span>
+</div>
+<div>
+<h4 class="font-headline-sm font-semibold text-on-surface">Teak Wood Plank</h4>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1 mt-1">
+                                Base Price: <span class="font-mono-stats text-mono-stats text-on-surface">₹ 2,500.00</span>
+</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-primary hover:bg-primary-container rounded-full transition-colors" title="Edit">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 text-error hover:bg-error-container rounded-full transition-colors" title="Delete">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-20 bg-surface pb-safe border-t border-outline-variant z-50">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:text-primary transition-all duration-200 active:scale-95" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:text-primary transition-all duration-200 active:scale-95" href="#">
+<span class="material-symbols-outlined">add_notes</span>
+<span class="font-label-sm text-label-sm mt-1">Invoices</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:text-primary transition-all duration-200 active:scale-95" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-sm text-label-sm mt-1">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:text-primary transition-all duration-200 active:scale-95" href="#">
+<span class="material-symbols-outlined">pending_actions</span>
+<span class="font-label-sm text-label-sm mt-1">Unpaid</span>
+</a>
+<!-- Active Tab Mapping to Intent -->
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-3 py-1 transition-all duration-200 active:scale-95" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-label-sm text-label-sm mt-1 font-bold">Items</span>
+</a>
+</nav>
+<style>
+        /* Hide scrollbar for horizontal scrolling tabs but keep functionality */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body></html>

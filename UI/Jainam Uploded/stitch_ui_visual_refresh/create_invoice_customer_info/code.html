@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create Invoice - Customer Info</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#002114",
+                        "primary": "#006948",
+                        "secondary-container": "#d6e0f4",
+                        "tertiary-container": "#00855b",
+                        "surface-container-highest": "#e1e3e4",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#68dba9",
+                        "primary-fixed": "#85f8c4",
+                        "on-tertiary-container": "#f5fff6",
+                        "secondary": "#555f70",
+                        "surface-tint": "#006c4a",
+                        "on-primary-fixed-variant": "#005137",
+                        "surface-bright": "#f8f9fa",
+                        "inverse-surface": "#2e3132",
+                        "on-secondary-fixed-variant": "#3d4757",
+                        "tertiary": "#006947",
+                        "secondary-fixed": "#d9e3f7",
+                        "on-primary-container": "#f5fff7",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "secondary-fixed-dim": "#bdc7db",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#121c2a",
+                        "primary-fixed-dim": "#68dba9",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#f8f9fa",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#191c1d",
+                        "inverse-on-surface": "#f0f1f2",
+                        "outline": "#6d7a72",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#e7e8e9",
+                        "on-background": "#191c1d",
+                        "surface-container-low": "#f3f4f5",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#00855d",
+                        "tertiary-fixed": "#6ffbbe",
+                        "on-secondary-container": "#596374",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-tertiary-fixed": "#002113",
+                        "surface-variant": "#e1e3e4",
+                        "surface-container": "#edeeef",
+                        "surface-dim": "#d9dadb",
+                        "on-surface-variant": "#3d4a42",
+                        "surface": "#f8f9fa",
+                        "outline-variant": "#bccac0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "max-width": "1280px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "xl": "48px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "base": "4px",
+                        "margin-desktop": "64px",
+                        "xs": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "mono-stats": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "mono-stats": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col md:flex-row">
+<!-- Mobile Top App Bar (Only visible on mobile, transactional page so TopAppBar structure from JSON is adapted for back navigation) -->
+<header class="md:hidden flex items-center px-margin-mobile h-16 w-full bg-surface border-b border-outline-variant fixed top-0 z-50">
+<button class="p-2 -ml-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-colors duration-200">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary ml-4 flex-1">Create Invoice</h1>
+</header>
+<!-- Desktop Sidebar (Transaction flow usually suppresses full sidebar, but keeping a minimal structure or hiding it completely. Let's hide full sidebar for focused task) -->
+<nav class="hidden md:flex flex-col w-80 h-screen fixed left-0 top-0 bg-surface shadow-xl z-40 border-r border-outline-variant">
+<div class="p-lg flex items-center border-b border-outline-variant">
+<h1 class="font-headline-md text-headline-md text-primary">Invoice Generator</h1>
+</div>
+<div class="flex-1 py-md overflow-y-auto hide-scrollbar">
+<!-- Reusing structure from NavigationDrawer JSON for context, but active state is Create Invoice -->
+<a class="flex items-center gap-4 text-on-surface-variant mx-2 px-4 py-3 hover:bg-surface-container-highest transition-all duration-150 rounded-xl" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 bg-secondary-container text-on-secondary-container mx-2 px-4 py-3 rounded-xl transition-all duration-150" href="#">
+<span class="material-symbols-outlined">post_add</span>
+<span class="font-label-md text-label-md font-bold">Create Invoice</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant mx-2 px-4 py-3 hover:bg-surface-container-highest transition-all duration-150 rounded-xl" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">Clients</span>
+</a>
+</div>
+<div class="p-lg border-t border-outline-variant">
+<a class="flex items-center gap-4 text-on-surface-variant px-4 py-2 hover:bg-surface-container-highest transition-all duration-150 rounded-xl" href="#">
+<span class="material-symbols-outlined">arrow_back</span>
+<span class="font-label-md text-label-md">Back to List</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full max-w-max-width mx-auto mt-16 md:mt-0 md:ml-80 pb-24 md:pb-lg pt-lg px-margin-mobile md:px-margin-desktop">
+<!-- Desktop Header -->
+<div class="hidden md:flex justify-between items-center mb-xl">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Create Invoice</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Enter customer details to begin.</p>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider block mb-1">Invoice Reference</span>
+<span class="font-mono-stats text-mono-stats text-primary">INV-2026-07-30-0001</span>
+</div>
+</div>
+<!-- Mobile Context Bar -->
+<div class="md:hidden flex justify-between items-center bg-surface-container-low p-sm rounded-lg mb-lg mt-4 border border-outline-variant">
+<span class="font-label-sm text-label-sm text-primary uppercase font-bold tracking-wider">STANDARD</span>
+<span class="font-mono-stats text-label-sm text-on-surface-variant">INV-2026-07-30-0001</span>
+</div>
+<section class="max-w-3xl">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-lg">Customer Information</h3>
+<!-- Customer Details Form -->
+<div class="space-y-md">
+<!-- Customer Name Input -->
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined">person</span>
+</div>
+<input class="block w-full pl-12 pr-4 py-4 bg-surface border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant focus:ring-2 focus:ring-primary focus:border-primary transition-shadow" id="customer_name" placeholder="Customer Name" type="text"/>
+</div>
+<!-- Mobile Number Input -->
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined">smartphone</span>
+</div>
+<input class="block w-full pl-12 pr-4 py-4 bg-surface border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant focus:ring-2 focus:ring-primary focus:border-primary transition-shadow" id="mobile_number" placeholder="Mobile Number" type="tel"/>
+</div>
+</div>
+<!-- Optional Opening Account Card (Glassmorphism/Minimalist style) -->
+<div class="mt-xl bg-surface border border-outline-variant rounded-xl p-lg shadow-sm relative overflow-hidden group">
+<!-- Decorative subtle accent -->
+<div class="absolute top-0 left-0 w-1 h-full bg-secondary-container group-hover:bg-primary transition-colors"></div>
+<div class="flex items-center gap-3 mb-sm">
+<span class="material-symbols-outlined text-primary text-2xl">account_balance</span>
+<h4 class="font-label-md text-label-md text-on-surface font-bold">Start Opening Account <span class="text-on-surface-variant font-normal">(Optional)</span></h4>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">Directly start this customer's account in the ledger with an opening balance.</p>
+<div class="space-y-lg border-t border-outline-variant pt-lg">
+<!-- Opening Outstanding Input -->
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+</div>
+<input class="block w-full pl-12 pr-4 py-4 bg-background border border-outline-variant rounded-lg font-mono-stats text-mono-stats text-on-surface placeholder:text-on-surface-variant focus:ring-2 focus:ring-primary focus:border-primary transition-shadow" id="opening_balance" placeholder="Opening Outstanding ($)" type="number"/>
+</div>
+<!-- Payment Status Toggles -->
+<div class="grid grid-cols-2 gap-4">
+<button class="flex items-center justify-center gap-2 py-3 px-4 rounded-lg border-2 border-primary bg-primary-container/10 text-primary font-label-md text-label-md transition-colors hover:bg-primary-container/20">
+<span class="material-symbols-outlined text-sm">arrow_downward</span>
+                            Missed Payment
+                        </button>
+<button class="flex items-center justify-center gap-2 py-3 px-4 rounded-lg border border-outline-variant bg-surface text-on-surface-variant font-label-md text-label-md transition-colors hover:bg-surface-container-low hover:text-on-surface">
+<span class="material-symbols-outlined text-sm">arrow_upward</span>
+                            Received
+                        </button>
+</div>
+<!-- Start Account Action -->
+<button class="w-full flex items-center justify-center gap-2 py-4 bg-surface-tint text-on-primary rounded-lg font-label-md text-label-md hover:opacity-90 active:scale-[0.98] transition-all shadow-sm">
+<span class="material-symbols-outlined">person_add</span>
+                        Start Account &amp; Save
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Action Bar (Sticky for easy continuation) -->
+<div class="fixed bottom-0 left-0 w-full md:left-80 md:w-[calc(100%-20rem)] bg-surface border-t border-outline-variant p-4 md:p-lg z-50 flex justify-end shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+<button class="w-full md:w-auto px-8 py-4 bg-primary text-on-primary rounded-lg font-label-md text-label-md font-bold hover:bg-tertiary shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+            Continue
+            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</body></html>

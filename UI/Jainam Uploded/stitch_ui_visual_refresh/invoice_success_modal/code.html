@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Invoice Saved Successfully</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#002114",
+                        "primary": "#006948",
+                        "secondary-container": "#d6e0f4",
+                        "tertiary-container": "#00855b",
+                        "surface-container-highest": "#e1e3e4",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#68dba9",
+                        "primary-fixed": "#85f8c4",
+                        "on-tertiary-container": "#f5fff6",
+                        "secondary": "#555f70",
+                        "surface-tint": "#006c4a",
+                        "on-primary-fixed-variant": "#005137",
+                        "surface-bright": "#f8f9fa",
+                        "inverse-surface": "#2e3132",
+                        "on-secondary-fixed-variant": "#3d4757",
+                        "tertiary": "#006947",
+                        "secondary-fixed": "#d9e3f7",
+                        "on-primary-container": "#f5fff7",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "secondary-fixed-dim": "#bdc7db",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#121c2a",
+                        "primary-fixed-dim": "#68dba9",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#f8f9fa",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#191c1d",
+                        "inverse-on-surface": "#f0f1f2",
+                        "outline": "#6d7a72",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#e7e8e9",
+                        "on-background": "#191c1d",
+                        "surface-container-low": "#f3f4f5",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#00855d",
+                        "tertiary-fixed": "#6ffbbe",
+                        "on-secondary-container": "#596374",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-tertiary-fixed": "#002113",
+                        "surface-variant": "#e1e3e4",
+                        "surface-container": "#edeeef",
+                        "surface-dim": "#d9dadb",
+                        "on-surface-variant": "#3d4a42",
+                        "surface": "#f8f9fa",
+                        "outline-variant": "#bccac0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "max-width": "1280px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "xl": "48px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "base": "4px",
+                        "margin-desktop": "64px",
+                        "xs": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "mono-stats": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "mono-stats": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+<!-- Blurred Background (Simulating underlying app context) -->
+<div class="absolute inset-0 bg-surface-variant/30 backdrop-blur-sm z-0"></div>
+<!-- Modal Container -->
+<div class="relative z-10 w-full max-w-md bg-surface rounded-t-[32px] md:rounded-[32px] shadow-[0_10px_40px_rgba(0,0,0,0.1)] flex flex-col mt-auto md:mt-0 h-[85vh] md:h-auto overflow-hidden animate-[slideUp_0.3s_ease-out]">
+<!-- Drag Handle (Mobile) -->
+<div class="w-full flex justify-center pt-4 pb-2 md:hidden">
+<div class="w-12 h-1.5 bg-outline-variant rounded-full"></div>
+</div>
+<div class="flex-1 flex flex-col items-center p-8 text-center overflow-y-auto">
+<!-- Success Icon -->
+<div class="w-20 h-20 rounded-full bg-primary-container flex items-center justify-center mb-6 shadow-sm border border-primary/10">
+<span class="material-symbols-outlined text-[40px] text-on-primary-container" style="font-variation-settings: 'FILL' 1;">
+                    check_circle
+                </span>
+</div>
+<!-- Headline & Meta -->
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Invoice Saved Successfully!</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-10 max-w-[280px]">
+                Bill reference <span class="font-mono-stats text-mono-stats text-on-surface">INV-2026-07-30--0001</span> is saved.
+            </p>
+<!-- Action Grid -->
+<div class="grid grid-cols-3 gap-4 w-full mb-10 max-w-[320px] mx-auto">
+<!-- Action 1: Print A4 -->
+<button class="group flex flex-col items-center justify-start gap-3 transition-transform active:scale-95">
+<div class="w-16 h-16 rounded-full bg-secondary-container flex items-center justify-center group-hover:bg-primary-container transition-colors shadow-sm">
+<span class="material-symbols-outlined text-on-secondary-container group-hover:text-on-primary-container transition-colors text-[28px]" style="font-variation-settings: 'FILL' 1;">
+                            print
+                        </span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant group-hover:text-on-surface transition-colors text-center leading-tight">Print A4</span>
+</button>
+<!-- Action 2: Share PDF Direct -->
+<button class="group flex flex-col items-center justify-start gap-3 transition-transform active:scale-95">
+<div class="w-16 h-16 rounded-full bg-secondary-container flex items-center justify-center group-hover:bg-primary-container transition-colors shadow-sm">
+<span class="material-symbols-outlined text-on-secondary-container group-hover:text-on-primary-container transition-colors text-[28px]" style="font-variation-settings: 'FILL' 1;">
+                            picture_as_pdf
+                        </span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant group-hover:text-on-surface transition-colors text-center leading-tight">Share PDF Direct</span>
+</button>
+<!-- Action 3: WhatsApp Text -->
+<button class="group flex flex-col items-center justify-start gap-3 transition-transform active:scale-95">
+<div class="w-16 h-16 rounded-full bg-secondary-container flex items-center justify-center group-hover:bg-primary-container transition-colors shadow-sm">
+<span class="material-symbols-outlined text-on-secondary-container group-hover:text-on-primary-container transition-colors text-[28px]" style="font-variation-settings: 'FILL' 1;">
+                            chat
+                        </span>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant group-hover:text-on-surface transition-colors text-center leading-tight">WhatsApp Text</span>
+</button>
+</div>
+<!-- Primary Action Button -->
+<div class="w-full mt-auto pt-4">
+<button class="w-full bg-primary hover:bg-tertiary-container text-on-primary font-label-md text-label-md py-4 px-6 rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(0,105,72,0.25)] active:shadow-inner active:scale-[0.98] flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                    Done &amp; Back to Dashboard
+                </button>
+</div>
+</div>
+</div>
+<style>
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</body></html>
