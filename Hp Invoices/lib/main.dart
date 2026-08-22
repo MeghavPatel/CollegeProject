@@ -20,18 +20,18 @@ void main() async {
         ChangeNotifierProvider(create: (_) => InvoiceProvider()),
         ChangeNotifierProvider(create: (_) => TransactionProvider()),
       ],
-      child: const LavenderMartPOS(),
+      child: const EmeraldLedgerPOS(),
     ),
   );
 }
 
-class LavenderMartPOS extends StatelessWidget {
-  const LavenderMartPOS({Key? key}) : super(key: key);
+class EmeraldLedgerPOS extends StatelessWidget {
+  const EmeraldLedgerPOS({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'HP Bill POS',
+      title: 'Invoice Generator',
       theme: AppTheme.lightTheme,
       debugShowCheckedModeBanner: false,
       home: const MasterPasswordScreen(),

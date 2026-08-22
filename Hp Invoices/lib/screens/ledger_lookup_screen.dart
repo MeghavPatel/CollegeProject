@@ -28,7 +28,7 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
   @override
   void initState() {
     super.initState();
-    // CRITICAL NAVIGATION FIX: Always clear active ledger search when entering the screen
+    // Always clear active ledger search when entering the screen
     // so it consistently opens to the "Recently Accessed Ledgers" list view.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final transProv = context.read<TransactionProvider>();
@@ -45,8 +45,6 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
   @override
   void dispose() {
     _searchController.dispose();
-    // CRITICAL NAVIGATION FIX: Clear active ledger search when leaving the screen
-    // so it doesn't get stuck displaying a single customer's data next time.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         context.read<TransactionProvider>().clearLedgerSearch();
@@ -94,7 +92,7 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("$_selectedExportFilter ledger PDF generated!"),
-          backgroundColor: AppTheme.accentIndigo,
+          backgroundColor: AppTheme.primaryEmerald,
         ),
       );
     } catch (e) {
@@ -111,12 +109,12 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
           title: Row(
             children: const [
-              Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
+              Icon(Icons.warning_amber_rounded, color: AppTheme.errorRed),
               SizedBox(width: 8),
-              Text("Delete Ledger Log"),
+              Text("Delete Ledger Log", style: TextStyle(fontWeight: FontWeight.w700)),
             ],
           ),
           content: Text(
@@ -133,10 +131,13 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                 prov.deleteLedgerForCustomer(customerName);
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Ledger for $customerName has been deleted.")),
+                  SnackBar(
+                    content: Text("Ledger for $customerName has been deleted."),
+                    backgroundColor: AppTheme.errorRed,
+                  ),
                 );
               },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.errorRed),
               child: const Text("Delete"),
             ),
           ],
@@ -153,8 +154,8 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: const Text("Delete Entry"),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          title: const Text("Delete Entry", style: TextStyle(fontWeight: FontWeight.w700)),
           content: Text("Are you sure you want to permanently delete this entry: \"${entry.description}\"? This will update the customer's balance."),
           actions: [
             TextButton(
@@ -190,7 +191,7 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                   );
                 }
               },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.errorRed),
               child: const Text("Delete"),
             ),
           ],
@@ -207,6 +208,7 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
     final recentCustomers = transProv.customers;
 
     return Scaffold(
+      backgroundColor: AppTheme.surface,
       appBar: AppBar(
         title: const Text("A/c. Ledger Statements"),
       ),
@@ -214,16 +216,21 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
         children: [
           // Search Card
           Container(
-            padding: const EdgeInsets.all(20),
-            color: AppTheme.accentIndigo.withValues(alpha: 0.04),
+            padding: const EdgeInsets.all(16),
+            color: AppTheme.surfaceContainerLowest,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  "Statement Ledger Lookup",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.accentIndigo),
+                  "STATEMENT LEDGER LOOKUP",
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textSecondary,
+                    letterSpacing: 0.5,
+                  ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
                 Autocomplete<String>(
                   optionsBuilder: (TextEditingValue textEditingValue) {
                     if (textEditingValue.text.isEmpty) {
@@ -243,7 +250,7 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                       focusNode: focusNode,
                       decoration: InputDecoration(
                         hintText: "Search customer (e.g. Aman Sharma, Riya Patel)...",
-                        prefixIcon: const Icon(Icons.person_search_rounded, color: AppTheme.accentIndigo),
+                        prefixIcon: const Icon(Icons.person_search_rounded, color: AppTheme.primaryEmerald),
                         suffixIcon: textController.text.isNotEmpty
                             ? IconButton(
                                 icon: const Icon(Icons.clear, color: AppTheme.textSecondary),
@@ -260,6 +267,7 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
               ],
             ),
           ),
+          const Divider(height: 1, color: AppTheme.outlineVariant),
 
           // Ledger statements list OR Recently Accessed Ledgers
           Expanded(
@@ -267,15 +275,14 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(20, 16, 20, 10),
                         child: Text(
                           "Recently Accessed Ledgers",
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.textSecondary,
-                            letterSpacing: 0.5,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.textPrimary,
                           ),
                         ),
                       ),
@@ -285,37 +292,48 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(Icons.find_in_page_outlined, size: 64, color: AppTheme.textSecondary.withValues(alpha: 0.3)),
+                                    Icon(Icons.find_in_page_outlined, size: 54, color: AppTheme.outlineVariant),
                                     const SizedBox(height: 12),
                                     const Text(
                                       "No ledger records found.\nCreate an invoice or quick entry to begin.",
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(color: AppTheme.textSecondary),
+                                      style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
                                     ),
                                   ],
                                 ),
                               )
                             : ListView.builder(
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
                                 itemCount: recentCustomers.length,
                                 itemBuilder: (ctx, index) {
                                   final name = recentCustomers[index];
-                                  return Card(
+                                  return Container(
                                     margin: const EdgeInsets.only(bottom: 10),
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.surfaceContainerLowest,
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(color: AppTheme.outlineVariant),
+                                      boxShadow: AppTheme.softShadow,
+                                    ),
                                     child: InkWell(
                                       onTap: () {
                                         _searchController.text = name;
                                         transProv.fetchLedger(name);
                                       },
                                       onLongPress: () => _confirmDeleteLedger(context, transProv, name),
-                                      borderRadius: BorderRadius.circular(16),
+                                      borderRadius: BorderRadius.circular(14),
                                       child: Padding(
-                                        padding: const EdgeInsets.all(16.0),
+                                        padding: const EdgeInsets.all(14.0),
                                         child: Row(
                                           children: [
-                                            CircleAvatar(
-                                              backgroundColor: AppTheme.accentIndigo.withValues(alpha: 0.08),
-                                              child: const Icon(Icons.person_outline_rounded, color: AppTheme.accentIndigo),
+                                            Container(
+                                              width: 42,
+                                              height: 42,
+                                              decoration: BoxDecoration(
+                                                color: AppTheme.secondaryContainer,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: const Icon(Icons.person_rounded, color: AppTheme.primaryEmerald, size: 22),
                                             ),
                                             const SizedBox(width: 14),
                                             Expanded(
@@ -324,11 +342,11 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                                                 children: [
                                                   Text(
                                                     name,
-                                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, color: AppTheme.textPrimary),
                                                   ),
-                                                  const SizedBox(height: 4),
+                                                  const SizedBox(height: 2),
                                                   const Text(
-                                                    "Long-press to delete ledger",
+                                                    "Tap to view statement • Long-press to delete",
                                                     style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                                                   ),
                                                 ],
@@ -349,8 +367,8 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                     children: [
                       // Client info card
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                        color: AppTheme.cardBg,
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                        color: AppTheme.surfaceContainerLowest,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -359,23 +377,23 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                               children: [
                                 Text(
                                   activeClient,
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 17, color: AppTheme.textPrimary),
                                 ),
-                                const Text("Account Statement", style: TextStyle(fontSize: 11, color: AppTheme.textSecondary)),
+                                const Text("Account Statement", style: TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
                               ],
                             ),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                const Text("Net Balance Due", style: TextStyle(fontSize: 10, color: AppTheme.textSecondary)),
+                                const Text("Net Balance Due", style: TextStyle(fontSize: 10, color: AppTheme.textSecondary, fontWeight: FontWeight.w600)),
                                 Text(
                                   ledger.isNotEmpty ? currencyFormatter.format(ledger.last.runningBalance) : "₹ 0.00",
                                   style: TextStyle(
                                     fontWeight: FontWeight.w900,
-                                    fontSize: 16,
+                                    fontSize: 18,
                                     color: ledger.isNotEmpty && ledger.last.runningBalance > 0
-                                        ? AppTheme.accentDeepPurple
-                                        : AppTheme.accentTeal,
+                                        ? AppTheme.errorRed
+                                        : AppTheme.primaryEmerald,
                                   ),
                                 ),
                               ],
@@ -386,17 +404,16 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
 
                       // --- PDF EXPORT FILTER BAR ---
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                         decoration: const BoxDecoration(
-                          color: AppTheme.cardBg,
+                          color: AppTheme.surfaceContainerLow,
                           border: Border(
-                            top: BorderSide(color: AppTheme.accentBorder),
-                            bottom: BorderSide(color: AppTheme.accentBorder),
+                            top: BorderSide(color: AppTheme.outlineVariant),
+                            bottom: BorderSide(color: AppTheme.outlineVariant),
                           ),
                         ),
                         child: Row(
                           children: [
-                            // Filter chips
                             Expanded(
                               child: Row(
                                 children: [
@@ -408,26 +425,18 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 10),
                             // Export button
                             GestureDetector(
                               onTap: _isExporting
                                   ? null
                                   : () => _exportLedgerPdf(activeClient, _getFilteredEntries(ledger)),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                 decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [AppTheme.accentIndigo, AppTheme.primaryPurple],
-                                  ),
+                                  color: AppTheme.primaryEmerald,
                                   borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppTheme.accentIndigo.withValues(alpha: 0.3),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
+                                  boxShadow: AppTheme.softShadow,
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -446,7 +455,7 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                                     const SizedBox(width: 6),
                                     const Text(
                                       "Export PDF",
-                                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
                                     ),
                                   ],
                                 ),
@@ -461,7 +470,7 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                         child: ledger.isEmpty
                             ? const Center(child: Text("No transactions logged for this client."))
                             : ListView.builder(
-                                padding: const EdgeInsets.all(20),
+                                padding: const EdgeInsets.all(16),
                                 itemCount: ledger.length,
                                 itemBuilder: (ctx, index) {
                                   final entry = ledger[index];
@@ -480,43 +489,36 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                                   final dayStr = DateFormat('dd').format(entry.date);
                                   final monthStr = DateFormat('MMM').format(entry.date).toUpperCase();
 
-
                                   // Paid/Unpaid badge (only for invoices)
                                   Widget? paidBadge;
                                   if (isInvoice) {
                                     paidBadge = Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                                       decoration: BoxDecoration(
                                         color: isPaidInvoice
-                                            ? AppTheme.accentTeal.withOpacity(0.08)
-                                            : Colors.orangeAccent.withOpacity(0.08),
-                                        borderRadius: BorderRadius.circular(6),
+                                            ? AppTheme.successContainer
+                                            : AppTheme.errorContainer,
+                                        borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: Text(
                                         isPaidInvoice ? "PAID" : "UNPAID",
                                         style: TextStyle(
                                           fontSize: 9,
                                           fontWeight: FontWeight.bold,
-                                          color: isPaidInvoice ? AppTheme.accentTeal : Colors.orange.shade800,
-                                          letterSpacing: 0.5,
+                                          color: isPaidInvoice ? AppTheme.primaryEmerald : AppTheme.onErrorContainer,
+                                          letterSpacing: 0.4,
                                         ),
                                       ),
                                     );
                                   }
 
                                   final cardContent = Container(
-                                    margin: const EdgeInsets.only(bottom: 12),
+                                    margin: const EdgeInsets.only(bottom: 10),
                                     decoration: BoxDecoration(
-                                      color: AppTheme.cardBg,
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(color: AppTheme.accentBorder),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.015),
-                                          blurRadius: 10,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
+                                      color: AppTheme.surfaceContainerLowest,
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(color: AppTheme.outlineVariant),
+                                      boxShadow: AppTheme.softShadow,
                                     ),
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -528,12 +530,11 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                                             children: [
                                               // Date block
                                               Container(
-                                                width: 50,
-                                                height: 52,
+                                                width: 46,
+                                                height: 48,
                                                 decoration: BoxDecoration(
-                                                  color: AppTheme.accentIndigo.withOpacity(0.05),
+                                                  color: AppTheme.secondaryContainer,
                                                   borderRadius: BorderRadius.circular(10),
-                                                  border: Border.all(color: AppTheme.accentIndigo.withOpacity(0.12)),
                                                 ),
                                                 child: Column(
                                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -541,9 +542,9 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                                                     Text(
                                                       dayStr,
                                                       style: const TextStyle(
-                                                        fontSize: 18,
+                                                        fontSize: 16,
                                                         fontWeight: FontWeight.w900,
-                                                        color: AppTheme.accentIndigo,
+                                                        color: AppTheme.textPrimary,
                                                         height: 1.1,
                                                       ),
                                                     ),
@@ -559,7 +560,7 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                                                   ],
                                                 ),
                                               ),
-                                              const SizedBox(width: 14),
+                                              const SizedBox(width: 12),
                                               
                                               // Main transaction info
                                               Expanded(
@@ -569,44 +570,19 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                                                     Text(
                                                       descriptionText,
                                                       style: const TextStyle(
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight: FontWeight.w700,
                                                         fontSize: 13,
                                                         color: AppTheme.textPrimary,
                                                       ),
                                                     ),
                                                     if (paidBadge != null) ...[
-                                                      const SizedBox(height: 6),
-                                                      Row(
-                                                        children: [
-                                                          paidBadge,
-                                                        ],
-                                                      ),
-                                                    ],
-                                                    if (isInvoice) ...[
-                                                      const SizedBox(height: 6),
-                                                      const Row(
-                                                        children: [
-                                                          Icon(
-                                                            Icons.picture_as_pdf_rounded,
-                                                            color: Colors.redAccent,
-                                                            size: 14,
-                                                          ),
-                                                          SizedBox(width: 4),
-                                                          Text(
-                                                            "Tap card to Print/Share PDF",
-                                                            style: TextStyle(
-                                                              fontSize: 10,
-                                                              color: AppTheme.primaryPurple,
-                                                              fontWeight: FontWeight.w600,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
+                                                      const SizedBox(height: 4),
+                                                      paidBadge,
                                                     ],
                                                   ],
                                                 ),
                                               ),
-                                              const SizedBox(width: 14),
+                                              const SizedBox(width: 12),
 
                                               // Financial information
                                               Column(
@@ -617,15 +593,15 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                                                     style: TextStyle(
                                                       fontWeight: FontWeight.w900,
                                                       fontSize: 14,
-                                                      color: displayAsDebit ? Colors.redAccent : AppTheme.accentTeal,
+                                                      color: displayAsDebit ? AppTheme.errorRed : AppTheme.primaryEmerald,
                                                     ),
                                                   ),
-                                                  const SizedBox(height: 4),
+                                                  const SizedBox(height: 2),
                                                   Text(
                                                     "Bal: ${currencyFormatter.format(entry.runningBalance)}",
                                                     style: const TextStyle(
                                                       fontSize: 11,
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight: FontWeight.w600,
                                                       color: AppTheme.textSecondary,
                                                     ),
                                                   ),
@@ -635,16 +611,16 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                                           ),
                                         ),
                                         
-                                        // Actions bar divider & buttons
+                                        // Actions bar
                                         Container(
-                                          decoration: BoxDecoration(
-                                            color: AppTheme.cardBg.withOpacity(0.5),
-                                            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
-                                            border: const Border(
+                                          decoration: const BoxDecoration(
+                                            color: AppTheme.surfaceContainerLow,
+                                            borderRadius: BorderRadius.vertical(bottom: Radius.circular(14)),
+                                            border: Border(
                                               top: BorderSide(color: AppTheme.accentBorder),
                                             ),
                                           ),
-                                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                                           child: Row(
                                             mainAxisAlignment: MainAxisAlignment.end,
                                             children: [
@@ -666,23 +642,23 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                                                   icon: const Icon(
                                                     Icons.visibility_outlined,
                                                     size: 14,
-                                                    color: AppTheme.accentIndigo,
+                                                    color: AppTheme.primaryEmerald,
                                                   ),
                                                   label: const Text(
-                                                    "Open in App",
+                                                    "Open PDF",
                                                     style: TextStyle(
-                                                      fontSize: 10,
+                                                      fontSize: 11,
                                                       fontWeight: FontWeight.bold,
-                                                      color: AppTheme.accentIndigo,
+                                                      color: AppTheme.primaryEmerald,
                                                     ),
                                                   ),
                                                   style: TextButton.styleFrom(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                                     minimumSize: Size.zero,
                                                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                                   ),
                                                 ),
-                                                const SizedBox(width: 12),
+                                                const SizedBox(width: 8),
                                                 TextButton.icon(
                                                   onPressed: () async {
                                                     await invoiceProv.toggleInvoicePaymentStatus(entry.invoiceId!);
@@ -694,41 +670,41 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                                                   icon: Icon(
                                                     isPaidInvoice ? Icons.cancel_outlined : Icons.check_circle_outline_rounded,
                                                     size: 14,
-                                                    color: isPaidInvoice ? Colors.grey : AppTheme.accentTeal,
+                                                    color: isPaidInvoice ? AppTheme.textSecondary : AppTheme.primaryEmerald,
                                                   ),
                                                   label: Text(
                                                     isPaidInvoice ? "Mark Unpaid" : "Mark Paid",
                                                     style: TextStyle(
-                                                      fontSize: 10,
+                                                      fontSize: 11,
                                                       fontWeight: FontWeight.bold,
-                                                      color: isPaidInvoice ? Colors.grey : AppTheme.accentTeal,
+                                                      color: isPaidInvoice ? AppTheme.textSecondary : AppTheme.primaryEmerald,
                                                     ),
                                                   ),
                                                   style: TextButton.styleFrom(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                                     minimumSize: Size.zero,
                                                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                                   ),
                                                 ),
-                                                const SizedBox(width: 12),
+                                                const SizedBox(width: 8),
                                               ],
                                               TextButton.icon(
                                                 onPressed: () => _deleteLedgerEntry(context, transProv, entry),
                                                 icon: const Icon(
                                                   Icons.delete_outline_rounded,
                                                   size: 14,
-                                                  color: Colors.redAccent,
+                                                  color: AppTheme.errorRed,
                                                 ),
                                                 label: const Text(
                                                   "Delete",
                                                   style: TextStyle(
-                                                    fontSize: 10,
+                                                    fontSize: 11,
                                                     fontWeight: FontWeight.bold,
-                                                    color: Colors.redAccent,
+                                                    color: AppTheme.errorRed,
                                                   ),
                                                 ),
                                                 style: TextButton.styleFrom(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                                   minimumSize: Size.zero,
                                                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                                 ),
@@ -744,7 +720,7 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                                     return Material(
                                       color: Colors.transparent,
                                       child: InkWell(
-                                        borderRadius: BorderRadius.circular(16),
+                                        borderRadius: BorderRadius.circular(14),
                                         onTap: () async {
                                           try {
                                             await PrintService.instance.printInvoice(inv);
@@ -782,12 +758,12 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
         });
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.accentIndigo : AppTheme.cardBg,
+          color: isSelected ? AppTheme.primaryEmerald : AppTheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? AppTheme.accentIndigo : AppTheme.accentBorder,
+            color: isSelected ? AppTheme.primaryEmerald : AppTheme.outlineVariant,
           ),
         ),
         child: Text(

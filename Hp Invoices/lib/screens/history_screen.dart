@@ -18,8 +18,9 @@ class HistoryOverlay extends StatefulWidget {
 
 class _HistoryOverlayState extends State<HistoryOverlay> {
   String _searchQuery = '';
-  String _statusFilter = 'all';
+  String _statusFilter = 'all'; // 'all', 'paid', 'unpaid'
   final currencyFormatter = NumberFormat.currency(locale: 'en_IN', symbol: '₹ ');
+  final dateFormatter = DateFormat('dd-MMM-yyyy');
 
   @override
   Widget build(BuildContext context) {
@@ -57,10 +58,8 @@ class _HistoryOverlayState extends State<HistoryOverlay> {
             item.type.name.toLowerCase().contains(_searchQuery.toLowerCase());
 
         if (_statusFilter == 'paid') {
-          // Receipts and contras represent money in/transfer, count as paid/settled
           return matchesSearch && (item.type == QuickEntryType.receipt || item.type == QuickEntryType.contra);
         } else if (_statusFilter == 'unpaid') {
-          // Payments are money out, can count as unpaid or not shown under paid filter
           return matchesSearch && (item.type == QuickEntryType.payment);
         }
         return matchesSearch;
@@ -71,7 +70,7 @@ class _HistoryOverlayState extends State<HistoryOverlay> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.88,
       decoration: const BoxDecoration(
-        color: AppTheme.lightPurpleBg,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: Column(
@@ -80,19 +79,19 @@ class _HistoryOverlayState extends State<HistoryOverlay> {
           Container(
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
             decoration: const BoxDecoration(
-              color: AppTheme.cardBg,
+              color: AppTheme.surfaceContainerLowest,
               borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-              border: Border(bottom: BorderSide(color: AppTheme.accentBorder)),
+              border: Border(bottom: BorderSide(color: AppTheme.outlineVariant)),
             ),
             child: Column(
               children: [
                 // Drag handle
                 Center(
                   child: Container(
-                    width: 40,
+                    width: 44,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: AppTheme.accentBorder,
+                      color: AppTheme.outlineVariant,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -105,16 +104,18 @@ class _HistoryOverlayState extends State<HistoryOverlay> {
                       "Transaction History",
                       style: TextStyle(
                         fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
                         color: AppTheme.textPrimary,
+                        letterSpacing: -0.3,
                       ),
                     ),
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
                       child: Container(
-                        padding: const EdgeInsets.all(8),
+                        width: 36,
+                        height: 36,
                         decoration: BoxDecoration(
-                          color: AppTheme.accentBorder.withValues(alpha: 0.3),
+                          color: AppTheme.surfaceContainer,
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(Icons.close_rounded, size: 18, color: AppTheme.textSecondary),
@@ -126,10 +127,10 @@ class _HistoryOverlayState extends State<HistoryOverlay> {
             ),
           ),
 
-          // Filter panel
+          // Search & Filter Panel
           Container(
             padding: const EdgeInsets.all(16),
-            color: AppTheme.primaryPurple.withValues(alpha: 0.03),
+            color: AppTheme.surfaceContainerLowest,
             child: Column(
               children: [
                 TextField(
@@ -140,7 +141,7 @@ class _HistoryOverlayState extends State<HistoryOverlay> {
                   },
                   decoration: const InputDecoration(
                     hintText: "Search customer, bill number, or quick entry...",
-                    prefixIcon: Icon(Icons.search_rounded, color: AppTheme.primaryPurple),
+                    prefixIcon: Icon(Icons.search_rounded, color: AppTheme.primaryEmerald),
                     isDense: true,
                   ),
                 ),
@@ -158,18 +159,20 @@ class _HistoryOverlayState extends State<HistoryOverlay> {
             ),
           ),
 
-          // Unified Transaction List
+          const Divider(height: 1, color: AppTheme.outlineVariant),
+
+          // Transaction List
           Expanded(
             child: filteredItems.isEmpty
                 ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.receipt_long_outlined, size: 56, color: AppTheme.textSecondary.withValues(alpha: 0.3)),
-                        const SizedBox(height: 12),
-                        const Text(
-                          "No transactions recorded.",
-                          style: TextStyle(color: AppTheme.textSecondary),
+                        Icon(Icons.history_toggle_off_rounded, size: 48, color: AppTheme.outlineVariant),
+                        const SizedBox(height: 8),
+                        Text(
+                          _searchQuery.isNotEmpty ? "No matching records found." : "No transactions recorded yet.",
+                          style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
                         ),
                       ],
                     ),
@@ -181,9 +184,9 @@ class _HistoryOverlayState extends State<HistoryOverlay> {
                       final item = filteredItems[index];
 
                       if (item is Invoice) {
-                        return _buildInvoiceCard(ctx, item, invoiceProv);
+                        return _buildInvoiceTile(context, invoiceProv, item);
                       } else if (item is QuickEntry) {
-                        return _buildQuickEntryCard(ctx, item, transProv);
+                        return _buildQuickEntryTile(item);
                       }
                       return const SizedBox.shrink();
                     },
@@ -194,432 +197,213 @@ class _HistoryOverlayState extends State<HistoryOverlay> {
     );
   }
 
-  Widget _buildInvoiceCard(BuildContext context, Invoice inv, InvoiceProvider prov) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: () => _showInvoiceDetail(context, inv, prov),
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(14.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: (inv.isPaid ? AppTheme.accentTeal : AppTheme.accentDeepPurple).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      inv.isPaid ? Icons.check_circle_rounded : Icons.schedule_rounded,
-                      color: inv.isPaid ? AppTheme.accentTeal : AppTheme.accentDeepPurple,
-                      size: 18,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        inv.invoiceNumber,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.primaryPurple),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        inv.customerName,
-                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppTheme.textPrimary),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    "${inv.isPaid ? '+' : '-'} ${currencyFormatter.format(inv.grandTotal)}",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontSize: 14,
-                      color: inv.isPaid ? AppTheme.accentTeal : Colors.redAccent,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    DateFormat('dd-MMM-yyyy').format(inv.date),
-                    style: const TextStyle(fontSize: 10, color: AppTheme.textSecondary),
-                  ),
-                ],
-              ),
-            ],
+  Widget _buildFilterChip(String filterKey, String label) {
+    final isSelected = _statusFilter == filterKey;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _statusFilter = filterKey;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.primaryEmerald : AppTheme.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected ? AppTheme.primaryEmerald : AppTheme.outlineVariant,
+          ),
+          boxShadow: isSelected ? AppTheme.softShadow : null,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: isSelected ? Colors.white : AppTheme.textSecondary,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildQuickEntryCard(BuildContext context, QuickEntry entry, TransactionProvider prov) {
-    final isReceipt = entry.type == QuickEntryType.receipt;
-    final isContra = entry.type == QuickEntryType.contra;
-
-    Color badgeColor = AppTheme.accentBlue;
-    if (isReceipt) badgeColor = AppTheme.accentTeal;
-    if (entry.type == QuickEntryType.payment) badgeColor = Colors.redAccent;
-
-    IconData leadIcon = Icons.account_balance_wallet_rounded;
-    if (isContra) leadIcon = Icons.swap_horiz_rounded;
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: () => _showQuickEntryDetail(context, entry, prov),
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(14.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: badgeColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      leadIcon,
-                      color: badgeColor,
-                      size: 18,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Quick ${entry.type.name.toUpperCase()}",
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: badgeColor),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        entry.partyName,
-                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppTheme.textPrimary),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    "${isReceipt ? '+' : (isContra ? '' : '-')} ${currencyFormatter.format(entry.amount)}",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontSize: 14,
-                      color: isReceipt ? AppTheme.accentTeal : (isContra ? AppTheme.accentBlue : Colors.redAccent),
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    DateFormat('dd-MMM-yyyy').format(entry.date),
-                    style: const TextStyle(fontSize: 10, color: AppTheme.textSecondary),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
+  Widget _buildInvoiceTile(BuildContext context, InvoiceProvider prov, Invoice invoice) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppTheme.outlineVariant),
+        boxShadow: AppTheme.softShadow,
       ),
-    );
-  }
-
-  Widget _buildFilterChip(String status, String label) {
-    final isSelected = _statusFilter == status;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            _statusFilter = status;
-          });
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(
-            color: isSelected ? AppTheme.primaryPurple : AppTheme.cardBg,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: isSelected ? AppTheme.primaryPurple : AppTheme.accentBorder),
-          ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: isSelected ? Colors.white : AppTheme.textSecondary,
+      child: Row(
+        children: [
+          // Status Icon Container
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: invoice.isPaid
+                  ? AppTheme.primaryLight.withValues(alpha: 0.35)
+                  : AppTheme.errorContainer,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              invoice.isPaid ? Icons.check_circle_rounded : Icons.schedule_rounded,
+              color: invoice.isPaid ? AppTheme.primaryEmerald : AppTheme.errorRed,
+              size: 22,
             ),
           ),
-        ),
-      ),
-    );
-  }
+          const SizedBox(width: 12),
 
-  void _showInvoiceDetail(BuildContext context, Invoice invoice, InvoiceProvider prov) {
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(invoice.invoiceNumber, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.primaryPurple)),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: (invoice.isPaid ? AppTheme.accentTeal : AppTheme.accentDeepPurple).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  invoice.isPaid ? "PAID" : "UNPAID",
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: invoice.isPaid ? AppTheme.accentTeal : AppTheme.accentDeepPurple,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          content: SingleChildScrollView(
+          // Details
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
               children: [
-                Text("Customer: ${invoice.customerName}", style: const TextStyle(fontWeight: FontWeight.w600)),
-                Text("Phone: +91 ${invoice.customerPhone}", style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
-                Text("Date: ${DateFormat('dd-MMM-yyyy • hh:mm a').format(invoice.date)}", style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
-                const Divider(height: 20),
-                const Text("ITEMS:", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textSecondary)),
-                const SizedBox(height: 8),
-                ...invoice.items.map((item) => Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(child: Text("${item.name} × ${item.quantity.toStringAsFixed(0)}", style: const TextStyle(fontSize: 13))),
-                      Text(currencyFormatter.format(item.total), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                    ],
+                Text(
+                  invoice.invoiceNumber,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.primaryEmerald,
                   ),
-                )),
-                const Divider(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text("Grand Total", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                    Text(currencyFormatter.format(invoice.grandTotal), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: AppTheme.primaryPurple)),
-                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  invoice.customerName,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textPrimary,
+                  ),
                 ),
               ],
             ),
           ),
-          actions: [
-            // Toggle payment status
-            IconButton(
-              onPressed: () async {
-                await prov.toggleInvoicePaymentStatus(invoice.id);
-                if (context.mounted) {
-                  await context.read<TransactionProvider>().fetchTransactions();
-                }
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Payment status updated!"), duration: Duration(seconds: 1)),
-                );
-              },
-              icon: Icon(
-                invoice.isPaid ? Icons.money_off_rounded : Icons.attach_money_rounded,
-                color: AppTheme.accentTeal,
-              ),
-              tooltip: invoice.isPaid ? "Mark as Unpaid" : "Mark as Paid",
-            ),
-            // Print
-            IconButton(
-              onPressed: () => prov.printInvoice(invoice),
-              icon: const Icon(Icons.print_rounded, color: AppTheme.primaryPurple),
-              tooltip: "Print A4",
-            ),
-            // Share
-            IconButton(
-              onPressed: () => prov.shareInvoice(invoice),
-              icon: const Icon(Icons.share_rounded, color: AppTheme.accentBlue),
-              tooltip: "Share PDF",
-            ),
-            // Delete
-            IconButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-                _confirmDeleteInvoice(context, prov, invoice);
-              },
-              icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
-              tooltip: "Delete",
-            ),
-          ],
-        );
-      },
-    );
-  }
 
-  void _confirmDeleteInvoice(BuildContext context, InvoiceProvider prov, Invoice invoice) {
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: const Text("Delete Record"),
-          content: Text("Are you sure you want to permanently delete invoice ${invoice.invoiceNumber}? This action is irreversible."),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text("Cancel"),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                await prov.deleteInvoice(invoice.id);
-                if (context.mounted) {
-                  await context.read<TransactionProvider>().fetchTransactions();
-                }
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Invoice record deleted.")),
-                );
-              },
-              child: const Text("Delete"),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showQuickEntryDetail(BuildContext context, QuickEntry entry, TransactionProvider prov) {
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        final isReceipt = entry.type == QuickEntryType.receipt;
-
-        Color badgeColor = AppTheme.accentBlue;
-        if (isReceipt) badgeColor = AppTheme.accentTeal;
-        if (entry.type == QuickEntryType.payment) badgeColor = Colors.redAccent;
-
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // Amount & Date
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                "Quick ${entry.type.name.toUpperCase()}",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: badgeColor),
+                invoice.isPaid
+                    ? "+ ${currencyFormatter.format(invoice.grandTotal)}"
+                    : "- ${currencyFormatter.format(invoice.grandTotal)}",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  color: invoice.isPaid ? AppTheme.primaryEmerald : AppTheme.errorRed,
+                ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: badgeColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  entry.mode.name.toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: badgeColor,
-                  ),
-                ),
+              const SizedBox(height: 2),
+              Text(
+                dateFormatter.format(invoice.date),
+                style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
               ),
             ],
           ),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text("Party / Account: ${entry.partyName}", style: const TextStyle(fontWeight: FontWeight.w600)),
-                const SizedBox(height: 6),
-                Text("Date: ${DateFormat('dd-MMM-yyyy • hh:mm a').format(entry.date)}", style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
-                if (entry.remarks.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  const Text("REMARKS / REFERENCE:", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textSecondary)),
-                  const SizedBox(height: 4),
-                  Text(entry.remarks, style: const TextStyle(fontSize: 13, color: AppTheme.textPrimary)),
-                ],
-                const Divider(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text("Amount", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                    Text(
-                      currencyFormatter.format(entry.amount),
-                      style: TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 16,
-                        color: badgeColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text("Close"),
-            ),
-            IconButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-                _confirmDeleteQuickEntry(context, prov, entry);
-              },
-              icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
-              tooltip: "Delete Entry",
-            ),
-          ],
-        );
-      },
+        ],
+      ),
     );
   }
 
-  void _confirmDeleteQuickEntry(BuildContext context, TransactionProvider prov, QuickEntry entry) {
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: const Text("Delete Quick Entry"),
-          content: Text("Are you sure you want to permanently delete this quick ${entry.type.name.toUpperCase()} entry of ${currencyFormatter.format(entry.amount)}? This action is irreversible."),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text("Cancel"),
+  Widget _buildQuickEntryTile(QuickEntry entry) {
+    final isReceipt = entry.type == QuickEntryType.receipt;
+    final isPayment = entry.type == QuickEntryType.payment;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppTheme.outlineVariant),
+        boxShadow: AppTheme.softShadow,
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: isReceipt
+                  ? AppTheme.primaryLight.withValues(alpha: 0.35)
+                  : isPayment
+                      ? AppTheme.errorContainer
+                      : AppTheme.secondaryContainer,
+              borderRadius: BorderRadius.circular(10),
             ),
-            ElevatedButton(
-              onPressed: () {
-                prov.deleteQuickEntry(entry.id);
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Quick entry deleted.")),
-                );
-              },
-              child: const Text("Delete"),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            child: Icon(
+              isReceipt
+                  ? Icons.arrow_downward_rounded
+                  : isPayment
+                      ? Icons.arrow_upward_rounded
+                      : Icons.swap_horiz_rounded,
+              color: isReceipt
+                  ? AppTheme.primaryEmerald
+                  : isPayment
+                      ? AppTheme.errorRed
+                      : AppTheme.secondarySlate,
+              size: 20,
             ),
-          ],
-        );
-      },
+          ),
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "LOG: ${entry.type.name.toUpperCase()} (${entry.mode.name.toUpperCase()})",
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.secondarySlate,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  entry.partyName,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+                if (entry.remarks.isNotEmpty)
+                  Text(
+                    entry.remarks,
+                    style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                  ),
+              ],
+            ),
+          ),
+
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                isReceipt
+                    ? "+ ${currencyFormatter.format(entry.amount)}"
+                    : "- ${currencyFormatter.format(entry.amount)}",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  color: isReceipt ? AppTheme.primaryEmerald : AppTheme.errorRed,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                dateFormatter.format(entry.date),
+                style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

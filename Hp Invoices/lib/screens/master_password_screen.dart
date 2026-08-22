@@ -134,7 +134,7 @@ class _MasterPasswordScreenState extends State<MasterPasswordScreen>
 
                     // Title
                     const Text(
-                      "HP Bill POS",
+                      "Invoice Generator",
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.w800,
@@ -239,7 +239,7 @@ class _MasterPasswordScreenState extends State<MasterPasswordScreen>
                               onPressed: _isUnlocking ? null : _handleUnlock,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
-                                foregroundColor: AppTheme.primaryPurple,
+                                foregroundColor: AppTheme.primaryEmerald,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
@@ -251,7 +251,7 @@ class _MasterPasswordScreenState extends State<MasterPasswordScreen>
                                       height: 22,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2.5,
-                                        valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryPurple),
+                                        valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryEmerald),
                                       ),
                                     )
                                   : const Text(

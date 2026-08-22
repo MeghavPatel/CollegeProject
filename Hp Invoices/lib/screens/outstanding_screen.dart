@@ -44,7 +44,7 @@ class _OutstandingScreenState extends State<OutstandingScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Daily outstanding PDF generated!"),
-          backgroundColor: AppTheme.accentDeepPurple,
+          backgroundColor: AppTheme.primaryEmerald,
         ),
       );
     } catch (e) {
@@ -61,12 +61,12 @@ class _OutstandingScreenState extends State<OutstandingScreen> {
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
           title: Row(
             children: const [
-              Icon(Icons.check_circle_outline_rounded, color: AppTheme.accentTeal),
+              Icon(Icons.check_circle_outline_rounded, color: AppTheme.primaryEmerald),
               SizedBox(width: 8),
-              Text("Settle Outstanding"),
+              Text("Settle Outstanding", style: TextStyle(fontWeight: FontWeight.w700)),
             ],
           ),
           content: Text(
@@ -85,54 +85,12 @@ class _OutstandingScreenState extends State<OutstandingScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text("Balance for ${item.customerName} marked as settled!"),
-                    backgroundColor: AppTheme.accentTeal,
+                    backgroundColor: AppTheme.primaryEmerald,
                   ),
                 );
               },
-              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.accentTeal),
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryEmerald),
               child: const Text("Settle Now"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _confirmDeleteRecord(BuildContext context, TransactionProvider prov, OutstandingSummary item) {
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Row(
-            children: const [
-              Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
-              SizedBox(width: 8),
-              Text("Delete Outstanding"),
-            ],
-          ),
-          content: Text(
-            "Wipe all ledger statements, invoices, and transactions for ${item.customerName} to clear their outstanding balance?\n\nThis action is irreversible.",
-            style: const TextStyle(fontSize: 13),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text("Cancel"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                prov.deleteLedgerForCustomer(item.customerName);
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Outstanding record deleted successfully."),
-                    backgroundColor: Colors.redAccent,
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-              child: const Text("Delete"),
             ),
           ],
         );
@@ -143,261 +101,288 @@ class _OutstandingScreenState extends State<OutstandingScreen> {
   @override
   Widget build(BuildContext context) {
     final transProv = context.watch<TransactionProvider>();
-    final list = transProv.getOutstandingSummaries();
+    final outstandingList = transProv.getOutstandingSummary();
 
-    final filteredList = list.where((item) =>
-        item.customerName.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+    final filteredList = outstandingList.where((item) {
+      return item.customerName.toLowerCase().contains(_searchQuery.toLowerCase());
+    }).toList();
 
     return Scaffold(
+      backgroundColor: AppTheme.surface,
       appBar: AppBar(
         title: const Text("Accounts Outstanding"),
       ),
-      body: Column(
-        children: [
-          // Search & Summary Header
-          Container(
-            padding: const EdgeInsets.all(20),
-            color: AppTheme.accentDeepPurple.withValues(alpha: 0.04),
-            child: Column(
-              children: [
-                // Outstanding Info Panel + PDF Button
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Total Outstanding",
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          currencyFormatter.format(transProv.totalOutstanding),
-                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppTheme.accentDeepPurple),
-                        ),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: AppTheme.accentDeepPurple.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // --- Summary & Actions Card matching Stitch UI ---
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceContainerLowest,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppTheme.outlineVariant),
+                boxShadow: AppTheme.softShadow,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "TOTAL OUTSTANDING",
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.textSecondary,
+                              letterSpacing: 0.5,
+                            ),
                           ),
-                          child: Text(
-                            "${filteredList.length} Accounts",
-                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.accentDeepPurple),
+                          const SizedBox(height: 4),
+                          Text(
+                            currencyFormatter.format(transProv.totalOutstanding),
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w800,
+                              color: AppTheme.primaryEmerald,
+                              letterSpacing: -0.5,
+                            ),
                           ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: AppTheme.surfaceContainer,
+                          borderRadius: BorderRadius.circular(20),
                         ),
-                        const SizedBox(height: 8),
-                        // DAILY PDF BACKUP BUTTON
-                        GestureDetector(
-                          onTap: _isGeneratingPdf ? null : () => _generateDailyPdf(list),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [AppTheme.primaryPurple, AppTheme.accentDeepPurple],
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.group_rounded, size: 14, color: AppTheme.secondarySlate),
+                            const SizedBox(width: 4),
+                            Text(
+                              "${outstandingList.length} Accounts",
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.textPrimary,
                               ),
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppTheme.primaryPurple.withValues(alpha: 0.3),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (_isGeneratingPdf)
-                                  const SizedBox(
-                                    width: 12,
-                                    height: 12,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 1.5,
-                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                    ),
-                                  )
-                                else
-                                  const Icon(Icons.picture_as_pdf_rounded, size: 14, color: Colors.white),
-                                const SizedBox(width: 6),
-                                const Text(
-                                  "Daily PDF Backup",
-                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
-                                ),
-                              ],
-                            ),
-                          ),
+                          ],
                         ),
-                      ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: _isGeneratingPdf
+                          ? null
+                          : () => _generateDailyPdf(outstandingList),
+                      icon: _isGeneratingPdf
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            )
+                          : const Icon(Icons.picture_as_pdf_rounded, size: 18),
+                      label: const Text("Daily PDF Backup"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryEmerald,
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // --- Search Bar ---
+            TextField(
+              onChanged: (val) => setState(() => _searchQuery = val),
+              decoration: const InputDecoration(
+                hintText: "Search customer name...",
+                prefixIcon: Icon(Icons.search_rounded, color: AppTheme.primaryEmerald),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // --- List Header ---
+            Text(
+              "Pending Accounts",
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: AppTheme.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            if (filteredList.isEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 40),
+                alignment: Alignment.center,
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.check_circle_outline_rounded,
+                      size: 48,
+                      color: AppTheme.tertiaryMint,
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      "No outstanding balances found!",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    const Text(
+                      "All customer ledgers are clear and settled.",
+                      style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                // Search bar
-                TextField(
-                  onChanged: (val) {
-                    setState(() {
-                      _searchQuery = val;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    hintText: "Search customer name...",
-                    prefixIcon: const Icon(Icons.search_rounded, color: AppTheme.accentDeepPurple),
-                    fillColor: AppTheme.cardBg,
-                    filled: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Outstandings List
-          Expanded(
-            child: filteredList.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.check_circle_outline_rounded, size: 56, color: AppTheme.accentTeal.withValues(alpha: 0.3)),
-                        const SizedBox(height: 12),
-                        const Text(
-                          "No outstanding balances found.",
-                          style: TextStyle(color: AppTheme.textSecondary),
-                        ),
-                      ],
+              )
+            else
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: filteredList.length,
+                itemBuilder: (ctx, index) {
+                  final item = filteredList[index];
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceContainerLowest,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppTheme.outlineVariant),
+                      boxShadow: AppTheme.softShadow,
                     ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(20),
-                    itemCount: filteredList.length,
-                    itemBuilder: (ctx, index) {
-                      final item = filteredList[index];
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => LedgerLookupScreen(initialCustomerName: item.customerName),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              item.customerName,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.textPrimary,
                               ),
-                            );
-                          },
-                          borderRadius: BorderRadius.circular(16),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Row(
+                            ),
+                            Text(
+                              currencyFormatter.format(item.balance),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: AppTheme.errorRed,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "${item.invoiceCount} invoices • Last updated recently",
+                              style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: AppTheme.errorContainer,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Text(
+                                "PENDING",
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppTheme.onErrorContainer,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Divider(height: 1, color: AppTheme.accentBorder),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            // View Ledger button
+                            TextButton.icon(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => LedgerLookupScreen(
+                                      initialCustomerName: item.customerName,
+                                    ),
+                                  ),
+                                );
+                              },
+                              icon: const Icon(Icons.receipt_long_rounded, size: 16, color: AppTheme.primaryEmerald),
+                              label: const Text(
+                                "View Ledger",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppTheme.primaryEmerald,
+                                ),
+                              ),
+                            ),
+                            Row(
                               children: [
-                                CircleAvatar(
-                                  radius: 20,
-                                  backgroundColor: AppTheme.accentDeepPurple.withValues(alpha: 0.08),
-                                  child: const Icon(
-                                    Icons.account_circle_outlined,
-                                    color: AppTheme.accentDeepPurple,
+                                OutlinedButton.icon(
+                                  onPressed: () => _sendReminder(item),
+                                  icon: const Icon(Icons.chat_bubble_outline_rounded, size: 14),
+                                  label: const Text("Reminder", style: TextStyle(fontSize: 11)),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                   ),
                                 ),
-                                const SizedBox(width: 14),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        item.customerName,
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        "Last Activity: ${DateFormat('dd-MMM-yyyy').format(item.lastTransactionDate)}",
-                                        style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary),
-                                      ),
-                                    ],
+                                const SizedBox(width: 8),
+                                ElevatedButton.icon(
+                                  onPressed: () => _confirmSettlement(context, transProv, item),
+                                  icon: const Icon(Icons.check_rounded, size: 14),
+                                  label: const Text("Settle", style: TextStyle(fontSize: 11)),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppTheme.primaryEmerald,
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                   ),
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      "${item.balance > 0 ? '-' : '+'} ${currencyFormatter.format(item.balance.abs())}",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: 15,
-                                        color: item.balance > 0 ? Colors.redAccent : AppTheme.accentTeal,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        // Tick / Pay Button
-                                        GestureDetector(
-                                          onTap: () => _confirmSettlement(context, transProv, item),
-                                          child: Container(
-                                            padding: const EdgeInsets.all(6),
-                                            decoration: BoxDecoration(
-                                              color: AppTheme.accentTeal.withValues(alpha: 0.1),
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: const Icon(
-                                              Icons.check_circle_outline_rounded,
-                                              size: 16,
-                                              color: AppTheme.accentTeal,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        // Delete Button
-                                        GestureDetector(
-                                          onTap: () => _confirmDeleteRecord(context, transProv, item),
-                                          child: Container(
-                                            padding: const EdgeInsets.all(6),
-                                            decoration: BoxDecoration(
-                                              color: Colors.redAccent.withValues(alpha: 0.1),
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: const Icon(
-                                              Icons.delete_outline_rounded,
-                                              size: 16,
-                                              color: Colors.redAccent,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        // Remind Button
-                                        GestureDetector(
-                                          onTap: () => _sendReminder(item),
-                                          child: Container(
-                                            padding: const EdgeInsets.all(6),
-                                            decoration: BoxDecoration(
-                                              color: AppTheme.accentDeepPurple.withValues(alpha: 0.1),
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: const Icon(
-                                              Icons.notifications_none_rounded,
-                                              size: 16,
-                                              color: AppTheme.accentDeepPurple,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
                                 ),
                               ],
                             ),
-                          ),
+                          ],
                         ),
-                      );
-                    },
-                  ),
-          ),
-        ],
+                      ],
+                    ),
+                  );
+                },
+              ),
+          ],
+        ),
       ),
     );
   }
