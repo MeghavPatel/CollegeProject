@@ -6,6 +6,9 @@ import 'data/vendor_ledger_provider.dart';
 import '../../core/auth/security_helper.dart';
 import '../../core/models/models.dart';
 
+import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/app_theme.dart';
+
 class ExpensesScreen extends ConsumerStatefulWidget {
   const ExpensesScreen({super.key});
 
@@ -14,8 +17,9 @@ class ExpensesScreen extends ConsumerStatefulWidget {
 }
 
 class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
-  static const Color brandGreen = Color(0xFF1B5E20);
+  static const Color brandGreen = AppTheme.primaryBlue;
   bool _isVendorMode = false;
+
 
   void _showAddExpenseDialog(BuildContext context, WidgetRef ref) {
     final titleController = TextEditingController();

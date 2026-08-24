@@ -5,11 +5,15 @@ import '../../core/models/models.dart';
 import 'data/salary_provider.dart';
 import '../../core/auth/security_helper.dart';
 
+import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/app_theme.dart';
+
 class SalaryDetailScreen extends ConsumerWidget {
   final EmployeeProfile employee;
   const SalaryDetailScreen({super.key, required this.employee});
 
-  static const Color brandGreen = Color(0xFF1B5E20);
+  static const Color brandGreen = AppTheme.primaryBlue;
+
 
   void _showAdvanceDialog(BuildContext context, WidgetRef ref, EmployeeProfile currentEmployee) {
     final amountController = TextEditingController();

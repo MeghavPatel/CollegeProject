@@ -9,6 +9,9 @@ import '../../core/models/models.dart';
 import 'data/attendance_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/app_theme.dart';
+
 class EmployeeAttendanceCalendarDialog extends StatefulWidget {
   final EmployeeProfile employee;
 
@@ -19,8 +22,9 @@ class EmployeeAttendanceCalendarDialog extends StatefulWidget {
 }
 
 class _EmployeeAttendanceCalendarDialogState extends State<EmployeeAttendanceCalendarDialog> {
-  static const Color brandGreen = Color(0xFF1B5E20);
+  static const Color brandGreen = AppTheme.primaryBlue;
   CalendarFormat _calendarFormat = CalendarFormat.month;
+
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   
