@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/models/models.dart';
 import 'data/stock_provider.dart';
 import '../../core/auth/security_helper.dart';
+import '../../core/theme/app_theme.dart';
 
 class StockDetailScreen extends ConsumerStatefulWidget {
-  final StockItem item;
-  const StockDetailScreen({super.key, required this.item});
+  final StockItem? item;
+  const StockDetailScreen({super.key, this.item});
 
   @override
   ConsumerState<StockDetailScreen> createState() => _StockDetailScreenState();
 }
 
 class _StockDetailScreenState extends ConsumerState<StockDetailScreen> {
-  static const Color brandGreen = Color(0xFF1B5E20);
+  static const Color brandGreen = AppTheme.primaryBlue;
   String? _selectedVariantId;
+
 
   void _showEditStockItemDialog(BuildContext context, WidgetRef ref, StockItem item) {
     final nameController = TextEditingController(text: item.itemName);

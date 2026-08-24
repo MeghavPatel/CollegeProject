@@ -4,11 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../core/models/models.dart';
 import 'data/transport_provider.dart';
-import '../../core/auth/security_helper.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/app_theme.dart';
 
-const brandGreen = Color(0xFF1B5E20);
+const brandGreen = AppTheme.primaryBlue;
 
 class TransportDetailScreen extends ConsumerWidget {
+
   final Transporter transporter;
 
   const TransportDetailScreen({super.key, required this.transporter});

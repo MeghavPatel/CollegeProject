@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'data/salary_provider.dart';
 import 'salary_detail_screen.dart';
 
+import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/app_theme.dart';
+
 class SalaryScreen extends ConsumerStatefulWidget {
   const SalaryScreen({super.key});
 
@@ -12,8 +15,9 @@ class SalaryScreen extends ConsumerStatefulWidget {
 }
 
 class _SalaryScreenState extends ConsumerState<SalaryScreen> {
-  static const Color brandGreen = Color(0xFF1B5E20);
+  static const Color brandGreen = AppTheme.primaryBlue;
   final TextEditingController _searchController = TextEditingController();
+
   String _searchQuery = '';
 
   final List<Color> avatarColors = [

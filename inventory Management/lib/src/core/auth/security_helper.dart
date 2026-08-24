@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../theme/app_theme.dart';
 
 /// Shows a dialog requesting the user's login password.
 /// Reauthenticates against Firebase Auth.
@@ -42,7 +43,8 @@ Future<bool> showPasswordVerificationDialog(BuildContext context) async {
                   decoration: InputDecoration(
                     labelText: 'Confirm Password',
                     hintText: 'Enter login password',
-                    prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF1B5E20)),
+                    prefixIcon: const Icon(Icons.lock_outline, color: AppTheme.primaryBlue),
+
                     filled: true,
                     fillColor: Theme.of(context).colorScheme.surface,
                     border: OutlineInputBorder(

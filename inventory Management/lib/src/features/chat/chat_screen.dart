@@ -4,6 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'data/chat_provider.dart';
 
+import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/app_theme.dart';
+
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
 
@@ -12,8 +15,9 @@ class ChatScreen extends ConsumerStatefulWidget {
 }
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
-  static const Color brandGreen = Color(0xFF1B5E20);
+  static const Color brandGreen = AppTheme.primaryBlue;
   final _messageController = TextEditingController();
+
   final _passphraseController = TextEditingController();
   final _scrollController = ScrollController();
   final _formKey = GlobalKey<FormState>();

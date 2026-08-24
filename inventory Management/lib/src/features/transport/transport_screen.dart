@@ -3,11 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/models/models.dart';
 import 'data/transport_provider.dart';
-import 'transport_detail_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/app_theme.dart';
 
-const brandGreen = Color(0xFF1B5E20);
+const brandGreen = AppTheme.primaryBlue;
 
 class TransportScreen extends ConsumerWidget {
+
   const TransportScreen({super.key});
 
   void _showAddTransporterDialog(BuildContext context, WidgetRef ref) {

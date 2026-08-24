@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'data/attendance_provider.dart';
 import 'attendance_calendar_dialog.dart';
 import '../../core/models/models.dart';
+import '../../core/theme/app_theme.dart';
+
 
 class AttendanceScreen extends ConsumerWidget {
   const AttendanceScreen({super.key});
@@ -84,7 +87,7 @@ class AttendanceScreenContentState extends ConsumerState<AttendanceScreenContent
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Color(0xFF1B5E20),
+              primary: AppTheme.primaryBlue,
             ),
           ),
           child: child!,
@@ -147,7 +150,7 @@ class AttendanceScreenContentState extends ConsumerState<AttendanceScreenContent
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Row(
           children: [
-            Icon(Icons.phone_in_talk, color: Color(0xFF1B5E20)),
+            Icon(Icons.phone_in_talk, color: AppTheme.primaryBlue),
             SizedBox(width: 8),
             Text('Call Employee', style: TextStyle(fontWeight: FontWeight.bold)),
           ],
@@ -160,7 +163,7 @@ class AttendanceScreenContentState extends ConsumerState<AttendanceScreenContent
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1B5E20),
+              backgroundColor: AppTheme.primaryBlue,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: () async {
@@ -280,7 +283,7 @@ class AttendanceScreenContentState extends ConsumerState<AttendanceScreenContent
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Attendance saved successfully'),
-                    backgroundColor: Color(0xFF1B5E20),
+                    backgroundColor: AppTheme.primaryBlue,
                   ),
                 );
               }
@@ -504,7 +507,7 @@ class AttendanceScreenContentState extends ConsumerState<AttendanceScreenContent
                                       ),
                                       child: Text(
                                         '${hours.toStringAsFixed(1)} hrs',
-                                        style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1B5E20), fontSize: 13),
+                                        style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: AppTheme.primaryBlue, fontSize: 13),
                                       ),
                                     ),
                                   ],
