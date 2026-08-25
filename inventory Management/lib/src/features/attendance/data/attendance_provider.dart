@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/models/models.dart';
+import '../../../core/services/encryption_service.dart';
 
 class AttendanceRecord {
   final String status;
@@ -120,13 +121,16 @@ class AttendanceNotifier extends Notifier<AsyncValue<Map<String, AttendanceRecor
             .doc(uid)
             .collection('attendance')
             .doc();
-        batch.set(docRef, {
+
+        final encryptedData = EncryptionService.instance.encryptMap({
           'employeeId': entry.key,
           'date': Timestamp.fromDate(startOfDay),
           'status': entry.value.status,
           'checkIn': entry.value.checkIn,
           'checkOut': entry.value.checkOut,
         });
+
+        batch.set(docRef, encryptedData);
       }
       
       await batch.commit();

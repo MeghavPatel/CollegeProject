@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/models.dart';
+import '../services/encryption_service.dart';
 
 class LastSeenActivityNotifier extends Notifier<DateTime?> {
   static const _key = 'last_seen_activity_time';
@@ -91,12 +92,14 @@ class ActivityNotifier extends Notifier<AsyncValue<void>> {
           .doc(uid)
           .collection('activity_logs');
       
-      // Step 1: Insert New Log
-      await collection.add({
+      // Step 1: Insert New Encrypted Log
+      final encryptedData = EncryptionService.instance.encryptMap({
         'moduleName': module,
         'description': description,
         'timestamp': FieldValue.serverTimestamp(),
       });
+
+      await collection.add(encryptedData);
       
       // Step 2: Check total count (Auto-clean logic)
       final allLogsSnapshot = await collection

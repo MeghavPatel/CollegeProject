@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/models/models.dart';
 import '../../../core/providers/activity_provider.dart';
+import '../../../core/services/encryption_service.dart';
 
 // Transport CRUD Provider
 class TransportNotifier extends Notifier<AsyncValue<void>> {
@@ -15,26 +16,30 @@ class TransportNotifier extends Notifier<AsyncValue<void>> {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception("User not logged in");
       
-      final docRef = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .collection('transporters')
-          .add({
+      final encryptedTransporter = EncryptionService.instance.encryptMap({
         'name': name,
         'createdAt': FieldValue.serverTimestamp(),
       });
 
+      final docRef = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('transporters')
+          .add(encryptedTransporter);
+
       if (initialPayment != null && initialPayment > 0) {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(uid)
-            .collection('transport_payments')
-            .add({
+        final encryptedPayment = EncryptionService.instance.encryptMap({
           'transporterId': docRef.id,
           'amount': initialPayment,
           'note': 'Initial payment',
           'date': FieldValue.serverTimestamp(),
         });
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .collection('transport_payments')
+            .add(encryptedPayment);
       }
 
       final logMsg = initialPayment != null && initialPayment > 0 
@@ -54,16 +59,19 @@ class TransportNotifier extends Notifier<AsyncValue<void>> {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception("User not logged in");
       
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .collection('transport_payments')
-          .add({
+      final encryptedPayment = EncryptionService.instance.encryptMap({
         'transporterId': transporterId,
         'amount': amount,
         'note': note,
         'date': FieldValue.serverTimestamp(),
       });
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('transport_payments')
+          .add(encryptedPayment);
+
       ref.read(activityProvider.notifier).logActivity(
         'Transport', 'Paid ₹${amount.toStringAsFixed(0)} to $transporterName',
       );
@@ -135,14 +143,20 @@ class TransportNotifier extends Notifier<AsyncValue<void>> {
     try {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception("User not logged in");
-      await FirebaseFirestore.instance
+
+      final docRef = FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
           .collection('transporters')
-          .doc(id)
-          .update({
-        'name': name,
-      });
+          .doc(id);
+
+      final snap = await docRef.get();
+      final currentData = EncryptionService.instance.decryptDoc(snap.data());
+      currentData['name'] = name;
+
+      final encryptedData = EncryptionService.instance.encryptMap(currentData);
+      await docRef.set(encryptedData, SetOptions(merge: true));
+
       ref.read(activityProvider.notifier).logActivity(
         'Transport', 'Updated transporter name to: $name',
       );
@@ -164,16 +178,22 @@ class TransportNotifier extends Notifier<AsyncValue<void>> {
     try {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception("User not logged in");
-      await FirebaseFirestore.instance
+
+      final docRef = FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
           .collection('transport_payments')
-          .doc(paymentId)
-          .update({
-        'amount': newAmount,
-        'note': note,
-        'date': Timestamp.fromDate(date),
-      });
+          .doc(paymentId);
+
+      final snap = await docRef.get();
+      final currentData = EncryptionService.instance.decryptDoc(snap.data());
+      currentData['amount'] = newAmount;
+      currentData['note'] = note;
+      currentData['date'] = Timestamp.fromDate(date);
+
+      final encryptedData = EncryptionService.instance.encryptMap(currentData);
+      await docRef.set(encryptedData, SetOptions(merge: true));
+
       ref.read(activityProvider.notifier).logActivity(
         'Transport', 'Updated transport payment for $transporterName (₹$oldAmount -> ₹$newAmount)',
       );
