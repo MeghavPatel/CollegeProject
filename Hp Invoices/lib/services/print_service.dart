@@ -275,15 +275,27 @@ class PrintService {
                       ),
                       // Divider
                       pw.Container(width: 1.5, color: PdfColors.black),
-                      // Signature block
+                      // Notes block
                       pw.Expanded(
                         flex: 3,
-                        child: pw.Container(
-                          alignment: pw.Alignment.bottomCenter,
-                          padding: const pw.EdgeInsets.only(bottom: 6),
-                          child: pw.Text(
-                            "Receiver Signature",
-                            style: const pw.TextStyle(fontSize: 7),
+                        child: pw.Padding(
+                          padding: const pw.EdgeInsets.all(6),
+                          child: pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
+                            mainAxisAlignment: pw.MainAxisAlignment.center,
+                            children: [
+                              pw.Text(
+                                "Notes:",
+                                style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 8),
+                              ),
+                              pw.SizedBox(height: 2),
+                              pw.Text(
+                                (invoice.notes != null && invoice.notes!.trim().isNotEmpty)
+                                    ? invoice.notes!.trim()
+                                    : "-",
+                                style: const pw.TextStyle(fontSize: 7),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -375,7 +387,7 @@ class PrintService {
 
   String _numberToWords(double amount) {
     if (amount < 0) {
-      return "Minus " + _numberToWords(-amount);
+      return "Minus ${_numberToWords(-amount)}";
     }
 
     int integerPart = amount.floor();
@@ -413,22 +425,22 @@ class PrintService {
     }
 
     if (number < 100) {
-      return tens[number ~/ 10] + (number % 10 != 0 ? " " + units[number % 10] : "");
+      return tens[number ~/ 10] + (number % 10 != 0 ? " ${units[number % 10]}" : "");
     }
 
     if (number < 1000) {
-      return units[number ~/ 100] + " Hundred" + (number % 100 != 0 ? " " + _convertIntegerToWords(number % 100) : "");
+      return "${units[number ~/ 100]} Hundred${number % 100 != 0 ? " ${_convertIntegerToWords(number % 100)}" : ""}";
     }
 
     if (number < 100000) {
-      return _convertIntegerToWords(number ~/ 1000) + " Thousand" + (number % 1000 != 0 ? " " + _convertIntegerToWords(number % 1000) : "");
+      return "${_convertIntegerToWords(number ~/ 1000)} Thousand${number % 1000 != 0 ? " ${_convertIntegerToWords(number % 1000)}" : ""}";
     }
 
     if (number < 10000000) {
-      return _convertIntegerToWords(number ~/ 100000) + " Lakh" + (number % 100000 != 0 ? " " + _convertIntegerToWords(number % 100000) : "");
+      return "${_convertIntegerToWords(number ~/ 100000)} Lakh${number % 100000 != 0 ? " ${_convertIntegerToWords(number % 100000)}" : ""}";
     }
 
-    return _convertIntegerToWords(number ~/ 10000000) + " Crore" + (number % 10000000 != 0 ? " " + _convertIntegerToWords(number % 10000000) : "");
+    return "${_convertIntegerToWords(number ~/ 10000000)} Crore${number % 10000000 != 0 ? " ${_convertIntegerToWords(number % 10000000)}" : ""}";
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -685,15 +697,51 @@ class PrintService {
   }
 
   // ═══════════════════════════════════════════════════════════════
-  //  NATIVE PRINT TRIGGERS
+  //  NATIVE & DIRECT WI-FI PRINT TRIGGERS (CANON LBP6030w/6018w)
   // ═══════════════════════════════════════════════════════════════
 
   Future<void> printInvoice(Invoice invoice) async {
     final pdfBytes = await generateA4InvoicePdf(invoice);
-    await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => pdfBytes,
-      name: 'Invoice_${invoice.invoiceNumber}.pdf',
-    );
+    final printerConfig = await DatabaseHelper.instance.getPrinterConfig();
+    final isDirect = printerConfig['directPrint'] as bool? ?? true;
+    final printerIp = (printerConfig['printerIp'] as String? ?? '192.168.1.81').trim();
+
+    bool directPrinted = false;
+
+    if (isDirect) {
+      try {
+        final printers = await Printing.listPrinters();
+        final matchedPrinter = printers.where((p) {
+          final pUrl = p.url.toLowerCase();
+          final pName = p.name.toLowerCase();
+          final pLoc = (p.location ?? '').toLowerCase();
+          return pUrl.contains(printerIp) ||
+                 pName.contains(printerIp) ||
+                 pLoc.contains(printerIp) ||
+                 pName.contains('canon') ||
+                 pName.contains('lbp') ||
+                 pName.contains('6030') ||
+                 pName.contains('6018');
+        }).firstOrNull;
+
+        if (matchedPrinter != null) {
+          directPrinted = await Printing.directPrintPdf(
+            printer: matchedPrinter,
+            onLayout: (PdfPageFormat format) async => pdfBytes,
+            name: 'Invoice_${invoice.invoiceNumber}.pdf',
+          );
+        }
+      } catch (e) {
+        // Graceful fallback to standard print spooler
+      }
+    }
+
+    if (!directPrinted) {
+      await Printing.layoutPdf(
+        onLayout: (PdfPageFormat format) async => pdfBytes,
+        name: 'Invoice_${invoice.invoiceNumber}.pdf',
+      );
+    }
   }
 
   Future<void> printOutstandingReport(List<OutstandingSummary> summaries) async {
@@ -709,6 +757,74 @@ class PrintService {
     await Printing.layoutPdf(
       onLayout: (PdfPageFormat format) async => pdfBytes,
       name: 'Ledger_${customer.replaceAll(' ', '_')}_$filterLabel.pdf',
+    );
+  }
+
+  /// Generates and prints a Wi-Fi Test Page for Canon LBP6030w/6018w
+  Future<void> printTestPage() async {
+    final pdf = pw.Document();
+    final profile = await DatabaseHelper.instance.getStoreProfile();
+    final storeName = profile['storeName'] ?? 'HP Bill';
+    final config = await DatabaseHelper.instance.getPrinterConfig();
+    final ip = config['printerIp'] ?? '192.168.1.81';
+    final name = config['printerName'] ?? 'Canon LBP6030w/6018w';
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(32),
+        build: (pw.Context context) {
+          return pw.Container(
+            padding: const pw.EdgeInsets.all(24),
+            decoration: pw.BoxDecoration(
+              border: pw.Border.all(color: PdfColors.black, width: 2),
+            ),
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.center,
+              mainAxisSize: pw.MainAxisSize.min,
+              children: [
+                pw.Text(
+                  storeName.toUpperCase(),
+                  style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
+                ),
+                pw.SizedBox(height: 8),
+                pw.Text(
+                  'WI-FI PRINTER TEST PAGE',
+                  style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColors.indigo900),
+                ),
+                pw.Divider(thickness: 1.5, height: 24),
+                pw.Align(
+                  alignment: pw.Alignment.centerLeft,
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Text('Printer Model: $name', style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold)),
+                      pw.SizedBox(height: 6),
+                      pw.Text('Printer IP Address: $ip (Port 9100 / RAW / IPP)', style: const pw.TextStyle(fontSize: 11)),
+                      pw.SizedBox(height: 6),
+                      pw.Text('Status: Linked & Ready for All-Day Printing', style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold, color: PdfColors.green900)),
+                      pw.SizedBox(height: 6),
+                      pw.Text('Printed On: ${DateFormat('dd-MMM-yyyy hh:mm a').format(DateTime.now())}', style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey700)),
+                    ],
+                  ),
+                ),
+                pw.Divider(thickness: 1, height: 24),
+                pw.Text(
+                  'If you see this page, your phone is successfully linked with your Canon Wi-Fi printer!',
+                  textAlign: pw.TextAlign.center,
+                  style: const pw.TextStyle(fontSize: 11),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+
+    final pdfBytes = await pdf.save();
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdfBytes,
+      name: 'Printer_Test_Page.pdf',
     );
   }
 

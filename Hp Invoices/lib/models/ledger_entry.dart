@@ -38,16 +38,26 @@ class LedgerEntry {
   }
 
   factory LedgerEntry.fromMap(Map<String, dynamic> map) {
+    DateTime parsedDate = DateTime.now();
+    if (map['date'] != null) {
+      parsedDate = DateTime.tryParse(map['date'].toString()) ?? DateTime.now();
+    } else if (map['createdAt'] != null) {
+      parsedDate = DateTime.tryParse(map['createdAt'].toString()) ?? DateTime.now();
+    }
+
+    final typeStr = (map['type'] ?? 'debit').toString().toLowerCase().trim();
+    final entryType = typeStr == 'credit' ? LedgerEntryType.credit : LedgerEntryType.debit;
+
     return LedgerEntry(
-      id: map['id'] ?? '',
-      customerName: map['customerName'] ?? '',
-      date: DateTime.parse(map['date']),
-      description: map['description'] ?? '',
-      type: map['type'] == 'credit' ? LedgerEntryType.credit : LedgerEntryType.debit,
-      amount: (map['amount'] as num).toDouble(),
-      runningBalance: (map['runningBalance'] as num).toDouble(),
-      invoiceId: map['invoiceId'],
-      customerPhone: map['customerPhone'],
+      id: (map['id'] ?? map['entryId'] ?? map['entry_id'] ?? '').toString(),
+      customerName: (map['customerName'] ?? map['customer_name'] ?? map['partyName'] ?? map['party_name'] ?? '').toString().trim(),
+      date: parsedDate,
+      description: (map['description'] ?? map['remarks'] ?? '').toString(),
+      type: entryType,
+      amount: ((map['amount'] ?? 0.0) as num).toDouble(),
+      runningBalance: ((map['runningBalance'] ?? map['running_balance'] ?? map['balance'] ?? 0.0) as num).toDouble(),
+      invoiceId: map['invoiceId']?.toString() ?? map['invoice_id']?.toString(),
+      customerPhone: map['customerPhone']?.toString() ?? map['customer_phone']?.toString(),
     );
   }
 }

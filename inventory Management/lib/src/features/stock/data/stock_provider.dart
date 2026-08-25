@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/models/models.dart';
 import '../../../core/providers/activity_provider.dart';
+import '../../../core/services/encryption_service.dart';
 
 // Scope Stock operations under user UID
 class StockNotifier extends Notifier<AsyncValue<void>> {
@@ -14,15 +15,19 @@ class StockNotifier extends Notifier<AsyncValue<void>> {
     try {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception("User not logged in");
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .collection('stock_items')
-          .add({
+
+      final encryptedData = EncryptionService.instance.encryptMap({
         'itemName': name,
         'currentQuantity': 0.0,
         'lastUpdated': FieldValue.serverTimestamp(),
       });
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('stock_items')
+          .add(encryptedData);
+
       ref.read(activityProvider.notifier).logActivity(
         'Stock', 'Created parent item: $name',
       );
@@ -37,14 +42,21 @@ class StockNotifier extends Notifier<AsyncValue<void>> {
     try {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception("User not logged in");
-      await FirebaseFirestore.instance
+
+      final docRef = FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
           .collection('stock_items')
-          .doc(id)
-          .update({
-        'itemName': newName,
-      });
+          .doc(id);
+
+      final snap = await docRef.get();
+      final currentData = EncryptionService.instance.decryptDoc(snap.data());
+      currentData['itemName'] = newName;
+      currentData['lastUpdated'] = FieldValue.serverTimestamp();
+
+      final encryptedData = EncryptionService.instance.encryptMap(currentData);
+      await docRef.set(encryptedData, SetOptions(merge: true));
+
       ref.read(activityProvider.notifier).logActivity(
         'Stock', 'Updated parent stock item name to: $newName',
       );
@@ -82,9 +94,10 @@ class StockNotifier extends Notifier<AsyncValue<void>> {
 
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         final parentSnapshot = await transaction.get(docRef);
-        final currentParentQty = (parentSnapshot.data()?['currentQuantity'] ?? 0.0).toDouble();
+        final parentData = EncryptionService.instance.decryptDoc(parentSnapshot.data());
+        final currentParentQty = (parentData['currentQuantity'] ?? 0.0).toDouble();
 
-        transaction.set(variantRef, {
+        final variantData = EncryptionService.instance.encryptMap({
           'thickness': thickness,
           'length': length,
           'width': width,
@@ -92,19 +105,22 @@ class StockNotifier extends Notifier<AsyncValue<void>> {
           'lastUpdated': FieldValue.serverTimestamp(),
         });
 
-        transaction.update(docRef, {
-          'currentQuantity': currentParentQty + initialStock,
-          'lastUpdated': FieldValue.serverTimestamp(),
-        });
+        parentData['currentQuantity'] = currentParentQty + initialStock;
+        parentData['lastUpdated'] = FieldValue.serverTimestamp();
+        final updatedParent = EncryptionService.instance.encryptMap(parentData);
+
+        transaction.set(variantRef, variantData);
+        transaction.set(docRef, updatedParent, SetOptions(merge: true));
 
         if (initialStock > 0) {
-          transaction.set(logRef, {
+          final logData = EncryptionService.instance.encryptMap({
             'itemId': itemId,
             'variantId': variantRef.id,
             'type': 'ADD',
             'quantityChange': initialStock,
             'date': FieldValue.serverTimestamp(),
           });
+          transaction.set(logRef, logData);
         }
       });
 
@@ -153,8 +169,11 @@ class StockNotifier extends Notifier<AsyncValue<void>> {
           throw Exception("Stock item or variant does not exist!");
         }
 
-        final currentParentQty = (parentSnapshot.data()?['currentQuantity'] ?? 0.0).toDouble();
-        final currentVarStock = (variantSnapshot.data()?['currentStock'] ?? 0.0).toDouble();
+        final parentData = EncryptionService.instance.decryptDoc(parentSnapshot.data());
+        final variantData = EncryptionService.instance.decryptDoc(variantSnapshot.data());
+
+        final currentParentQty = (parentData['currentQuantity'] ?? 0.0).toDouble();
+        final currentVarStock = (variantData['currentStock'] ?? 0.0).toDouble();
 
         double newVarStock = currentVarStock;
         double newParentQty = currentParentQty;
@@ -167,17 +186,16 @@ class StockNotifier extends Notifier<AsyncValue<void>> {
           newParentQty -= quantityChange;
         }
 
-        transaction.update(variantRef, {
-          'currentStock': newVarStock,
-          'lastUpdated': FieldValue.serverTimestamp(),
-        });
+        variantData['currentStock'] = newVarStock;
+        variantData['lastUpdated'] = FieldValue.serverTimestamp();
 
-        transaction.update(parentRef, {
-          'currentQuantity': newParentQty,
-          'lastUpdated': FieldValue.serverTimestamp(),
-        });
+        parentData['currentQuantity'] = newParentQty;
+        parentData['lastUpdated'] = FieldValue.serverTimestamp();
 
-        transaction.set(logRef, {
+        transaction.set(variantRef, EncryptionService.instance.encryptMap(variantData), SetOptions(merge: true));
+        transaction.set(parentRef, EncryptionService.instance.encryptMap(parentData), SetOptions(merge: true));
+
+        final logData = EncryptionService.instance.encryptMap({
           'itemId': itemId,
           'variantId': variantId,
           'type': type,
@@ -185,6 +203,8 @@ class StockNotifier extends Notifier<AsyncValue<void>> {
           'date': FieldValue.serverTimestamp(),
           'note': note,
         });
+
+        transaction.set(logRef, logData);
       });
 
       final action = type == 'ADD' ? 'Added' : 'Sold';
@@ -230,13 +250,15 @@ class StockNotifier extends Notifier<AsyncValue<void>> {
 
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         final parentSnapshot = await transaction.get(parentRef);
-        final currentParentQty = (parentSnapshot.data()?['currentQuantity'] ?? 0.0).toDouble();
+        final parentData = EncryptionService.instance.decryptDoc(parentSnapshot.data());
+        final currentParentQty = (parentData['currentQuantity'] ?? 0.0).toDouble();
 
         transaction.delete(variantRef);
-        transaction.update(parentRef, {
-          'currentQuantity': (currentParentQty - currentStock).clamp(0.0, double.infinity),
-          'lastUpdated': FieldValue.serverTimestamp(),
-        });
+
+        parentData['currentQuantity'] = (currentParentQty - currentStock).clamp(0.0, double.infinity);
+        parentData['lastUpdated'] = FieldValue.serverTimestamp();
+
+        transaction.set(parentRef, EncryptionService.instance.encryptMap(parentData), SetOptions(merge: true));
 
         for (var doc in logsSnapshot.docs) {
           transaction.delete(doc.reference);
@@ -328,8 +350,11 @@ class StockNotifier extends Notifier<AsyncValue<void>> {
           throw Exception("Stock item or variant does not exist!");
         }
 
-        final currentParentQty = (parentSnapshot.data()?['currentQuantity'] ?? 0.0).toDouble();
-        final currentVarStock = (variantSnapshot.data()?['currentStock'] ?? 0.0).toDouble();
+        final parentData = EncryptionService.instance.decryptDoc(parentSnapshot.data());
+        final variantData = EncryptionService.instance.decryptDoc(variantSnapshot.data());
+
+        final currentParentQty = (parentData['currentQuantity'] ?? 0.0).toDouble();
+        final currentVarStock = (variantData['currentStock'] ?? 0.0).toDouble();
 
         double newVarStock = currentVarStock;
         double newParentQty = currentParentQty;
@@ -343,15 +368,14 @@ class StockNotifier extends Notifier<AsyncValue<void>> {
           newParentQty += quantityChange;
         }
 
-        transaction.update(variantRef, {
-          'currentStock': newVarStock.clamp(0.0, double.infinity),
-          'lastUpdated': FieldValue.serverTimestamp(),
-        });
+        variantData['currentStock'] = newVarStock.clamp(0.0, double.infinity);
+        variantData['lastUpdated'] = FieldValue.serverTimestamp();
 
-        transaction.update(parentRef, {
-          'currentQuantity': newParentQty.clamp(0.0, double.infinity),
-          'lastUpdated': FieldValue.serverTimestamp(),
-        });
+        parentData['currentQuantity'] = newParentQty.clamp(0.0, double.infinity);
+        parentData['lastUpdated'] = FieldValue.serverTimestamp();
+
+        transaction.set(variantRef, EncryptionService.instance.encryptMap(variantData), SetOptions(merge: true));
+        transaction.set(parentRef, EncryptionService.instance.encryptMap(parentData), SetOptions(merge: true));
 
         transaction.delete(logRef);
       });
@@ -405,8 +429,11 @@ class StockNotifier extends Notifier<AsyncValue<void>> {
           throw Exception("Stock item or variant does not exist!");
         }
 
-        final currentParentQty = (parentSnapshot.data()?['currentQuantity'] ?? 0.0).toDouble();
-        final currentVarStock = (variantSnapshot.data()?['currentStock'] ?? 0.0).toDouble();
+        final parentData = EncryptionService.instance.decryptDoc(parentSnapshot.data());
+        final variantData = EncryptionService.instance.decryptDoc(variantSnapshot.data());
+
+        final currentParentQty = (parentData['currentQuantity'] ?? 0.0).toDouble();
+        final currentVarStock = (variantData['currentStock'] ?? 0.0).toDouble();
 
         double newVarStock = currentVarStock;
         double newParentQty = currentParentQty;
@@ -429,22 +456,25 @@ class StockNotifier extends Notifier<AsyncValue<void>> {
           newParentQty -= newQuantity;
         }
 
-        transaction.update(variantRef, {
-          'currentStock': newVarStock.clamp(0.0, double.infinity),
-          'lastUpdated': FieldValue.serverTimestamp(),
-        });
+        variantData['currentStock'] = newVarStock.clamp(0.0, double.infinity);
+        variantData['lastUpdated'] = FieldValue.serverTimestamp();
 
-        transaction.update(parentRef, {
-          'currentQuantity': newParentQty.clamp(0.0, double.infinity),
-          'lastUpdated': FieldValue.serverTimestamp(),
-        });
+        parentData['currentQuantity'] = newParentQty.clamp(0.0, double.infinity);
+        parentData['lastUpdated'] = FieldValue.serverTimestamp();
 
-        transaction.update(logRef, {
+        transaction.set(variantRef, EncryptionService.instance.encryptMap(variantData), SetOptions(merge: true));
+        transaction.set(parentRef, EncryptionService.instance.encryptMap(parentData), SetOptions(merge: true));
+
+        final logData = EncryptionService.instance.encryptMap({
+          'itemId': itemId,
+          'variantId': variantId,
           'type': newType,
           'quantityChange': newQuantity,
           'note': note,
           'date': Timestamp.fromDate(date),
         });
+
+        transaction.set(logRef, logData, SetOptions(merge: true));
       });
 
       ref.read(activityProvider.notifier).logActivity(
@@ -471,19 +501,22 @@ class StockNotifier extends Notifier<AsyncValue<void>> {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception("User not logged in");
       
-      await FirebaseFirestore.instance
+      final variantRef = FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
           .collection('stock_items')
           .doc(itemId)
           .collection('variants')
-          .doc(variantId)
-          .update({
-        'thickness': thickness,
-        'length': length,
-        'width': width,
-        'lastUpdated': FieldValue.serverTimestamp(),
-      });
+          .doc(variantId);
+
+      final snap = await variantRef.get();
+      final varData = EncryptionService.instance.decryptDoc(snap.data());
+      varData['thickness'] = thickness;
+      varData['length'] = length;
+      varData['width'] = width;
+      varData['lastUpdated'] = FieldValue.serverTimestamp();
+
+      await variantRef.set(EncryptionService.instance.encryptMap(varData), SetOptions(merge: true));
       
       final parts = <String>[];
       if (length != null && width != null) {
@@ -545,9 +578,12 @@ final stockItemsProvider = StreamProvider<List<StockItem>>((ref) {
       .collection('users')
       .doc(uid)
       .collection('stock_items')
-      .orderBy('lastUpdated', descending: true)
       .snapshots()
-      .map((snapshot) => snapshot.docs.map((doc) => StockItem.fromFirestore(doc)).toList());
+      .map((snapshot) {
+        final list = snapshot.docs.map((doc) => StockItem.fromFirestore(doc)).toList();
+        list.sort((a, b) => b.lastUpdated.compareTo(a.lastUpdated));
+        return list;
+      });
 });
 
 // Stock Variants Provider

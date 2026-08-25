@@ -1,4 +1,6 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:hp_bill/firebase_options.dart';
 import 'package:hp_bill/providers/invoice_provider.dart';
 import 'package:hp_bill/providers/sync_provider.dart';
 import 'package:hp_bill/providers/transaction_provider.dart';
@@ -10,8 +12,19 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize the persistent database helper (loads from SharedPreferences)
+  // Initialize local persistent database
   await DatabaseHelper.instance.init();
+
+  // Gracefully initialize Firebase with project credentials (hp-bills)
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    debugPrint("Firebase initialized successfully for hp-bills.");
+  } catch (e) {
+    debugPrint("Firebase initialization notice: $e");
+    debugPrint("App running in local/offline mode.");
+  }
 
   runApp(
     MultiProvider(

@@ -38,13 +38,13 @@ class AppTheme {
   // Modern Soft Shadows
   static List<BoxShadow> softShadow = [
     BoxShadow(
-      color: primaryPurple.withOpacity(0.04),
+      color: primaryPurple.withValues(alpha: 0.04),
       offset: const Offset(0, 4),
       blurRadius: 16,
       spreadRadius: 0,
     ),
     BoxShadow(
-      color: Colors.black.withOpacity(0.02),
+      color: Colors.black.withValues(alpha: 0.02),
       offset: const Offset(0, 2),
       blurRadius: 4,
       spreadRadius: 0,
@@ -53,13 +53,13 @@ class AppTheme {
 
   static List<BoxShadow> tileShadow(Color accentColor) => [
         BoxShadow(
-          color: accentColor.withOpacity(0.06),
+          color: accentColor.withValues(alpha: 0.06),
           offset: const Offset(0, 8),
           blurRadius: 20,
           spreadRadius: -2,
         ),
         BoxShadow(
-          color: Colors.black.withOpacity(0.01),
+          color: Colors.black.withValues(alpha: 0.01),
           offset: const Offset(0, 2),
           blurRadius: 6,
         ),

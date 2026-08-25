@@ -3,6 +3,7 @@ import 'package:hp_bill/models/invoice.dart';
 import 'package:hp_bill/models/quick_entry.dart';
 import 'package:hp_bill/providers/invoice_provider.dart';
 import 'package:hp_bill/providers/transaction_provider.dart';
+import 'package:hp_bill/screens/sales_invoice_screen.dart';
 import 'package:hp_bill/theme/app_theme.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +11,7 @@ import 'package:provider/provider.dart';
 /// A pop-up modal overlay for viewing transaction history.
 /// Opened via showModalBottomSheet from the Dashboard.
 class HistoryOverlay extends StatefulWidget {
-  const HistoryOverlay({Key? key}) : super(key: key);
+  const HistoryOverlay({super.key});
 
   @override
   State<HistoryOverlay> createState() => _HistoryOverlayState();
@@ -428,6 +429,20 @@ class _HistoryOverlayState extends State<HistoryOverlay> {
             ),
           ),
           actions: [
+            // Edit Invoice on spot
+            IconButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                Navigator.pop(context);
+                prov.loadInvoiceForEditing(invoice);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SalesInvoiceScreen()),
+                );
+              },
+              icon: Icon(Icons.edit_note_rounded, color: Colors.orange.shade800),
+              tooltip: "Edit Invoice",
+            ),
             // Toggle payment status
             IconButton(
               onPressed: () async {
@@ -452,11 +467,11 @@ class _HistoryOverlayState extends State<HistoryOverlay> {
               icon: const Icon(Icons.print_rounded, color: AppTheme.primaryPurple),
               tooltip: "Print A4",
             ),
-            // Share
+            // Share PDF Direct
             IconButton(
-              onPressed: () => prov.shareInvoice(invoice),
-              icon: const Icon(Icons.share_rounded, color: AppTheme.accentBlue),
-              tooltip: "Share PDF",
+              onPressed: () => prov.shareInvoicePdf(invoice),
+              icon: const Icon(Icons.picture_as_pdf_rounded, color: AppTheme.accentBlue),
+              tooltip: "Share PDF Direct",
             ),
             // Delete
             IconButton(
@@ -497,8 +512,8 @@ class _HistoryOverlayState extends State<HistoryOverlay> {
                   const SnackBar(content: Text("Invoice record deleted.")),
                 );
               },
-              child: const Text("Delete"),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+              child: const Text("Delete"),
             ),
           ],
         );
@@ -614,8 +629,8 @@ class _HistoryOverlayState extends State<HistoryOverlay> {
                   const SnackBar(content: Text("Quick entry deleted.")),
                 );
               },
-              child: const Text("Delete"),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+              child: const Text("Delete"),
             ),
           ],
         );

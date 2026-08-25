@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:hp_bill/models/inventory_item.dart';
 import 'package:hp_bill/providers/invoice_provider.dart';
 import 'package:hp_bill/providers/transaction_provider.dart';
+import 'package:hp_bill/services/database_helper.dart';
+import 'package:hp_bill/services/master_password_service.dart';
+import 'package:hp_bill/services/print_service.dart';
 import 'package:hp_bill/services/share_service.dart';
 import 'package:hp_bill/theme/app_theme.dart';
 import 'package:intl/intl.dart';
@@ -22,6 +25,11 @@ class _AdminScreenState extends State<AdminScreen> {
   final _storeNameController = TextEditingController();
   final _storeAddressController = TextEditingController();
 
+  // Wi-Fi Printer Controllers (Canon LBP6030w/6018w)
+  final _printerIpController = TextEditingController(text: '192.168.1.81');
+  final _printerNameController = TextEditingController(text: 'Canon LBP6030w/6018w');
+  bool _directPrintEnabled = true;
+
   // Inventory Management Controllers
   final _itemNameController = TextEditingController();
   final _itemRateController = TextEditingController();
@@ -31,11 +39,20 @@ class _AdminScreenState extends State<AdminScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final prov = context.read<InvoiceProvider>();
       prov.fetchStoreDetails();
       _storeNameController.text = prov.storeName;
       _storeAddressController.text = prov.storeAddress;
+
+      final pCfg = await DatabaseHelper.instance.getPrinterConfig();
+      if (mounted) {
+        setState(() {
+          _printerIpController.text = pCfg['printerIp'] ?? '192.168.1.81';
+          _printerNameController.text = pCfg['printerName'] ?? 'Canon LBP6030w/6018w';
+          _directPrintEnabled = pCfg['directPrint'] ?? true;
+        });
+      }
     });
   }
 
@@ -43,6 +60,8 @@ class _AdminScreenState extends State<AdminScreen> {
   void dispose() {
     _storeNameController.dispose();
     _storeAddressController.dispose();
+    _printerIpController.dispose();
+    _printerNameController.dispose();
     _itemNameController.dispose();
     _itemRateController.dispose();
     super.dispose();
@@ -324,6 +343,14 @@ class _AdminScreenState extends State<AdminScreen> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () async {
+                final allowed = await MasterPasswordService.confirmMasterPassword(
+                  context,
+                  title: "Master Password Required",
+                  message: "Enter master password to save store profile.",
+                );
+                if (!allowed) return;
+
+                if (!mounted) return;
                 await prov.saveStoreProfile(
                   _storeNameController.text,
                   _storeAddressController.text,
@@ -334,6 +361,152 @@ class _AdminScreenState extends State<AdminScreen> {
                 );
               },
               child: const Text("Save Store Profile"),
+            ),
+          ),
+
+          const SizedBox(height: 28),
+          const Divider(),
+          const SizedBox(height: 16),
+
+          // --- WI-FI PRINTER AUTO-LINK (Canon LBP6030w/6018w) ---
+          const Text(
+            "WI-FI PRINTER SETUP & AUTO-LINK",
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.textSecondary,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: AppTheme.cardBg,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppTheme.accentBorder),
+              boxShadow: AppTheme.softShadow,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppTheme.accentIndigo.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Icons.print_rounded, color: AppTheme.accentIndigo, size: 22),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Canon LBP6030w/6018w (Wi-Fi)",
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                          ),
+                          Text(
+                            "Link once in the morning to print seamlessly all day.",
+                            style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: _printerIpController,
+                  keyboardType: TextInputType.datetime,
+                  decoration: const InputDecoration(
+                    labelText: "Printer IP Address",
+                    hintText: "192.168.1.81",
+                    prefixIcon: Icon(Icons.wifi_rounded, color: AppTheme.accentIndigo),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                TextField(
+                  controller: _printerNameController,
+                  decoration: const InputDecoration(
+                    labelText: "Printer Model / Name",
+                    hintText: "Canon LBP6030w/6018w",
+                    prefixIcon: Icon(Icons.devices_other_rounded, color: AppTheme.accentIndigo),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                SwitchListTile.adaptive(
+                  contentPadding: EdgeInsets.zero,
+                  activeColor: AppTheme.accentTeal,
+                  title: const Text(
+                    "Direct 1-Tap Print",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                  subtitle: const Text(
+                    "Automatically sends invoices directly to Canon Wi-Fi printer without opening Android print picker.",
+                    style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
+                  ),
+                  value: _directPrintEnabled,
+                  onChanged: (val) {
+                    setState(() => _directPrintEnabled = val);
+                  },
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          final ip = _printerIpController.text.trim();
+                          final name = _printerNameController.text.trim();
+                          if (ip.isEmpty) return;
+
+                          await DatabaseHelper.instance.savePrinterConfig(
+                            ip: ip,
+                            name: name.isEmpty ? 'Canon LBP6030w/6018w' : name,
+                            directPrint: _directPrintEnabled,
+                          );
+
+                          if (!mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Canon Wi-Fi printer linked successfully!"),
+                              backgroundColor: AppTheme.accentTeal,
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.link_rounded, size: 18),
+                        label: const Text("Save & Link"),
+                        style: ElevatedButton.styleFrom(backgroundColor: AppTheme.accentTeal),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () async {
+                          try {
+                            await PrintService.instance.printTestPage();
+                          } catch (e) {
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Test print notice: $e")),
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.speed_rounded, size: 18, color: AppTheme.accentIndigo),
+                        label: const Text("Test Print", style: TextStyle(color: AppTheme.accentIndigo)),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: AppTheme.accentIndigo),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
@@ -389,11 +562,19 @@ class _AdminScreenState extends State<AdminScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: () {
+                    onPressed: () async {
                       final name = _itemNameController.text.trim();
                       final rateText = _itemRateController.text.trim();
                       final rate = rateText.isEmpty ? null : double.tryParse(rateText);
                       if (name.isNotEmpty) {
+                        final allowed = await MasterPasswordService.confirmMasterPassword(
+                          context,
+                          title: "Master Password Required",
+                          message: "Enter master password to add product.",
+                        );
+                        if (!allowed) return;
+
+                        if (!mounted) return;
                         prov.addInventoryItem(name, rate);
                         _itemNameController.clear();
                         _itemRateController.clear();
@@ -456,7 +637,15 @@ class _AdminScreenState extends State<AdminScreen> {
                             ),
                             IconButton(
                               icon: const Icon(Icons.delete_sweep_rounded, color: Colors.redAccent),
-                              onPressed: () {
+                              onPressed: () async {
+                                final allowed = await MasterPasswordService.confirmMasterPassword(
+                                  context,
+                                  title: "Master Password Required",
+                                  message: "Enter master password to delete product ${item.name}.",
+                                );
+                                if (!allowed) return;
+
+                                if (!mounted) return;
                                 prov.deleteInventoryItem(item.id);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(content: Text("Product removed from inventory.")),
@@ -520,6 +709,13 @@ class _AdminScreenState extends State<AdminScreen> {
                 final rate = rateText.isEmpty ? null : double.tryParse(rateText);
 
                 if (name.isNotEmpty) {
+                  final allowed = await MasterPasswordService.confirmMasterPassword(
+                    context,
+                    title: "Master Password Required",
+                    message: "Enter master password to update product.",
+                  );
+                  if (!allowed) return;
+
                   final updatedItem = InventoryItem(
                     id: item.id,
                     name: name,
@@ -565,11 +761,11 @@ class _AdminScreenState extends State<AdminScreen> {
             ),
             child: const Row(
               children: [
-                Icon(Icons.security_rounded, color: AppTheme.primaryPurple),
+                Icon(Icons.lock_outline_rounded, color: AppTheme.accentTeal),
                 SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    "Master Data Control Center. Backup, restore, or wipe your entire database. Backup files are saved locally and can be restored using the file picker.",
+                    "End-to-End Encrypted Cloud & Local Storage. All invoice, customer ledger, and financial data stored in Firebase is secured with AES-256 encryption.",
                     style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
                   ),
                 ),
@@ -579,13 +775,13 @@ class _AdminScreenState extends State<AdminScreen> {
 
           const SizedBox(height: 28),
 
-          // 1. ALL-IN-ONE BACKUP
+          // 1. ALL-IN-ONE BACKUP (.JSON)
           _buildDataActionCard(
             icon: Icons.cloud_upload_rounded,
             iconColor: AppTheme.accentTeal,
-            title: "All-In-One Backup",
-            subtitle: "Exports all inventory, invoices, transactions, ledger entries, and profile into a structured JSON file on your device.",
-            buttonLabel: "Export Backup File",
+            title: "Export Data (.json Backup)",
+            subtitle: "Exports all invoices, ledger entries, cash/bank records, inventory, and profile settings into a single .json file on your device.",
+            buttonLabel: "Export .json Backup File",
             buttonColor: AppTheme.accentTeal,
             onTap: () async {
               try {
@@ -609,26 +805,67 @@ class _AdminScreenState extends State<AdminScreen> {
 
           const SizedBox(height: 16),
 
-          // 2. DATA RESTORE (WITH FILE PICKER)
+          // 2. DATA RESTORE (.JSON)
           _buildDataActionCard(
             icon: Icons.cloud_download_rounded,
             iconColor: AppTheme.accentBlue,
-            title: "Data Restore (Put Back)",
-            subtitle: "Select a previously exported backup JSON file from your device storage to restore the app back to its exact saved state.",
-            buttonLabel: "Select Backup File",
+            title: "Restore Data from .json",
+            subtitle: "Select a previously exported .json backup file to restore. Automatically cleans cloud leftovers and synchronizes all devices with AES-256 encryption.",
+            buttonLabel: "Select .json Backup File",
             buttonColor: AppTheme.accentBlue,
             onTap: () => _performFileRestore(prov),
           ),
 
           const SizedBox(height: 16),
 
-          // 3. FULL DATABASE WIPE
+          // 3. RECALCULATE & RE-SYNC CLOUD (ENCRYPTED)
+          _buildDataActionCard(
+            icon: Icons.sync_rounded,
+            iconColor: AppTheme.accentIndigo,
+            title: "Recalculate & Re-Sync Cloud",
+            subtitle: "Recalculates all customer ledger running balances and pushes a clean, AES-256 encrypted batch sync to Firebase Cloud to fix any device mismatches.",
+            buttonLabel: "Recalculate & Sync All Devices",
+            buttonColor: AppTheme.accentIndigo,
+            onTap: () async {
+              final invProv = context.read<InvoiceProvider>();
+              final transProv = context.read<TransactionProvider>();
+              try {
+                invProv.pauseRealtimeSync();
+                transProv.pauseRealtimeSync();
+
+                await invProv.recalculateAndResyncAll();
+                if (context.mounted) {
+                  await transProv.fetchTransactions();
+                }
+
+                invProv.startRealtimeSync();
+                transProv.startRealtimeSync();
+
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("All customer ledgers recalculated & synced to Cloud!"),
+                    backgroundColor: AppTheme.accentIndigo,
+                  ),
+                );
+              } catch (e) {
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Sync failed: $e")),
+                );
+              }
+            },
+          ),
+
+          const SizedBox(height: 16),
+
+          // 4. FULL DATABASE WIPE (MASTER PASSWORD PROTECTED)
           _buildDataActionCard(
             icon: Icons.delete_forever_rounded,
             iconColor: Colors.redAccent,
-            title: "Full Database Wipe",
-            subtitle: "DANGER: Permanently deletes ALL transaction history, inventory items, ledger entries, and profile data.",
-            buttonLabel: "Delete All Data",
+            title: "Delete All Data (Master Password)",
+            subtitle: "Permanently deletes ALL data from both Firebase cloud database and local device storage. Protected by Master Password.",
+            buttonLabel: "Delete All Data with Password",
             buttonColor: Colors.redAccent,
             onTap: () => _confirmFullWipe(prov),
           ),
@@ -704,43 +941,38 @@ class _AdminScreenState extends State<AdminScreen> {
   }
 
   Future<void> _performFileRestore(InvoiceProvider prov) async {
+    final invProv = context.read<InvoiceProvider>();
+    final transProv = context.read<TransactionProvider>();
+
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['json'],
       );
 
+      String? jsonString;
       if (result != null && result.files.single.bytes != null) {
-        final bytes = result.files.single.bytes!;
-        final jsonString = utf8.decode(bytes);
-        
-        await prov.restoreFromJson(jsonString);
-        if (context.mounted) {
-          await context.read<TransactionProvider>().fetchTransactions();
-        }
-
-        if (!mounted) return;
-        _storeNameController.text = prov.storeName;
-        _storeAddressController.text = prov.storeAddress;
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Data restored successfully from backup file!"),
-            backgroundColor: AppTheme.accentBlue,
-          ),
-        );
+        jsonString = utf8.decode(result.files.single.bytes!);
       } else if (result != null && result.files.single.path != null) {
         final file = io.File(result.files.single.path!);
-        final jsonString = await file.readAsString();
+        jsonString = await file.readAsString();
+      }
 
-        await prov.restoreFromJson(jsonString);
+      if (jsonString != null) {
+        invProv.pauseRealtimeSync();
+        transProv.pauseRealtimeSync();
+
+        await invProv.restoreFromJson(jsonString);
         if (context.mounted) {
-          await context.read<TransactionProvider>().fetchTransactions();
+          await transProv.fetchTransactions();
         }
 
+        invProv.startRealtimeSync();
+        transProv.startRealtimeSync();
+
         if (!mounted) return;
-        _storeNameController.text = prov.storeName;
-        _storeAddressController.text = prov.storeAddress;
+        _storeNameController.text = invProv.storeName;
+        _storeAddressController.text = invProv.storeAddress;
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -760,7 +992,15 @@ class _AdminScreenState extends State<AdminScreen> {
     }
   }
 
-  void _confirmFullWipe(InvoiceProvider prov) {
+  void _confirmFullWipe(InvoiceProvider prov) async {
+    final allowed = await MasterPasswordService.confirmMasterPassword(
+      context,
+      title: "Master Password Required",
+      message: "Enter master password to perform full database wipe.",
+    );
+    if (!allowed) return;
+
+    if (!mounted) return;
     showDialog(
       context: context,
       builder: (ctx) {

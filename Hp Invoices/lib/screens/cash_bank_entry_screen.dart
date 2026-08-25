@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hp_bill/models/quick_entry.dart';
 import 'package:hp_bill/providers/transaction_provider.dart';
+import 'package:hp_bill/services/master_password_service.dart';
 import 'package:hp_bill/theme/app_theme.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class CashBankEntryScreen extends StatefulWidget {
-  const CashBankEntryScreen({Key? key}) : super(key: key);
+  const CashBankEntryScreen({super.key});
 
   @override
   State<CashBankEntryScreen> createState() => _CashBankEntryScreenState();
@@ -42,6 +43,14 @@ class _CashBankEntryScreenState extends State<CashBankEntryScreen> {
   void _submitEntry() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final allowed = await MasterPasswordService.confirmMasterPassword(
+      context,
+      title: "Master Password Required",
+      message: "Enter master password to save cash/bank transaction.",
+    );
+    if (!allowed) return;
+
+    if (!mounted) return;
     final transProv = context.read<TransactionProvider>();
     final amount = double.tryParse(_amountController.text) ?? 0.0;
 
@@ -53,6 +62,7 @@ class _CashBankEntryScreenState extends State<CashBankEntryScreen> {
       remarks: _remarksController.text.trim(),
     );
 
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text("Quick receipt entry saved!"),
@@ -84,7 +94,7 @@ class _CashBankEntryScreenState extends State<CashBankEntryScreen> {
 
                   // Account mode selector
                   DropdownButtonFormField<AccountMode>(
-                    value: _selectedMode,
+                    initialValue: _selectedMode,
                     decoration: const InputDecoration(
                       labelText: "Account Mode",
                       prefixIcon: Icon(Icons.account_balance_wallet_rounded, color: AppTheme.accentBlue),
@@ -213,10 +223,10 @@ class _CashBankEntryScreenState extends State<CashBankEntryScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: _submitEntry,
-                      child: const Text("Save Transaction"),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.accentBlue,
                       ),
+                      child: const Text("Save Transaction"),
                     ),
                   ),
                 ],

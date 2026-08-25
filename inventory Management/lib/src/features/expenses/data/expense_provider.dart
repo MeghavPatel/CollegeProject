@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/models/models.dart';
 import '../../../core/providers/activity_provider.dart';
+import '../../../core/services/encryption_service.dart';
 
 // -----------------------------------------------------------------------------
 // 1. DATE FILTER STATE
@@ -104,11 +105,8 @@ class ExpenseController extends Notifier<void> {
     try {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception("User not logged in");
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .collection('expenses')
-          .add({
+
+      final encryptedData = EncryptionService.instance.encryptMap({
         'title': title,
         'amount': amount,
         'category': 'General',
@@ -116,6 +114,12 @@ class ExpenseController extends Notifier<void> {
         'note': note,
         'date': Timestamp.fromDate(date),
       });
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('expenses')
+          .add(encryptedData);
       
       // Log Activity
       ref.read(activityProvider.notifier).logActivity('Expense', 'Added: $title - ₹$amount');
@@ -150,17 +154,22 @@ class ExpenseController extends Notifier<void> {
     try {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception("User not logged in");
+
+      final encryptedData = EncryptionService.instance.encryptMap({
+        'title': title,
+        'amount': amount,
+        'category': 'General',
+        'note': note,
+        'date': Timestamp.fromDate(date),
+      });
+
       await FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
           .collection('expenses')
           .doc(id)
-          .update({
-        'title': title,
-        'amount': amount,
-        'note': note,
-        'date': Timestamp.fromDate(date),
-      });
+          .set(encryptedData, SetOptions(merge: true));
+
       ref.read(activityProvider.notifier).logActivity('Expense', 'Updated: $title - ₹$amount');
     } catch (e) {
       rethrow;

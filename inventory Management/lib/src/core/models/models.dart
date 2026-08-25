@@ -1,4 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../services/encryption_service.dart';
+
+/// Helper to safely parse dates from either Firestore Timestamp, ISO-8601 String, or int timestamp
+DateTime _parseDateTime(dynamic value, [DateTime? fallback]) {
+  if (value == null) return fallback ?? DateTime.now();
+  if (value is Timestamp) return value.toDate();
+  if (value is DateTime) return value;
+  if (value is String) {
+    return DateTime.tryParse(value) ?? (fallback ?? DateTime.now());
+  }
+  if (value is int) {
+    return DateTime.fromMillisecondsSinceEpoch(value);
+  }
+  return fallback ?? DateTime.now();
+}
 
 class EmployeeProfile {
   final String id;
@@ -22,14 +37,15 @@ class EmployeeProfile {
   double get netPayableSalary => salary - advanceTaken;
 
   factory EmployeeProfile.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final raw = doc.data() as Map<String, dynamic>?;
+    final data = EncryptionService.instance.decryptDoc(raw);
     return EmployeeProfile(
       id: doc.id,
       name: data['name'] ?? '',
       role: data['role'],
       salary: (data['salary'] ?? 0.0).toDouble(),
       phoneNumber: data['phoneNumber'] ?? '',
-      joinedDate: (data['joinedDate'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      joinedDate: _parseDateTime(data['joinedDate']),
       advanceTaken: (data['advanceTaken'] ?? 0.0).toDouble(),
     );
   }
@@ -56,12 +72,18 @@ class ExpenseEntry {
   final DateTime date;
 
   ExpenseEntry({
-    required this.id, required this.title, required this.amount, 
-    required this.category, this.account, this.note, required this.date
+    required this.id,
+    required this.title,
+    required this.amount, 
+    required this.category,
+    this.account,
+    this.note,
+    required this.date,
   });
 
   factory ExpenseEntry.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final raw = doc.data() as Map<String, dynamic>?;
+    final data = EncryptionService.instance.decryptDoc(raw);
     return ExpenseEntry(
       id: doc.id,
       title: data['title'] ?? '',
@@ -69,7 +91,7 @@ class ExpenseEntry {
       category: data['category'] ?? '',
       account: data['account'],
       note: data['note'],
-      date: (data['date'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      date: _parseDateTime(data['date']),
     );
   }
 
@@ -90,14 +112,19 @@ class Transporter {
   final String name;
   final DateTime createdAt;
 
-  Transporter({required this.id, required this.name, required this.createdAt});
+  Transporter({
+    required this.id,
+    required this.name,
+    required this.createdAt,
+  });
 
   factory Transporter.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final raw = doc.data() as Map<String, dynamic>?;
+    final data = EncryptionService.instance.decryptDoc(raw);
     return Transporter(
       id: doc.id,
       name: data['name'] ?? '',
-      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      createdAt: _parseDateTime(data['createdAt']),
     );
   }
 
@@ -117,18 +144,22 @@ class TransportPayment {
   final DateTime date;
 
   TransportPayment({
-    required this.id, required this.transporterId, required this.amount, 
-    this.note, required this.date
+    required this.id,
+    required this.transporterId,
+    required this.amount, 
+    this.note,
+    required this.date,
   });
 
   factory TransportPayment.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final raw = doc.data() as Map<String, dynamic>?;
+    final data = EncryptionService.instance.decryptDoc(raw);
     return TransportPayment(
       id: doc.id,
       transporterId: data['transporterId'] ?? '',
       amount: (data['amount'] ?? 0).toDouble(),
       note: data['note'],
-      date: (data['date'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      date: _parseDateTime(data['date']),
     );
   }
 
@@ -161,13 +192,20 @@ class StockItem {
   final DateTime lastUpdated;
 
   StockItem({
-    required this.id, required this.itemName, this.serialNumber,
-    this.length, this.width, this.thickness, this.thicknessUnit,
-    required this.currentQuantity, required this.lastUpdated
+    required this.id,
+    required this.itemName,
+    this.serialNumber,
+    this.length,
+    this.width,
+    this.thickness,
+    this.thicknessUnit,
+    required this.currentQuantity,
+    required this.lastUpdated,
   });
 
   factory StockItem.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final raw = doc.data() as Map<String, dynamic>?;
+    final data = EncryptionService.instance.decryptDoc(raw);
     return StockItem(
       id: doc.id,
       itemName: data['itemName'] ?? '',
@@ -177,7 +215,7 @@ class StockItem {
       thickness: (data['thickness'])?.toDouble(),
       thicknessUnit: data['thicknessUnit'] ?? 'mm',
       currentQuantity: (data['currentQuantity'] ?? 0).toDouble(),
-      lastUpdated: (data['lastUpdated'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      lastUpdated: _parseDateTime(data['lastUpdated']),
     );
   }
 
@@ -205,19 +243,25 @@ class StockLog {
   final String? note;
 
   StockLog({
-    required this.id, required this.itemId, this.variantId, required this.type,
-    required this.quantityChange, required this.date, this.note
+    required this.id,
+    required this.itemId,
+    this.variantId,
+    required this.type,
+    required this.quantityChange,
+    required this.date,
+    this.note,
   });
 
   factory StockLog.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final raw = doc.data() as Map<String, dynamic>?;
+    final data = EncryptionService.instance.decryptDoc(raw);
     return StockLog(
       id: doc.id,
       itemId: data['itemId'] ?? '',
       variantId: data['variantId'],
       type: data['type'] ?? '',
       quantityChange: (data['quantityChange'] ?? 0).toDouble(),
-      date: (data['date'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      date: _parseDateTime(data['date']),
       note: data['note'],
     );
   }
@@ -241,17 +285,20 @@ class ActivityLog {
   final DateTime timestamp;
 
   ActivityLog({
-    required this.id, required this.moduleName, 
-    required this.description, required this.timestamp
+    required this.id,
+    required this.moduleName, 
+    required this.description,
+    required this.timestamp,
   });
 
   factory ActivityLog.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final raw = doc.data() as Map<String, dynamic>?;
+    final data = EncryptionService.instance.decryptDoc(raw);
     return ActivityLog(
       id: doc.id,
       moduleName: data['moduleName'] ?? '',
       description: data['description'] ?? '',
-      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      timestamp: _parseDateTime(data['timestamp']),
     );
   }
 
@@ -274,20 +321,24 @@ class SalaryPayment {
   final double? overtimeBonus;
 
   SalaryPayment({
-    required this.id, required this.employeeId, required this.amount,
-    this.note, required this.paymentDate,
+    required this.id,
+    required this.employeeId,
+    required this.amount,
+    this.note,
+    required this.paymentDate,
     this.type = 'Salary',
     this.overtimeBonus,
   });
 
   factory SalaryPayment.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final raw = doc.data() as Map<String, dynamic>?;
+    final data = EncryptionService.instance.decryptDoc(raw);
     return SalaryPayment(
       id: doc.id,
       employeeId: data['employeeId'] ?? '',
       amount: (data['amount'] ?? 0).toDouble(),
       note: data['note'],
-      paymentDate: (data['paymentDate'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      paymentDate: _parseDateTime(data['paymentDate']),
       type: data['type'] ?? 'Salary',
       overtimeBonus: (data['overtimeBonus'] as num?)?.toDouble(),
     );
@@ -314,17 +365,21 @@ class EmployeeAttendanceData {
   final String? checkOut;
 
   EmployeeAttendanceData({
-    required this.id, required this.employeeId, 
-    required this.date, required this.status,
-    this.checkIn, this.checkOut
+    required this.id,
+    required this.employeeId, 
+    required this.date,
+    required this.status,
+    this.checkIn,
+    this.checkOut,
   });
 
   factory EmployeeAttendanceData.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final raw = doc.data() as Map<String, dynamic>?;
+    final data = EncryptionService.instance.decryptDoc(raw);
     return EmployeeAttendanceData(
       id: doc.id,
       employeeId: data['employeeId'] ?? '',
-      date: (data['date'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      date: _parseDateTime(data['date']),
       status: data['status'] ?? 'Present',
       checkIn: data['checkIn'],
       checkOut: data['checkOut'],
@@ -349,17 +404,20 @@ class CompanyProfile {
   final DateTime createdAt;
 
   CompanyProfile({
-    required this.id, required this.companyName, 
-    this.contactNumber, required this.createdAt
+    required this.id,
+    required this.companyName, 
+    this.contactNumber,
+    required this.createdAt,
   });
 
   factory CompanyProfile.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final raw = doc.data() as Map<String, dynamic>?;
+    final data = EncryptionService.instance.decryptDoc(raw);
     return CompanyProfile(
       id: doc.id,
       companyName: data['companyName'] ?? '',
       contactNumber: data['contactNumber'],
-      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      createdAt: _parseDateTime(data['createdAt']),
     );
   }
 
@@ -381,19 +439,24 @@ class CompanyProduct {
   final DateTime lastUpdated;
 
   CompanyProduct({
-    required this.id, required this.companyId, required this.productName,
-    this.serialNumber, required this.price, required this.lastUpdated
+    required this.id,
+    required this.companyId,
+    required this.productName,
+    this.serialNumber,
+    required this.price,
+    required this.lastUpdated,
   });
 
   factory CompanyProduct.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final raw = doc.data() as Map<String, dynamic>?;
+    final data = EncryptionService.instance.decryptDoc(raw);
     return CompanyProduct(
       id: doc.id,
       companyId: data['companyId'] ?? '',
       productName: data['productName'] ?? '',
       serialNumber: data['serialNumber'],
       price: (data['price'] ?? 0).toDouble(),
-      lastUpdated: (data['lastUpdated'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      lastUpdated: _parseDateTime(data['lastUpdated']),
     );
   }
 
@@ -419,13 +482,19 @@ class CompanyTransaction {
   final DateTime transactionDate;
 
   CompanyTransaction({
-    required this.id, required this.companyId, required this.transactionType,
-    required this.itemName, required this.quantity, required this.amount,
-    this.note, required this.transactionDate
+    required this.id,
+    required this.companyId,
+    required this.transactionType,
+    required this.itemName,
+    required this.quantity,
+    required this.amount,
+    this.note,
+    required this.transactionDate,
   });
 
   factory CompanyTransaction.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final raw = doc.data() as Map<String, dynamic>?;
+    final data = EncryptionService.instance.decryptDoc(raw);
     return CompanyTransaction(
       id: doc.id,
       companyId: data['companyId'] ?? '',
@@ -434,7 +503,7 @@ class CompanyTransaction {
       quantity: (data['quantity'] ?? 0).toDouble(),
       amount: (data['amount'] ?? 0).toDouble(),
       note: data['note'],
-      transactionDate: (data['transactionDate'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      transactionDate: _parseDateTime(data['transactionDate']),
     );
   }
 
@@ -469,14 +538,15 @@ class StockVariant {
   });
 
   factory StockVariant.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final raw = doc.data() as Map<String, dynamic>?;
+    final data = EncryptionService.instance.decryptDoc(raw);
     return StockVariant(
       id: doc.id,
       thickness: (data['thickness'])?.toDouble(),
       length: (data['length'])?.toDouble(),
       width: (data['width'])?.toDouble(),
       currentStock: (data['currentStock'] ?? 0).toDouble(),
-      lastUpdated: (data['lastUpdated'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      lastUpdated: _parseDateTime(data['lastUpdated']),
     );
   }
 
@@ -507,13 +577,14 @@ class ChaiWalaLedgerEntry {
   });
 
   factory ChaiWalaLedgerEntry.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final raw = doc.data() as Map<String, dynamic>?;
+    final data = EncryptionService.instance.decryptDoc(raw);
     return ChaiWalaLedgerEntry(
       id: doc.id,
       type: data['type'] ?? 'EXPENSE',
       amount: (data['amount'] ?? 0).toDouble(),
       note: data['note'],
-      date: (data['date'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      date: _parseDateTime(data['date']),
     );
   }
 

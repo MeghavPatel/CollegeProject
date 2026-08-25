@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hp_bill/screens/dashboard_screen.dart';
+import 'package:hp_bill/services/master_password_service.dart';
 import 'package:hp_bill/theme/app_theme.dart';
 
 class MasterPasswordScreen extends StatefulWidget {
-  const MasterPasswordScreen({Key? key}) : super(key: key);
+  const MasterPasswordScreen({super.key});
 
   @override
   State<MasterPasswordScreen> createState() => _MasterPasswordScreenState();
@@ -45,23 +46,20 @@ class _MasterPasswordScreenState extends State<MasterPasswordScreen>
   }
 
   void _handleUnlock() {
-    setState(() {
-      _errorMessage = null;
-      _isUnlocking = true;
-    });
-
-    Future.delayed(const Duration(milliseconds: 300), () {
-      final password = _passwordController.text.trim();
-      if (password == '2453') {
-        _navigateToDashboard();
-      } else {
-        setState(() {
-          _errorMessage = "Incorrect password. Access denied.";
-          _isUnlocking = false;
-        });
-        _shakeError();
-      }
-    });
+    final password = _passwordController.text.trim();
+    if (MasterPasswordService.verifyPassword(password)) {
+      setState(() {
+        _errorMessage = null;
+        _isUnlocking = true;
+      });
+      _navigateToDashboard();
+    } else {
+      setState(() {
+        _errorMessage = "Incorrect password. Access denied.";
+        _isUnlocking = false;
+      });
+      _shakeError();
+    }
   }
 
   void _shakeError() {
@@ -70,15 +68,10 @@ class _MasterPasswordScreenState extends State<MasterPasswordScreen>
   }
 
   void _navigateToDashboard() {
-    Navigator.pushReplacement(
+    Navigator.pushAndRemoveUntil(
       context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => const DashboardScreen(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        transitionDuration: const Duration(milliseconds: 500),
-      ),
+      MaterialPageRoute(builder: (_) => const DashboardScreen()),
+      (route) => false,
     );
   }
 

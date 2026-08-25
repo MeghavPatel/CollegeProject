@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/models/models.dart';
 import '../../../core/providers/activity_provider.dart';
+import '../../../core/services/encryption_service.dart';
 
 enum DateFilter { allTime, thisMonth, lastYear, custom }
 
@@ -24,17 +25,22 @@ class EmployeeNotifier extends Notifier<AsyncValue<void>> {
     try {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception("User not logged in");
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .collection('employees')
-          .add({
+
+      final encryptedData = EncryptionService.instance.encryptMap({
         'name': name,
         'role': role,
         'salary': salary,
         'phoneNumber': phoneNumber,
         'joinedDate': FieldValue.serverTimestamp(),
+        'advanceTaken': 0.0,
       });
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('employees')
+          .add(encryptedData);
+
       ref.read(activityProvider.notifier).logActivity(
         'Salary', 'Added employee: $name',
       );
@@ -69,17 +75,23 @@ class EmployeeNotifier extends Notifier<AsyncValue<void>> {
     try {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception("User not logged in");
-      await FirebaseFirestore.instance
+
+      final docRef = FirebaseFirestore.instance
           .collection('users')
           .doc(uid)
           .collection('employees')
-          .doc(id)
-          .update({
-        'name': name,
-        'role': role,
-        'salary': salary,
-        'phoneNumber': phoneNumber,
-      });
+          .doc(id);
+
+      final snap = await docRef.get();
+      final currentData = EncryptionService.instance.decryptDoc(snap.data());
+      currentData['name'] = name;
+      currentData['role'] = role;
+      currentData['salary'] = salary;
+      currentData['phoneNumber'] = phoneNumber;
+
+      final encryptedData = EncryptionService.instance.encryptMap(currentData);
+      await docRef.set(encryptedData, SetOptions(merge: true));
+
       ref.read(activityProvider.notifier).logActivity(
         'Salary', 'Updated employee details: $name ($role, ₹${salary.toStringAsFixed(0)})',
       );
@@ -114,19 +126,19 @@ class PaymentNotifier extends Notifier<AsyncValue<void>> {
             .collection('salary_payments')
             .doc();
             
+        final empSnapshot = await transaction.get(empRef);
+        final empData = EncryptionService.instance.decryptDoc(empSnapshot.data());
+
         if (type == 'Advance') {
-          final empSnapshot = await transaction.get(empRef);
-          final currentAdvance = (empSnapshot.data()?['advanceTaken'] ?? 0.0).toDouble();
-          transaction.update(empRef, {
-            'advanceTaken': currentAdvance + amount,
-          });
+          final currentAdvance = (empData['advanceTaken'] ?? 0.0).toDouble();
+          empData['advanceTaken'] = currentAdvance + amount;
+          transaction.set(empRef, EncryptionService.instance.encryptMap(empData), SetOptions(merge: true));
         } else if (type == 'Salary') {
-          transaction.update(empRef, {
-            'advanceTaken': 0.0,
-          });
+          empData['advanceTaken'] = 0.0;
+          transaction.set(empRef, EncryptionService.instance.encryptMap(empData), SetOptions(merge: true));
         }
         
-        transaction.set(paymentRef, {
+        final paymentData = EncryptionService.instance.encryptMap({
           'employeeId': employeeId,
           'amount': amount,
           'note': note,
@@ -134,6 +146,8 @@ class PaymentNotifier extends Notifier<AsyncValue<void>> {
           'type': type,
           'overtimeBonus': overtimeBonus ?? 0.0,
         });
+
+        transaction.set(paymentRef, paymentData);
       });
 
       final actionStr = type == 'Advance' ? 'Advance early payment' : 'Monthly Salary payout';
@@ -168,10 +182,10 @@ class PaymentNotifier extends Notifier<AsyncValue<void>> {
         if (type == 'Advance') {
           final empSnapshot = await transaction.get(empRef);
           if (empSnapshot.exists) {
-            final currentAdvance = (empSnapshot.data()?['advanceTaken'] ?? 0.0).toDouble();
-            transaction.update(empRef, {
-              'advanceTaken': (currentAdvance - amount).clamp(0.0, double.infinity),
-            });
+            final empData = EncryptionService.instance.decryptDoc(empSnapshot.data());
+            final currentAdvance = (empData['advanceTaken'] ?? 0.0).toDouble();
+            empData['advanceTaken'] = (currentAdvance - amount).clamp(0.0, double.infinity);
+            transaction.set(empRef, EncryptionService.instance.encryptMap(empData), SetOptions(merge: true));
           }
         }
         
@@ -218,19 +232,23 @@ class PaymentNotifier extends Notifier<AsyncValue<void>> {
         if (type == 'Advance') {
           final empSnapshot = await transaction.get(empRef);
           if (empSnapshot.exists) {
-            final currentAdvance = (empSnapshot.data()?['advanceTaken'] ?? 0.0).toDouble();
+            final empData = EncryptionService.instance.decryptDoc(empSnapshot.data());
+            final currentAdvance = (empData['advanceTaken'] ?? 0.0).toDouble();
             // Revert old advance and apply new advance
-            transaction.update(empRef, {
-              'advanceTaken': (currentAdvance - oldAmount + newAmount).clamp(0.0, double.infinity),
-            });
+            empData['advanceTaken'] = (currentAdvance - oldAmount + newAmount).clamp(0.0, double.infinity);
+            transaction.set(empRef, EncryptionService.instance.encryptMap(empData), SetOptions(merge: true));
           }
         }
         
-        transaction.update(paymentRef, {
+        final paymentData = EncryptionService.instance.encryptMap({
+          'employeeId': employeeId,
           'amount': newAmount,
           'note': note,
           'paymentDate': Timestamp.fromDate(date),
+          'type': type,
         });
+
+        transaction.set(paymentRef, paymentData, SetOptions(merge: true));
       });
 
       ref.read(activityProvider.notifier).logActivity(
@@ -262,9 +280,12 @@ final employeesProvider = StreamProvider<List<EmployeeProfile>>((ref) {
       .collection('users')
       .doc(uid)
       .collection('employees')
-      .orderBy('name')
       .snapshots()
-      .map((snapshot) => snapshot.docs.map((doc) => EmployeeProfile.fromFirestore(doc)).toList());
+      .map((snapshot) {
+        final list = snapshot.docs.map((doc) => EmployeeProfile.fromFirestore(doc)).toList();
+        list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+        return list;
+      });
 });
 
 // Employee Payments Provider (with date filtering)

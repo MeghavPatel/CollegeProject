@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hp_bill/models/ledger_entry.dart';
+import 'package:hp_bill/models/quick_entry.dart';
 import 'package:hp_bill/providers/invoice_provider.dart';
 import 'package:hp_bill/providers/transaction_provider.dart';
 import 'package:hp_bill/screens/pdf_viewer_screen.dart';
 import 'package:hp_bill/services/print_service.dart';
+import 'package:hp_bill/services/share_service.dart';
 import 'package:hp_bill/theme/app_theme.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -106,6 +108,353 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
     setState(() => _isExporting = false);
   }
 
+  Future<void> _shareLedgerPdfDirect(String customerName, List<LedgerEntry> entries) async {
+    if (entries.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("No entries found for the selected filter period.")),
+      );
+      return;
+    }
+
+    setState(() => _isExporting = true);
+    try {
+      await ShareService.instance.shareLedgerPdf(
+        customerName: customerName,
+        entries: entries,
+        filterLabel: _selectedExportFilter,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Sharing $_selectedExportFilter ledger PDF..."),
+          backgroundColor: AppTheme.accentTeal,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Ledger PDF share failed: $e")),
+      );
+    }
+    setState(() => _isExporting = false);
+  }
+
+  void _showEditCustomerDialog(BuildContext context, String customerName) async {
+    final transProv = context.read<TransactionProvider>();
+    final phone = await transProv.getCustomerPhone(customerName) ?? '';
+    final openingEntry = transProv.getOpeningAccountEntry(customerName);
+
+    final nameController = TextEditingController(text: customerName);
+    final phoneController = TextEditingController(text: phone);
+    final openingAmtController = TextEditingController(
+      text: openingEntry != null ? openingEntry.amount.toStringAsFixed(2) : '0.00',
+    );
+    LedgerEntryType selectedType = openingEntry?.type ?? LedgerEntryType.debit;
+
+    if (!context.mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: Row(
+                children: const [
+                  Icon(Icons.edit_note_rounded, color: AppTheme.accentIndigo),
+                  SizedBox(width: 8),
+                  Text("Edit Opening Account"),
+                ],
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                        labelText: "Customer / Account Name",
+                        prefixIcon: Icon(Icons.person_rounded, color: AppTheme.accentIndigo),
+                      ),
+                      textCapitalization: TextCapitalization.words,
+                    ),
+                    const SizedBox(height: 14),
+                    TextField(
+                      controller: phoneController,
+                      keyboardType: TextInputType.phone,
+                      decoration: const InputDecoration(
+                        labelText: "Phone Number",
+                        prefixIcon: Icon(Icons.phone_rounded, color: AppTheme.accentIndigo),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    TextField(
+                      controller: openingAmtController,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      decoration: const InputDecoration(
+                        labelText: "Opening Account Balance (₹)",
+                        prefixIcon: Icon(Icons.currency_rupee_rounded, color: AppTheme.accentIndigo),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      "Opening Balance Type",
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ChoiceChip(
+                            label: const Text("Receivable (Debit)"),
+                            selected: selectedType == LedgerEntryType.debit,
+                            selectedColor: Colors.redAccent.withOpacity(0.2),
+                            onSelected: (val) {
+                              if (val) setDialogState(() => selectedType = LedgerEntryType.debit);
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ChoiceChip(
+                            label: const Text("Received (Credit)"),
+                            selected: selectedType == LedgerEntryType.credit,
+                            selectedColor: AppTheme.accentTeal.withOpacity(0.2),
+                            onSelected: (val) {
+                              if (val) setDialogState(() => selectedType = LedgerEntryType.credit);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text("Cancel"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final newName = nameController.text.trim();
+                    final newPhone = phoneController.text.trim();
+                    final newOpeningAmt = double.tryParse(openingAmtController.text) ?? 0.0;
+
+                    if (newName.isEmpty) return;
+
+                    Navigator.pop(ctx);
+
+                    try {
+                      if (newName.toLowerCase() != customerName.toLowerCase()) {
+                        await transProv.updateCustomerDetails(
+                          oldName: customerName,
+                          newName: newName,
+                          phone: newPhone,
+                        );
+                        _searchController.text = newName;
+                      }
+
+                      await transProv.updateOpeningAccount(
+                        customerName: newName,
+                        amount: newOpeningAmt,
+                        type: selectedType,
+                        phone: newPhone,
+                      );
+
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Account details for '$newName' updated!"),
+                          backgroundColor: AppTheme.accentTeal,
+                        ),
+                      );
+                    } catch (e) {
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Failed to update account: $e")),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.accentIndigo),
+                  child: const Text("Save Changes"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showEditEntryDialog(BuildContext context, LedgerEntry entry) async {
+    final transProv = context.read<TransactionProvider>();
+
+    final amtController = TextEditingController(text: entry.amount.toStringAsFixed(2));
+    final descController = TextEditingController(text: entry.description);
+    final phoneController = TextEditingController(text: entry.customerPhone ?? '');
+    LedgerEntryType selectedType = entry.type;
+
+    final isInvoice = entry.invoiceId != null;
+    final isQuickEntry = entry.id.startsWith('L-QE-');
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: Row(
+                children: const [
+                  Icon(Icons.edit_calendar_rounded, color: AppTheme.accentIndigo),
+                  SizedBox(width: 8),
+                  Text("Edit Ledger Entry"),
+                ],
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: descController,
+                      decoration: const InputDecoration(
+                        labelText: "Description / Remarks",
+                        prefixIcon: Icon(Icons.notes_rounded, color: AppTheme.accentIndigo),
+                      ),
+                      enabled: !isInvoice,
+                    ),
+                    const SizedBox(height: 14),
+                    TextField(
+                      controller: amtController,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      decoration: const InputDecoration(
+                        labelText: "Amount (₹)",
+                        prefixIcon: Icon(Icons.currency_rupee_rounded, color: AppTheme.accentIndigo),
+                      ),
+                      enabled: !isInvoice,
+                    ),
+                    const SizedBox(height: 14),
+                    TextField(
+                      controller: phoneController,
+                      keyboardType: TextInputType.phone,
+                      decoration: const InputDecoration(
+                        labelText: "Phone Number",
+                        prefixIcon: Icon(Icons.phone_rounded, color: AppTheme.accentIndigo),
+                      ),
+                    ),
+                    if (!isInvoice) ...[
+                      const SizedBox(height: 14),
+                      const Text(
+                        "Entry Type",
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary),
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ChoiceChip(
+                              label: const Text("Debit (-)"),
+                              selected: selectedType == LedgerEntryType.debit,
+                              selectedColor: Colors.redAccent.withOpacity(0.2),
+                              onSelected: (val) {
+                                if (val) setDialogState(() => selectedType = LedgerEntryType.debit);
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: ChoiceChip(
+                              label: const Text("Credit (+)"),
+                              selected: selectedType == LedgerEntryType.credit,
+                              selectedColor: AppTheme.accentTeal.withOpacity(0.2),
+                              onSelected: (val) {
+                                if (val) setDialogState(() => selectedType = LedgerEntryType.credit);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text("Cancel"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final newAmount = double.tryParse(amtController.text) ?? entry.amount;
+                    final newDesc = descController.text.trim();
+                    final newPhone = phoneController.text.trim();
+
+                    Navigator.pop(ctx);
+
+                    try {
+                      if (isQuickEntry) {
+                        final qeId = entry.id.replaceFirst('L-QE-', '');
+                        final qeList = transProv.quickEntries;
+                        final qe = qeList.where((e) => e.id == qeId).firstOrNull;
+                        if (qe != null) {
+                          final updatedQe = QuickEntry(
+                            id: qe.id,
+                            date: qe.date,
+                            type: selectedType == LedgerEntryType.credit
+                                ? QuickEntryType.receipt
+                                : QuickEntryType.payment,
+                            mode: qe.mode,
+                            partyName: qe.partyName,
+                            amount: newAmount,
+                            remarks: newDesc,
+                            isSynced: qe.isSynced,
+                          );
+                          await transProv.updateQuickEntry(updatedQe);
+                        }
+                      } else {
+                        final updatedEntry = LedgerEntry(
+                          id: entry.id,
+                          customerName: entry.customerName,
+                          date: entry.date,
+                          description: newDesc.isEmpty ? entry.description : newDesc,
+                          type: selectedType,
+                          amount: newAmount,
+                          runningBalance: entry.runningBalance,
+                          invoiceId: entry.invoiceId,
+                          customerPhone: newPhone.isEmpty ? null : newPhone,
+                        );
+                        await transProv.updateLedgerEntry(updatedEntry);
+                      }
+
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Ledger entry updated successfully!"),
+                          backgroundColor: AppTheme.accentTeal,
+                        ),
+                      );
+                    } catch (e) {
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Failed to update entry: $e")),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.accentIndigo),
+                  child: const Text("Save Changes"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   void _confirmDeleteLedger(BuildContext context, TransactionProvider prov, String customerName) {
     showDialog(
       context: context,
@@ -116,11 +465,11 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
             children: const [
               Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
               SizedBox(width: 8),
-              Text("Delete Ledger Log"),
+              Text("Delete Ledger & Account"),
             ],
           ),
           content: Text(
-            "Are you sure you want to permanently delete all transaction history, invoices, and ledger logs for $customerName?\n\nThis action cannot be undone.",
+            "Are you sure you want to permanently delete all invoices, transaction history, and ledger records for $customerName?\n\nThis will delete the account from both device and cloud database.",
             style: const TextStyle(fontSize: 13),
           ),
           actions: [
@@ -129,12 +478,15 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
               child: const Text("Cancel"),
             ),
             ElevatedButton(
-              onPressed: () {
-                prov.deleteLedgerForCustomer(customerName);
+              onPressed: () async {
                 Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Ledger for $customerName has been deleted.")),
-                );
+                await prov.deleteLedgerForCustomer(customerName);
+                if (context.mounted) {
+                  await context.read<InvoiceProvider>().fetchInvoices();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Account and records for $customerName deleted successfully.")),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
               child: const Text("Delete"),
@@ -169,12 +521,13 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                   if (entry.id.startsWith('L-QE-')) {
                     final qeId = entry.id.replaceFirst('L-QE-', '');
                     await transProv.deleteQuickEntry(qeId);
-                  } else if (entry.invoiceId != null) {
+                  } else if (entry.invoiceId != null && entry.invoiceId!.isNotEmpty) {
                     await invoiceProv.deleteInvoice(entry.invoiceId!);
                     await transProv.fetchTransactions();
+                  } else {
+                    await transProv.deleteLedgerEntry(entry.id, entry.customerName);
                   }
 
-                  // Reload the current client's ledger view
                   if (activeClient != null) {
                     await transProv.fetchLedger(activeClient);
                   }
@@ -307,7 +660,6 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                                         _searchController.text = name;
                                         transProv.fetchLedger(name);
                                       },
-                                      onLongPress: () => _confirmDeleteLedger(context, transProv, name),
                                       borderRadius: BorderRadius.circular(16),
                                       child: Padding(
                                         padding: const EdgeInsets.all(16.0),
@@ -319,20 +671,20 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                                             ),
                                             const SizedBox(width: 14),
                                             Expanded(
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    name,
-                                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                                                  ),
-                                                  const SizedBox(height: 4),
-                                                  const Text(
-                                                    "Long-press to delete ledger",
-                                                    style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
-                                                  ),
-                                                ],
+                                              child: Text(
+                                                name,
+                                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                                               ),
+                                            ),
+                                            IconButton(
+                                              icon: const Icon(Icons.edit_outlined, color: AppTheme.accentIndigo, size: 20),
+                                              tooltip: "Edit Account",
+                                              onPressed: () => _showEditCustomerDialog(context, name),
+                                            ),
+                                            IconButton(
+                                              icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent, size: 20),
+                                              tooltip: "Delete Customer Ledger",
+                                              onPressed: () => _confirmDeleteLedger(context, transProv, name),
                                             ),
                                             const Icon(Icons.chevron_right_rounded, color: AppTheme.textSecondary),
                                           ],
@@ -354,29 +706,46 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  activeClient,
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                ),
-                                const Text("Account Statement", style: TextStyle(fontSize: 11, color: AppTheme.textSecondary)),
-                              ],
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                const Text("Net Balance Due", style: TextStyle(fontSize: 10, color: AppTheme.textSecondary)),
-                                Text(
-                                  ledger.isNotEmpty ? currencyFormatter.format(ledger.last.runningBalance) : "₹ 0.00",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 16,
-                                    color: ledger.isNotEmpty && ledger.last.runningBalance > 0
-                                        ? AppTheme.accentDeepPurple
-                                        : AppTheme.accentTeal,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    activeClient,
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                                   ),
+                                  const Text("Account Statement", style: TextStyle(fontSize: 11, color: AppTheme.textSecondary)),
+                                ],
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit_outlined, color: AppTheme.accentIndigo, size: 20),
+                                  tooltip: "Edit Account",
+                                  onPressed: () => _showEditCustomerDialog(context, activeClient),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent, size: 20),
+                                  tooltip: "Delete Customer Ledger",
+                                  onPressed: () => _confirmDeleteLedger(context, transProv, activeClient),
+                                ),
+                                const SizedBox(width: 8),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    const Text("Net Balance Due", style: TextStyle(fontSize: 10, color: AppTheme.textSecondary)),
+                                    Text(
+                                      ledger.isNotEmpty ? currencyFormatter.format(ledger.last.runningBalance) : "₹ 0.00",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 16,
+                                        color: ledger.isNotEmpty && ledger.last.runningBalance > 0
+                                            ? AppTheme.accentDeepPurple
+                                            : AppTheme.accentTeal,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -386,7 +755,7 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
 
                       // --- PDF EXPORT FILTER BAR ---
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: const BoxDecoration(
                           color: AppTheme.cardBg,
                           border: Border(
@@ -394,63 +763,106 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                             bottom: BorderSide(color: AppTheme.accentBorder),
                           ),
                         ),
-                        child: Row(
+                        child: Column(
                           children: [
-                            // Filter chips
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  _buildFilterChip('Daily'),
-                                  const SizedBox(width: 8),
-                                  _buildFilterChip('Monthly'),
-                                  const SizedBox(width: 8),
-                                  _buildFilterChip('Yearly'),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            // Export button
-                            GestureDetector(
-                              onTap: _isExporting
-                                  ? null
-                                  : () => _exportLedgerPdf(activeClient, _getFilteredEntries(ledger)),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [AppTheme.accentIndigo, AppTheme.primaryPurple],
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      _buildFilterChip('Daily'),
+                                      const SizedBox(width: 8),
+                                      _buildFilterChip('Monthly'),
+                                      const SizedBox(width: 8),
+                                      _buildFilterChip('Yearly'),
+                                    ],
                                   ),
-                                  borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppTheme.accentIndigo.withValues(alpha: 0.3),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
                                 ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    if (_isExporting)
-                                      const SizedBox(
-                                        width: 12,
-                                        height: 12,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 1.5,
-                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: _isExporting
+                                        ? null
+                                        : () => _exportLedgerPdf(activeClient, _getFilteredEntries(ledger)),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 10),
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(
+                                          colors: [AppTheme.accentIndigo, AppTheme.primaryPurple],
                                         ),
-                                      )
-                                    else
-                                      const Icon(Icons.picture_as_pdf_rounded, size: 14, color: Colors.white),
-                                    const SizedBox(width: 6),
-                                    const Text(
-                                      "Export PDF",
-                                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
+                                        borderRadius: BorderRadius.circular(8),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: AppTheme.accentIndigo.withValues(alpha: 0.3),
+                                            blurRadius: 6,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          if (_isExporting)
+                                            const SizedBox(
+                                              width: 12,
+                                              height: 12,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 1.5,
+                                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                              ),
+                                            )
+                                          else
+                                            const Icon(Icons.picture_as_pdf_rounded, size: 14, color: Colors.white),
+                                          const SizedBox(width: 6),
+                                          const Text(
+                                            "Export PDF",
+                                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: _isExporting
+                                        ? null
+                                        : () => _shareLedgerPdfDirect(activeClient, _getFilteredEntries(ledger)),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 10),
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(
+                                          colors: [AppTheme.accentTeal, Color(0xFF059669)],
+                                        ),
+                                        borderRadius: BorderRadius.circular(8),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: AppTheme.accentTeal.withValues(alpha: 0.3),
+                                            blurRadius: 6,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: const [
+                                          Icon(Icons.share_rounded, size: 14, color: Colors.white),
+                                          SizedBox(width: 6),
+                                          Text(
+                                            "Share PDF Direct",
+                                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -636,106 +1048,100 @@ class _LedgerLookupScreenState extends State<LedgerLookupScreen> {
                                         ),
                                         
                                         // Actions bar divider & buttons
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: AppTheme.cardBg.withOpacity(0.5),
-                                            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
-                                            border: const Border(
-                                              top: BorderSide(color: AppTheme.accentBorder),
-                                            ),
-                                          ),
-                                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.end,
-                                            children: [
-                                              if (isInvoice) ...[
-                                                TextButton.icon(
-                                                  onPressed: () {
-                                                    if (inv != null) {
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (_) => PdfViewerScreen(
-                                                            title: "Invoice ${inv.invoiceNumber}",
-                                                            buildPdf: () => PrintService.instance.generateA4InvoicePdf(inv),
-                                                          ),
-                                                        ),
-                                                      );
-                                                    }
-                                                  },
-                                                  icon: const Icon(
-                                                    Icons.visibility_outlined,
-                                                    size: 14,
-                                                    color: AppTheme.accentIndigo,
-                                                  ),
-                                                  label: const Text(
-                                                    "Open in App",
-                                                    style: TextStyle(
-                                                      fontSize: 10,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: AppTheme.accentIndigo,
-                                                    ),
-                                                  ),
-                                                  style: TextButton.styleFrom(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                                    minimumSize: Size.zero,
-                                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 12),
-                                                TextButton.icon(
-                                                  onPressed: () async {
-                                                    await invoiceProv.toggleInvoicePaymentStatus(entry.invoiceId!);
-                                                    await transProv.fetchTransactions();
-                                                    if (transProv.activeSearchCustomer != null) {
-                                                      await transProv.fetchLedger(transProv.activeSearchCustomer!);
-                                                    }
-                                                  },
-                                                  icon: Icon(
-                                                    isPaidInvoice ? Icons.cancel_outlined : Icons.check_circle_outline_rounded,
-                                                    size: 14,
-                                                    color: isPaidInvoice ? Colors.grey : AppTheme.accentTeal,
-                                                  ),
-                                                  label: Text(
-                                                    isPaidInvoice ? "Mark Unpaid" : "Mark Paid",
-                                                    style: TextStyle(
-                                                      fontSize: 10,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: isPaidInvoice ? Colors.grey : AppTheme.accentTeal,
-                                                    ),
-                                                  ),
-                                                  style: TextButton.styleFrom(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                                    minimumSize: Size.zero,
-                                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 12),
-                                              ],
-                                              TextButton.icon(
-                                                onPressed: () => _deleteLedgerEntry(context, transProv, entry),
-                                                icon: const Icon(
-                                                  Icons.delete_outline_rounded,
-                                                  size: 14,
-                                                  color: Colors.redAccent,
-                                                ),
-                                                label: const Text(
-                                                  "Delete",
-                                                  style: TextStyle(
-                                                    fontSize: 10,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.redAccent,
-                                                  ),
-                                                ),
-                                                style: TextButton.styleFrom(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                                  minimumSize: Size.zero,
-                                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                                         Container(
+                                           decoration: BoxDecoration(
+                                             color: AppTheme.cardBg.withOpacity(0.5),
+                                             borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                                             border: const Border(
+                                               top: BorderSide(color: AppTheme.accentBorder),
+                                             ),
+                                           ),
+                                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                                           child: Row(
+                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                             children: [
+                                               Row(
+                                                 children: [
+                                                   TextButton.icon(
+                                                     onPressed: () => _showEditEntryDialog(context, entry),
+                                                     icon: const Icon(
+                                                       Icons.edit_outlined,
+                                                       size: 14,
+                                                       color: AppTheme.accentIndigo,
+                                                     ),
+                                                     label: const Text(
+                                                       "Edit",
+                                                       style: TextStyle(
+                                                         fontSize: 11,
+                                                         fontWeight: FontWeight.bold,
+                                                         color: AppTheme.accentIndigo,
+                                                       ),
+                                                     ),
+                                                     style: TextButton.styleFrom(
+                                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                       minimumSize: Size.zero,
+                                                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                     ),
+                                                   ),
+                                                   const SizedBox(width: 8),
+                                                   TextButton.icon(
+                                                     onPressed: () => _deleteLedgerEntry(context, transProv, entry),
+                                                     icon: const Icon(
+                                                       Icons.delete_outline_rounded,
+                                                       size: 14,
+                                                       color: Colors.redAccent,
+                                                     ),
+                                                     label: const Text(
+                                                       "Delete",
+                                                       style: TextStyle(
+                                                         fontSize: 11,
+                                                         fontWeight: FontWeight.bold,
+                                                         color: Colors.redAccent,
+                                                       ),
+                                                     ),
+                                                     style: TextButton.styleFrom(
+                                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                       minimumSize: Size.zero,
+                                                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                     ),
+                                                   ),
+                                                 ],
+                                               ),
+                                               if (isInvoice && inv != null)
+                                                 TextButton.icon(
+                                                   onPressed: () {
+                                                     Navigator.push(
+                                                       context,
+                                                       MaterialPageRoute(
+                                                         builder: (_) => PdfViewerScreen(
+                                                           title: "Invoice ${inv.invoiceNumber}",
+                                                           buildPdf: () => PrintService.instance.generateA4InvoicePdf(inv),
+                                                         ),
+                                                       ),
+                                                     );
+                                                   },
+                                                   icon: const Icon(
+                                                     Icons.visibility_outlined,
+                                                     size: 14,
+                                                     color: AppTheme.accentIndigo,
+                                                   ),
+                                                   label: const Text(
+                                                     "Open in App",
+                                                     style: TextStyle(
+                                                       fontSize: 10,
+                                                       fontWeight: FontWeight.bold,
+                                                       color: AppTheme.accentIndigo,
+                                                     ),
+                                                   ),
+                                                   style: TextButton.styleFrom(
+                                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                     minimumSize: Size.zero,
+                                                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                   ),
+                                                 ),
+                                             ],
+                                           ),
+                                         ),
                                       ],
                                     ),
                                   );

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/models/models.dart';
 import '../../../core/providers/activity_provider.dart';
+import '../../../core/services/encryption_service.dart';
 
 class VendorLedgerNotifier extends Notifier<AsyncValue<void>> {
   @override
@@ -14,16 +15,18 @@ class VendorLedgerNotifier extends Notifier<AsyncValue<void>> {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception("User not logged in");
       
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .collection('chai_wala_ledger')
-          .add({
+      final encryptedData = EncryptionService.instance.encryptMap({
         'type': type,
         'amount': amount,
         'note': note,
         'date': Timestamp.fromDate(date),
       });
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('chai_wala_ledger')
+          .add(encryptedData);
 
       final typeStr = type == 'DEPOSIT' ? 'Deposit' : 'Running Expense';
       ref.read(activityProvider.notifier).logActivity(
@@ -70,17 +73,19 @@ class VendorLedgerNotifier extends Notifier<AsyncValue<void>> {
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null) throw Exception("User not logged in");
       
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .collection('chai_wala_ledger')
-          .doc(id)
-          .update({
+      final encryptedData = EncryptionService.instance.encryptMap({
         'type': type,
         'amount': amount,
         'note': note,
         'date': Timestamp.fromDate(date),
       });
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('chai_wala_ledger')
+          .doc(id)
+          .set(encryptedData, SetOptions(merge: true));
 
       final typeStr = type == 'DEPOSIT' ? 'Deposit' : 'Running Expense';
       ref.read(activityProvider.notifier).logActivity(

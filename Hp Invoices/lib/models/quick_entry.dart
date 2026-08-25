@@ -36,15 +36,36 @@ class QuickEntry {
   }
 
   factory QuickEntry.fromMap(Map<String, dynamic> map) {
+    DateTime parsedDate = DateTime.now();
+    if (map['date'] != null) {
+      parsedDate = DateTime.tryParse(map['date'].toString()) ?? DateTime.now();
+    } else if (map['createdAt'] != null) {
+      parsedDate = DateTime.tryParse(map['createdAt'].toString()) ?? DateTime.now();
+    }
+
+    final typeStr = (map['type'] ?? 'receipt').toString().toLowerCase().trim();
+    QuickEntryType entryType = QuickEntryType.receipt;
+    if (typeStr == 'payment') {
+      entryType = QuickEntryType.payment;
+    } else if (typeStr == 'contra') {
+      entryType = QuickEntryType.contra;
+    }
+
+    final modeStr = (map['mode'] ?? 'cash').toString().toLowerCase().trim();
+    AccountMode accountMode = AccountMode.cash;
+    if (modeStr == 'bank') {
+      accountMode = AccountMode.bank;
+    }
+
     return QuickEntry(
-      id: map['id'] ?? '',
-      date: DateTime.parse(map['date']),
-      type: QuickEntryType.values.byName(map['type']),
-      mode: AccountMode.values.byName(map['mode']),
-      partyName: map['partyName'] ?? '',
-      amount: (map['amount'] as num).toDouble(),
-      remarks: map['remarks'] ?? '',
-      isSynced: map['isSynced'] == 1,
+      id: (map['id'] ?? '').toString(),
+      date: parsedDate,
+      type: entryType,
+      mode: accountMode,
+      partyName: (map['partyName'] ?? map['party_name'] ?? map['customerName'] ?? '').toString(),
+      amount: ((map['amount'] ?? 0.0) as num).toDouble(),
+      remarks: (map['remarks'] ?? map['description'] ?? '').toString(),
+      isSynced: map['isSynced'] == 1 || map['isSynced'] == true || map['is_synced'] == 1,
     );
   }
 }
