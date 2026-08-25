@@ -7,10 +7,10 @@ class PdfViewerScreen extends StatefulWidget {
   final Future<Uint8List> Function() buildPdf;
 
   const PdfViewerScreen({
-    Key? key,
+    super.key,
     required this.title,
     required this.buildPdf,
-  }) : super(key: key);
+  });
 
   @override
   State<PdfViewerScreen> createState() => _PdfViewerScreenState();

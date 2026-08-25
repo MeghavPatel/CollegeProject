@@ -6,6 +6,7 @@ import 'package:hp_bill/providers/invoice_provider.dart';
 import 'package:hp_bill/providers/transaction_provider.dart';
 import 'package:hp_bill/providers/sync_provider.dart';
 import 'package:hp_bill/screens/ledger_lookup_screen.dart';
+import 'package:hp_bill/services/master_password_service.dart';
 import 'package:hp_bill/services/share_service.dart';
 import 'package:hp_bill/services/database_helper.dart';
 import 'package:hp_bill/theme/app_theme.dart';
@@ -13,7 +14,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class SalesInvoiceScreen extends StatefulWidget {
-  const SalesInvoiceScreen({Key? key}) : super(key: key);
+  const SalesInvoiceScreen({super.key});
 
   @override
   State<SalesInvoiceScreen> createState() => _SalesInvoiceScreenState();
@@ -34,6 +35,7 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
   // Temporary dialog input controllers
   final _qtyController = TextEditingController();
   final _rateController = TextEditingController();
+  final _notesController = TextEditingController();
 
   final currencyFormatter = NumberFormat.currency(locale: 'en_IN', symbol: '₹ ');
 
@@ -41,6 +43,23 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
   void initState() {
     super.initState();
     _nameController.addListener(_onNameChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final prov = context.read<InvoiceProvider>();
+      if (prov.customerName.isNotEmpty) {
+        _nameController.text = prov.customerName;
+      }
+      if (prov.customerPhone.isNotEmpty) {
+        _phoneController.text = prov.customerPhone;
+      }
+      if (prov.notes != null && prov.notes!.isNotEmpty) {
+        _notesController.text = prov.notes!;
+      }
+      if (prov.editingInvoiceId != null) {
+        setState(() {
+          _currentStep = 1; // Go directly to Step 2: "Tap Inventory Item to Add" page
+        });
+      }
+    });
   }
 
   void _onNameChanged() async {
@@ -73,6 +92,7 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
     _openingAmountController.dispose();
     _qtyController.dispose();
     _rateController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
@@ -147,6 +167,17 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
 
   void _finalizeInvoice(BuildContext context) async {
     final invoiceProv = context.read<InvoiceProvider>();
+
+    if (invoiceProv.editingInvoiceId != null) {
+      final allowed = await MasterPasswordService.confirmMasterPassword(
+        context,
+        title: "Master Password Required",
+        message: "Enter master password to update existing invoice.",
+      );
+      if (!allowed) return;
+    }
+
+    if (!mounted) return;
     invoiceProv.setCustomerDetails(
       name: _nameController.text.trim(),
       phone: _phoneController.text.trim(),
@@ -198,7 +229,7 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
           // Header: Store Profile branding
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            color: AppTheme.primaryPurple.withOpacity(0.06),
+            color: AppTheme.primaryPurple.withValues(alpha: 0.06),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -392,7 +423,7 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
                           color: _openingAccountType == LedgerEntryType.debit
-                              ? AppTheme.primaryPurple.withOpacity(0.1)
+                              ? AppTheme.primaryPurple.withValues(alpha: 0.1)
                               : AppTheme.cardBg,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
@@ -440,7 +471,7 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
                           color: _openingAccountType == LedgerEntryType.credit
-                              ? AppTheme.primaryPurple.withOpacity(0.1)
+                              ? AppTheme.primaryPurple.withValues(alpha: 0.1)
                               : AppTheme.cardBg,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
@@ -532,7 +563,7 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppTheme.primaryPurple.withOpacity(0.04),
+              color: AppTheme.primaryPurple.withValues(alpha: 0.04),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Center(
@@ -578,7 +609,7 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
             alignment: Alignment.center,
             child: Column(
               children: [
-                Icon(Icons.receipt_long_outlined, size: 40, color: AppTheme.textSecondary.withOpacity(0.3)),
+                Icon(Icons.receipt_long_outlined, size: 40, color: AppTheme.textSecondary.withValues(alpha: 0.3)),
                 const SizedBox(height: 8),
                 const Text(
                   "No items added to this bill yet.",
@@ -618,7 +649,7 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
         const SizedBox(height: 16),
         
         // Live Calculation block (NO TAX)
-        if (prov.activeItems.isNotEmpty)
+        if (prov.activeItems.isNotEmpty) ...[
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -634,6 +665,20 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
               ],
             ),
           ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _notesController,
+            onChanged: (val) {
+              prov.setNotes(val);
+            },
+            maxLines: 2,
+            decoration: const InputDecoration(
+              labelText: "Invoice Notes (Optional)",
+              hintText: "Add notes to display on invoice PDF...",
+              prefixIcon: Icon(Icons.note_alt_outlined, color: AppTheme.primaryPurple),
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -736,7 +781,7 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
 
   // --- PARAMETER INPUT DIALOG (ONLY QTY + RATE, NO TAX) ---
   void _promptItemParameters(InvoiceProvider prov, InventoryItem item) {
-    _qtyController.text = "1";
+    _qtyController.text = "";
     _rateController.text = item.defaultRate != null ? item.defaultRate!.toStringAsFixed(0) : "";
 
     showDialog(
@@ -745,6 +790,65 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: Text("Add ${item.name}", style: const TextStyle(fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _qtyController,
+                      keyboardType: TextInputType.number,
+                      autofocus: true,
+                      decoration: const InputDecoration(
+                        labelText: "Quantity",
+                        hintText: "Enter qty",
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: _rateController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(labelText: "Rate (₹)"),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final qty = double.tryParse(_qtyController.text) ?? 1.0;
+                final rate = double.tryParse(_rateController.text) ?? item.defaultRate ?? 0.0;
+                prov.addInvoiceItem(item.name, qty, rate);
+                Navigator.pop(ctx);
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.accentTeal),
+              child: const Text("Add to Bill"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _promptEditItemParameters(InvoiceProvider prov, InvoiceItem item) {
+    _qtyController.text = item.quantity.toStringAsFixed(0);
+    _rateController.text = item.rate.toStringAsFixed(0);
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text("Edit ${item.name}", style: const TextStyle(fontWeight: FontWeight.bold)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -777,13 +881,13 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                final qty = double.tryParse(_qtyController.text) ?? 1.0;
-                final rate = double.tryParse(_rateController.text) ?? item.defaultRate ?? 0.0;
-                prov.addInvoiceItem(item.name, qty, rate);
+                final qty = double.tryParse(_qtyController.text) ?? item.quantity;
+                final rate = double.tryParse(_rateController.text) ?? item.rate;
+                prov.updateActiveInvoiceItem(item.id, qty, rate);
                 Navigator.pop(ctx);
               },
-              child: const Text("Add to Bill"),
               style: ElevatedButton.styleFrom(backgroundColor: AppTheme.accentTeal),
+              child: const Text("Update Item"),
             ),
           ],
         );
@@ -795,6 +899,7 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
   Widget _buildBottomNavigationBar(InvoiceProvider prov) {
     final isFirstStep = _currentStep == 0;
     final isLastStep = _currentStep == 2;
+    final isEditing = prov.editingInvoiceId != null;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
@@ -812,11 +917,11 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
                   _currentStep--;
                 });
               },
-              child: const Text("Back"),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
+              child: const Text("Back"),
             )
           else
             const SizedBox.shrink(),
@@ -857,7 +962,11 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
                     _finalizeInvoice(context);
                   }
                 },
-                child: Text(isLastStep ? "Generate Invoice" : "Continue"),
+                child: Text(
+                  isLastStep
+                      ? (isEditing ? "Update Invoice" : "Generate Invoice")
+                      : "Continue",
+                ),
               ),
             ),
           ),
@@ -888,21 +997,43 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
     );
   }
 
-  // Success sheet
+  // Slide-up animated bottom success sheet ("down to up")
   void _showSuccessDialog(BuildContext context, Invoice invoice) {
     showModalBottomSheet(
       context: context,
       isDismissible: false,
-      enableDrag: false,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
+      enableDrag: true,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (ctx) {
         return Container(
+          decoration: const BoxDecoration(
+            color: AppTheme.cardBg,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 20,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Drag Handle
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: AppTheme.accentBorder,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
               const CircleAvatar(
                 radius: 28,
                 backgroundColor: Color(0xFFD1FAE5),
@@ -910,11 +1041,12 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
               ),
               const SizedBox(height: 16),
               const Text(
-                "Invoice Generated Successfully!",
+                "Invoice Saved Successfully!",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
               ),
+              const SizedBox(height: 4),
               Text(
-                "Bill reference ${invoice.invoiceNumber} has been locked and saved.",
+                "Bill reference ${invoice.invoiceNumber} is saved.",
                 style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
               ),
               const SizedBox(height: 24),
@@ -930,16 +1062,16 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
                     },
                   ),
                   _buildActionCircle(
-                    icon: Icons.share_rounded,
-                    label: "Share PDF",
+                    icon: Icons.picture_as_pdf_rounded,
+                    label: "Share PDF Direct",
                     color: AppTheme.accentBlue,
                     onTap: () {
-                      context.read<InvoiceProvider>().shareInvoice(invoice);
+                      context.read<InvoiceProvider>().shareInvoicePdf(invoice);
                     },
                   ),
                   _buildActionCircle(
                     icon: Icons.chat_bubble_outline_rounded,
-                    label: "WhatsApp",
+                    label: "WhatsApp Text",
                     color: AppTheme.accentTeal,
                     onTap: () {
                       context.read<InvoiceProvider>().shareWhatsAppDirect(invoice);
@@ -950,16 +1082,16 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
-                child: OutlinedButton(
+                child: ElevatedButton(
                   onPressed: () {
                     Navigator.pop(ctx);
                     Navigator.pop(context);
                   },
-                  child: const Text("Done & Back to Dashboard"),
-                  style: OutlinedButton.styleFrom(
+                  style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
+                  child: const Text("Done & Back to Dashboard"),
                 ),
               ),
             ],
@@ -981,7 +1113,7 @@ class _SalesInvoiceScreenState extends State<SalesInvoiceScreen> {
         children: [
           CircleAvatar(
             radius: 24,
-            backgroundColor: color.withOpacity(0.1),
+            backgroundColor: color.withValues(alpha: 0.1),
             child: Icon(icon, color: color, size: 22),
           ),
           const SizedBox(height: 8),

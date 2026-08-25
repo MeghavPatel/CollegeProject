@@ -29,16 +29,18 @@ class DatabaseHelper {
     if (_prefs != null) return;
     _prefs = await SharedPreferences.getInstance();
 
-    // Load store profile
+    // Load store profile & printer config
     _storeName = _prefs!.getString('storeName') ?? 'HP Bill';
     _storeAddress = _prefs!.getString('storeAddress') ?? '12, Lavender Arcade, Industrial Area, Mumbai';
+    _printerIp = _prefs!.getString('printerIp') ?? '192.168.1.81';
+    _printerName = _prefs!.getString('printerName') ?? 'Canon LBP6030w/6018w';
+    _directPrint = _prefs!.getBool('printerDirectPrint') ?? true;
 
-    // Load lists
+    // Load lists from storage
     _loadFromPrefs();
 
-    // Seed if never initialized
+    // Mark db initialized without injecting mock fake records
     if (!(_prefs!.getBool('db_initialized') ?? false)) {
-      seedInitialData();
       await _prefs!.setBool('db_initialized', true);
       await _saveAllToPrefs();
     }
@@ -90,97 +92,6 @@ class DatabaseHelper {
     await _prefs!.setString('quick_entries_list', jsonEncode(_quickEntries.map((q) => q.toMap()).toList()));
   }
 
-  // Seed initial mock data for dashboard visuals, ledger lookups, and inventory
-  void seedInitialData() {
-    // Seed Global Inventory Items (NO TAX RATES)
-    _inventory.addAll([
-      InventoryItem(id: 'inv1', name: '18mm Premium Ply', defaultRate: 1450.0),
-      InventoryItem(id: 'inv2', name: '12mm MDF Board', defaultRate: 980.0),
-      InventoryItem(id: 'inv3', name: 'Teak Wood Plank', defaultRate: 2500.0),
-      InventoryItem(id: 'inv4', name: 'Lavender Soap Bar', defaultRate: 120.0),
-      InventoryItem(id: 'inv5', name: 'Essential Diffuser', defaultRate: 850.0),
-    ]);
-
-    final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
-
-    // Seed Invoices (NO TAX, NO DISCOUNT)
-    final invoice1 = Invoice(
-      id: '1',
-      invoiceNumber: 'INV-$todayStr--0001',
-      customerName: 'Aman Sharma',
-      customerPhone: '9876543210',
-      date: DateTime.now().subtract(const Duration(hours: 3)),
-      items: [
-        InvoiceItem(id: 'i1', name: 'Lavender Soap Bar', quantity: 10, rate: 120.0),
-        InvoiceItem(id: 'i2', name: 'Essential Diffuser', quantity: 2, rate: 850.0),
-      ],
-      isPaid: true,
-      isSynced: true,
-    );
-
-    final invoice2 = Invoice(
-      id: '2',
-      invoiceNumber: 'INV-$todayStr--0002',
-      customerName: 'Riya Patel',
-      customerPhone: '9812345678',
-      date: DateTime.now().subtract(const Duration(hours: 1)),
-      items: [
-        InvoiceItem(id: 'i3', name: '18mm Premium Ply', quantity: 5, rate: 1450.0),
-      ],
-      isPaid: false,
-      isSynced: false,
-    );
-
-    _invoices.addAll([invoice1, invoice2]);
-
-    // Seed Ledger Entries
-    _ledgerEntries.addAll([
-      LedgerEntry(
-        id: 'l1',
-        customerName: 'Aman Sharma',
-        date: DateTime.now().subtract(const Duration(days: 3)),
-        description: 'Sales Bill INV-$todayStr--0001',
-        type: LedgerEntryType.debit,
-        amount: 2900.0,
-        runningBalance: 2900.0,
-        invoiceId: '1',
-      ),
-      LedgerEntry(
-        id: 'l2',
-        customerName: 'Aman Sharma',
-        date: DateTime.now().subtract(const Duration(days: 2)),
-        description: 'Cash Receipt',
-        type: LedgerEntryType.credit,
-        amount: 2000.0,
-        runningBalance: 900.0,
-      ),
-      LedgerEntry(
-        id: 'l3',
-        customerName: 'Riya Patel',
-        date: DateTime.now().subtract(const Duration(days: 1)),
-        description: 'Sales Bill INV-$todayStr--0002',
-        type: LedgerEntryType.debit,
-        amount: 7250.0,
-        runningBalance: 7250.0,
-        invoiceId: '2',
-      ),
-    ]);
-
-    // Seed Quick Entries
-    _quickEntries.addAll([
-      QuickEntry(
-        id: 'q1',
-        date: DateTime.now().subtract(const Duration(days: 2)),
-        type: QuickEntryType.receipt,
-        mode: AccountMode.cash,
-        partyName: 'Aman Sharma',
-        amount: 2000.0,
-        remarks: 'Part payment received',
-        isSynced: true,
-      ),
-    ]);
-  }
-
   // --- Store Profile Methods ---
 
   Future<Map<String, String>> getStoreProfile() async {
@@ -196,6 +107,35 @@ class DatabaseHelper {
     if (_prefs != null) {
       await _prefs!.setString('storeName', name);
       await _prefs!.setString('storeAddress', address);
+    }
+  }
+
+  // --- Wi-Fi Printer Configuration Methods ---
+
+  String _printerIp = '192.168.1.81';
+  String _printerName = 'Canon LBP6030w/6018w';
+  bool _directPrint = true;
+
+  Future<Map<String, dynamic>> getPrinterConfig() async {
+    return {
+      'printerIp': _printerIp,
+      'printerName': _printerName,
+      'directPrint': _directPrint,
+    };
+  }
+
+  Future<void> savePrinterConfig({
+    required String ip,
+    required String name,
+    required bool directPrint,
+  }) async {
+    _printerIp = ip;
+    _printerName = name;
+    _directPrint = directPrint;
+    if (_prefs != null) {
+      await _prefs!.setString('printerIp', ip);
+      await _prefs!.setString('printerName', name);
+      await _prefs!.setBool('printerDirectPrint', directPrint);
     }
   }
 
@@ -228,7 +168,7 @@ class DatabaseHelper {
 
   /// Generates invoice number sequentially based on current date, resetting daily
   Future<String> generateNextInvoiceNumber() async {
-    final todayPrefix = DateFormat('yyyy-MM-dd').format(DateTime.now()); // e.g. 2026-07-01
+    final todayPrefix = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final searchPrefix = 'INV-$todayPrefix--';
 
     int maxDailySeq = 0;
@@ -247,35 +187,63 @@ class DatabaseHelper {
     return 'INV-$todayPrefix--$paddedSeq';
   }
 
-  Future<void> saveInvoice(Invoice invoice) async {
-    _invoices.add(invoice);
+  Future<void> saveInvoice(Invoice invoice, {bool fromSync = false}) async {
+    final existingIndex = _invoices.indexWhere((inv) => inv.id == invoice.id);
+    String? oldCustomerName;
+    if (existingIndex != -1) {
+      oldCustomerName = _invoices[existingIndex].customerName.trim();
+      _invoices[existingIndex] = invoice;
+    } else {
+      _invoices.add(invoice);
+    }
 
     final cleanName = invoice.customerName.trim();
 
-    // Automatically add to Client Ledger as a Debit entry
-    final ledgerItem = LedgerEntry(
-      id: 'L-${invoice.id}',
-      customerName: cleanName,
-      date: invoice.date,
-      description: 'Sales Bill ${invoice.invoiceNumber}',
-      type: LedgerEntryType.debit,
-      amount: invoice.grandTotal,
-      runningBalance: 0.0, // Will be recalculated
-      invoiceId: invoice.id,
-      customerPhone: invoice.customerPhone.trim().isEmpty ? null : invoice.customerPhone.trim(),
-    );
-    _ledgerEntries.add(ledgerItem);
+    if (!fromSync) {
+      // Upsert into Client Ledger as a Debit entry
+      final ledgerId = 'L-${invoice.id}';
+      final existingLedgerIdx = _ledgerEntries.indexWhere((e) => e.id == ledgerId || e.invoiceId == invoice.id);
 
-    _recalculateCustomerLedger(cleanName);
+      final ledgerItem = LedgerEntry(
+        id: ledgerId,
+        customerName: cleanName,
+        date: invoice.date,
+        description: 'Sales Bill ${invoice.invoiceNumber}',
+        type: LedgerEntryType.debit,
+        amount: invoice.grandTotal,
+        runningBalance: 0.0,
+        invoiceId: invoice.id,
+        customerPhone: invoice.customerPhone.trim().isEmpty ? null : invoice.customerPhone.trim(),
+      );
+
+      if (existingLedgerIdx != -1) {
+        _ledgerEntries[existingLedgerIdx] = ledgerItem;
+      } else {
+        _ledgerEntries.add(ledgerItem);
+      }
+
+      if (oldCustomerName != null && oldCustomerName.isNotEmpty && oldCustomerName != cleanName) {
+        _recalculateCustomerLedger(oldCustomerName);
+      }
+      _recalculateCustomerLedger(cleanName);
+    }
     await _saveAllToPrefs();
   }
 
   Future<void> deleteInvoice(String id) async {
-    final invoiceIndex = _invoices.indexWhere((inv) => inv.id == id);
+    final invoiceIndex = _invoices.indexWhere((inv) => inv.id == id || inv.invoiceNumber == id);
     if (invoiceIndex != -1) {
-      final customerName = _invoices[invoiceIndex].customerName;
+      final inv = _invoices[invoiceIndex];
+      final customerName = inv.customerName;
       _invoices.removeAt(invoiceIndex);
-      _ledgerEntries.removeWhere((entry) => entry.invoiceId == id);
+      _ledgerEntries.removeWhere((entry) =>
+          entry.invoiceId == id ||
+          entry.invoiceId == inv.id ||
+          entry.invoiceId == inv.invoiceNumber ||
+          entry.id == 'L-$id' ||
+          entry.id == 'L-${inv.id}' ||
+          (entry.description.isNotEmpty && inv.invoiceNumber.isNotEmpty && entry.description.contains(inv.invoiceNumber))
+      );
       _recalculateCustomerLedger(customerName);
       await _saveAllToPrefs();
     }
@@ -299,6 +267,9 @@ class DatabaseHelper {
         transport: old.transport,
         lrNo: old.lrNo,
         siteName: old.siteName,
+        notes: old.notes,
+        tax: old.tax,
+        discount: old.discount,
       );
 
       _recalculateCustomerLedger(old.customerName);
@@ -313,7 +284,12 @@ class DatabaseHelper {
   }
 
   Future<void> saveQuickEntry(QuickEntry entry) async {
-    _quickEntries.add(entry);
+    final existingIndex = _quickEntries.indexWhere((e) => e.id == entry.id);
+    if (existingIndex != -1) {
+      _quickEntries[existingIndex] = entry;
+    } else {
+      _quickEntries.add(entry);
+    }
 
     if (entry.type != QuickEntryType.contra) {
       final cleanName = entry.partyName.trim();
@@ -326,9 +302,15 @@ class DatabaseHelper {
         description: '${entry.type.name.toUpperCase()} (${entry.mode.name.toUpperCase()}) - ${entry.remarks}',
         type: isReceipt ? LedgerEntryType.credit : LedgerEntryType.debit,
         amount: entry.amount,
-        runningBalance: 0.0, // Will be recalculated
+        runningBalance: 0.0,
       );
-      _ledgerEntries.add(ledgerItem);
+
+      final ledgerIndex = _ledgerEntries.indexWhere((e) => e.id == ledgerItem.id);
+      if (ledgerIndex != -1) {
+        _ledgerEntries[ledgerIndex] = ledgerItem;
+      } else {
+        _ledgerEntries.add(ledgerItem);
+      }
       _recalculateCustomerLedger(cleanName);
     }
     await _saveAllToPrefs();
@@ -347,34 +329,29 @@ class DatabaseHelper {
     }
   }
 
-  // --- Ledger Methods ---
+  // --- Ledger Methods (Standard Double-Entry Accounting) ---
 
   void _recalculateCustomerLedger(String customerName) {
     final cleanName = customerName.toLowerCase().trim();
+    if (cleanName.isEmpty) return;
 
     // 1. Get all entries for this customer
     final customerEntries = _ledgerEntries
         .where((e) => e.customerName.toLowerCase().trim() == cleanName)
         .toList();
 
-    // 2. Sort them by date chronologically
+    // 2. Sort chronologically by date
     customerEntries.sort((a, b) => a.date.compareTo(b.date));
 
-    // 3. Recalculate running balance
-    double balance = 0.0;
+    // 3. Recalculate running balance: Debit adds, Credit subtracts
+    double running = 0.0;
     final updatedEntries = customerEntries.map((e) {
-      final invoice = e.invoiceId != null
-          ? _invoices.where((inv) => inv.id == e.invoiceId).firstOrNull
-          : null;
-      final isPaidInvoice = invoice != null && invoice.isPaid;
-
       if (e.type == LedgerEntryType.debit) {
-        if (!isPaidInvoice) {
-          balance += e.amount;
-        }
+        running += e.amount;
       } else {
-        balance -= e.amount;
+        running -= e.amount;
       }
+
       return LedgerEntry(
         id: e.id,
         customerName: e.customerName,
@@ -382,8 +359,9 @@ class DatabaseHelper {
         description: e.description,
         type: e.type,
         amount: e.amount,
-        runningBalance: balance,
+        runningBalance: running,
         invoiceId: e.invoiceId,
+        customerPhone: e.customerPhone,
       );
     }).toList();
 
@@ -393,6 +371,96 @@ class DatabaseHelper {
       if (idx != -1) {
         _ledgerEntries[idx] = updated;
       }
+    }
+  }
+
+  void recalculateAllCustomerLedgers() {
+    // 1. Ensure EVERY invoice in _invoices has its debit ledger entry
+    for (var inv in _invoices) {
+      final cleanName = inv.customerName.trim();
+      if (cleanName.isEmpty) continue;
+
+      final existingIndex = _ledgerEntries.indexWhere((e) =>
+          e.invoiceId == inv.id ||
+          e.id == 'L-${inv.id}' ||
+          (e.description.isNotEmpty && inv.invoiceNumber.isNotEmpty && e.description == 'Sales Bill ${inv.invoiceNumber}')
+      );
+
+      final ledgerItem = LedgerEntry(
+        id: 'L-${inv.id}',
+        customerName: cleanName,
+        date: inv.date,
+        description: 'Sales Bill ${inv.invoiceNumber}',
+        type: LedgerEntryType.debit,
+        amount: inv.grandTotal,
+        runningBalance: 0.0,
+        invoiceId: inv.id,
+        customerPhone: inv.customerPhone.trim().isEmpty ? null : inv.customerPhone.trim(),
+      );
+
+      if (existingIndex != -1) {
+        _ledgerEntries[existingIndex] = ledgerItem;
+      } else {
+        _ledgerEntries.add(ledgerItem);
+      }
+    }
+
+    // 2. Ensure EVERY non-contra Quick Entry has its linked ledger entry
+    for (var qe in _quickEntries) {
+      if (qe.type != QuickEntryType.contra) {
+        final cleanName = qe.partyName.trim();
+        if (cleanName.isEmpty) continue;
+
+        final linkedId = 'L-QE-${qe.id}';
+        final existingIndex = _ledgerEntries.indexWhere((e) => e.id == linkedId);
+        final isReceipt = qe.type == QuickEntryType.receipt;
+        final ledgerItem = LedgerEntry(
+          id: linkedId,
+          customerName: cleanName,
+          date: qe.date,
+          description: '${qe.type.name.toUpperCase()} (${qe.mode.name.toUpperCase()}) - ${qe.remarks}',
+          type: isReceipt ? LedgerEntryType.credit : LedgerEntryType.debit,
+          amount: qe.amount,
+          runningBalance: 0.0,
+        );
+
+        if (existingIndex != -1) {
+          _ledgerEntries[existingIndex] = ledgerItem;
+        } else {
+          _ledgerEntries.add(ledgerItem);
+        }
+      }
+    }
+
+    // 3. Remove orphan invoice debit entries if invoice was deleted
+    final validInvoiceIds = _invoices.map((i) => i.id).toSet();
+    _ledgerEntries.removeWhere((e) =>
+        e.invoiceId != null &&
+        e.invoiceId!.isNotEmpty &&
+        !validInvoiceIds.contains(e.invoiceId)
+    );
+
+    // 4. Remove orphan quick entries if quick entry was deleted
+    final validQuickIds = _quickEntries.map((q) => 'L-QE-${q.id}').toSet();
+    _ledgerEntries.removeWhere((e) =>
+        e.id.startsWith('L-QE-') &&
+        !validQuickIds.contains(e.id)
+    );
+
+    // 5. Gather all unique customers and calculate clean running balances
+    final customers = <String>{};
+    for (var entry in _ledgerEntries) {
+      if (entry.customerName.trim().isNotEmpty) {
+        customers.add(entry.customerName.trim());
+      }
+    }
+    for (var inv in _invoices) {
+      if (inv.customerName.trim().isNotEmpty) {
+        customers.add(inv.customerName.trim());
+      }
+    }
+    for (var name in customers) {
+      _recalculateCustomerLedger(name);
     }
   }
 
@@ -407,8 +475,18 @@ class DatabaseHelper {
     return List.from(_ledgerEntries);
   }
 
+  Future<void> removeLedgerEntryById(String id) async {
+    _ledgerEntries.removeWhere((e) => e.id == id);
+    await _saveAllToPrefs();
+  }
+
   Future<void> addLedgerEntry(LedgerEntry entry) async {
-    _ledgerEntries.add(entry);
+    final existingIndex = _ledgerEntries.indexWhere((e) => e.id == entry.id);
+    if (existingIndex != -1) {
+      _ledgerEntries[existingIndex] = entry;
+    } else {
+      _ledgerEntries.add(entry);
+    }
     _recalculateCustomerLedger(entry.customerName.trim());
     await _saveAllToPrefs();
   }
@@ -431,15 +509,19 @@ class DatabaseHelper {
   Future<List<String>> getUniqueCustomers() async {
     final customers = <String>{};
     for (var entry in _ledgerEntries) {
-      customers.add(entry.customerName.trim());
+      if (entry.customerName.trim().isNotEmpty) {
+        customers.add(entry.customerName.trim());
+      }
     }
     for (var inv in _invoices) {
-      customers.add(inv.customerName.trim());
+      if (inv.customerName.trim().isNotEmpty) {
+        customers.add(inv.customerName.trim());
+      }
     }
     return customers.toList();
   }
 
-  /// Deletes all ledger statements and invoices for a specific customer
+  /// Deletes all ledger statements, invoices, and quick entries for a specific customer
   Future<void> deleteLedgerForCustomer(String customerName) async {
     final cleanName = customerName.toLowerCase().trim();
     _ledgerEntries.removeWhere((e) => e.customerName.toLowerCase().trim() == cleanName);
@@ -448,11 +530,248 @@ class DatabaseHelper {
     await _saveAllToPrefs();
   }
 
+  /// Synchronizes local invoices with cloud snapshot (adds new, updates modified, removes deleted)
+  Future<void> syncInvoicesFromCloud(List<Invoice> cloudInvoices) async {
+    _invoices.clear();
+    _invoices.addAll(cloudInvoices);
+
+    // Remove ledger entries for any bills deleted from cloud
+    final cloudInvoiceIds = _invoices.map((i) => i.id).toSet();
+    _ledgerEntries.removeWhere((e) =>
+        e.invoiceId != null &&
+        e.invoiceId!.isNotEmpty &&
+        !cloudInvoiceIds.contains(e.invoiceId)
+    );
+
+    // Ensure every cloud invoice has its corresponding ledger debit entry
+    for (var inv in _invoices) {
+      final cleanName = inv.customerName.trim();
+      if (cleanName.isEmpty) continue;
+
+      final existingLedger = _ledgerEntries.where((e) =>
+          e.invoiceId == inv.id || e.id == 'L-${inv.id}'
+      ).firstOrNull;
+
+      if (existingLedger == null) {
+        _ledgerEntries.add(LedgerEntry(
+          id: 'L-${inv.id}',
+          customerName: cleanName,
+          date: inv.date,
+          description: 'Sales Bill ${inv.invoiceNumber}',
+          type: LedgerEntryType.debit,
+          amount: inv.grandTotal,
+          runningBalance: 0.0,
+          invoiceId: inv.id,
+          customerPhone: inv.customerPhone.trim().isEmpty ? null : inv.customerPhone.trim(),
+        ));
+      }
+    }
+
+    recalculateAllCustomerLedgers();
+    await _saveAllToPrefs();
+  }
+
+  /// Synchronizes local ledger entries with cloud snapshot
+  Future<void> syncLedgerFromCloud(List<LedgerEntry> cloudLedger) async {
+    _ledgerEntries.clear();
+    _ledgerEntries.addAll(cloudLedger);
+    recalculateAllCustomerLedgers();
+    await _saveAllToPrefs();
+  }
+
+  /// Synchronizes local quick entries with cloud snapshot
+  Future<void> syncQuickEntriesFromCloud(List<QuickEntry> cloudQuick) async {
+    _quickEntries.clear();
+    _quickEntries.addAll(cloudQuick);
+    await _saveAllToPrefs();
+  }
+
+  /// Synchronizes local inventory items with cloud snapshot
+  Future<void> syncInventoryFromCloud(List<InventoryItem> cloudInventory) async {
+    _inventory.clear();
+    _inventory.addAll(cloudInventory);
+    await _saveAllToPrefs();
+  }
+
+  /// Synchronizes local store profile configuration with cloud snapshot
+  Future<void> syncStoreProfileFromCloud(String name, String address) async {
+    _storeName = name;
+    _storeAddress = address;
+    if (_prefs != null) {
+      await _prefs!.setString('storeName', name);
+      await _prefs!.setString('storeAddress', address);
+    }
+  }
+
+  /// Updates customer details (name, phone) across all ledger entries, invoices, and quick entries
+  Future<void> updateCustomerDetails({
+    required String oldName,
+    required String newName,
+    String? phone,
+  }) async {
+    final cleanOld = oldName.toLowerCase().trim();
+    final cleanNew = newName.trim();
+    final cleanPhone = phone?.trim().isEmpty == true ? null : phone?.trim();
+
+    // 1. Update ledger entries
+    for (int i = 0; i < _ledgerEntries.length; i++) {
+      final entry = _ledgerEntries[i];
+      if (entry.customerName.toLowerCase().trim() == cleanOld) {
+        _ledgerEntries[i] = LedgerEntry(
+          id: entry.id,
+          customerName: cleanNew,
+          date: entry.date,
+          description: entry.description,
+          type: entry.type,
+          amount: entry.amount,
+          runningBalance: entry.runningBalance,
+          invoiceId: entry.invoiceId,
+          customerPhone: cleanPhone ?? entry.customerPhone,
+        );
+      }
+    }
+
+    // 2. Update invoices
+    for (int i = 0; i < _invoices.length; i++) {
+      final inv = _invoices[i];
+      if (inv.customerName.toLowerCase().trim() == cleanOld) {
+        _invoices[i] = Invoice(
+          id: inv.id,
+          invoiceNumber: inv.invoiceNumber,
+          customerName: cleanNew,
+          customerPhone: cleanPhone ?? inv.customerPhone,
+          date: inv.date,
+          items: inv.items,
+          isPaid: inv.isPaid,
+          isSynced: inv.isSynced,
+          customerAddress: inv.customerAddress,
+          transport: inv.transport,
+          lrNo: inv.lrNo,
+          siteName: inv.siteName,
+          notes: inv.notes,
+        );
+      }
+    }
+
+    // 3. Update quick entries
+    for (int i = 0; i < _quickEntries.length; i++) {
+      final qe = _quickEntries[i];
+      if (qe.partyName.toLowerCase().trim() == cleanOld) {
+        _quickEntries[i] = QuickEntry(
+          id: qe.id,
+          date: qe.date,
+          type: qe.type,
+          mode: qe.mode,
+          partyName: cleanNew,
+          amount: qe.amount,
+          remarks: qe.remarks,
+          isSynced: qe.isSynced,
+        );
+      }
+    }
+
+    _recalculateCustomerLedger(oldName);
+    _recalculateCustomerLedger(cleanNew);
+    await _saveAllToPrefs();
+  }
+
+  /// Get Opening Account entry for customer if exists
+  LedgerEntry? getOpeningAccountEntry(String customerName) {
+    final cleanName = customerName.toLowerCase().trim();
+    for (var entry in _ledgerEntries) {
+      if (entry.customerName.toLowerCase().trim() == cleanName &&
+          (entry.description == 'Opening Balance' || entry.id.startsWith('L-OP-'))) {
+        return entry;
+      }
+    }
+    return null;
+  }
+
+  /// Updates or creates opening account for customer
+  Future<void> updateOpeningAccount({
+    required String customerName,
+    required double amount,
+    required LedgerEntryType type,
+    String? phone,
+  }) async {
+    final cleanName = customerName.trim();
+    final cleanPhone = phone?.trim().isEmpty == true ? null : phone?.trim();
+    final existingOp = getOpeningAccountEntry(cleanName);
+
+    if (existingOp != null) {
+      final idx = _ledgerEntries.indexWhere((e) => e.id == existingOp.id);
+      if (idx != -1) {
+        _ledgerEntries[idx] = LedgerEntry(
+          id: existingOp.id,
+          customerName: cleanName,
+          date: existingOp.date,
+          description: 'Opening Balance',
+          type: type,
+          amount: amount,
+          runningBalance: 0.0,
+          customerPhone: cleanPhone ?? existingOp.customerPhone,
+        );
+      }
+    } else {
+      final newOp = LedgerEntry(
+        id: 'L-OP-${DateTime.now().millisecondsSinceEpoch}',
+        customerName: cleanName,
+        date: DateTime.now().subtract(const Duration(days: 365)),
+        description: 'Opening Balance',
+        type: type,
+        amount: amount,
+        runningBalance: 0.0,
+        customerPhone: cleanPhone,
+      );
+      _ledgerEntries.add(newOp);
+    }
+
+    if (cleanPhone != null) {
+      await updateCustomerDetails(oldName: cleanName, newName: cleanName, phone: cleanPhone);
+    } else {
+      _recalculateCustomerLedger(cleanName);
+      await _saveAllToPrefs();
+    }
+  }
+
+  Future<void> updateLedgerEntry(LedgerEntry updatedEntry) async {
+    final idx = _ledgerEntries.indexWhere((e) => e.id == updatedEntry.id);
+    if (idx != -1) {
+      _ledgerEntries[idx] = updatedEntry;
+      _recalculateCustomerLedger(updatedEntry.customerName);
+      await _saveAllToPrefs();
+    }
+  }
+
+  Future<void> updateQuickEntry(QuickEntry updatedEntry) async {
+    final idx = _quickEntries.indexWhere((e) => e.id == updatedEntry.id);
+    if (idx != -1) {
+      _quickEntries[idx] = updatedEntry;
+
+      final linkedLedgerId = 'L-QE-${updatedEntry.id}';
+      final lIdx = _ledgerEntries.indexWhere((e) => e.id == linkedLedgerId);
+      if (lIdx != -1) {
+        final isReceipt = updatedEntry.type == QuickEntryType.receipt;
+        _ledgerEntries[lIdx] = LedgerEntry(
+          id: linkedLedgerId,
+          customerName: updatedEntry.partyName.trim(),
+          date: updatedEntry.date,
+          description: '${updatedEntry.type.name.toUpperCase()} (${updatedEntry.mode.name.toUpperCase()}) - ${updatedEntry.remarks}',
+          type: isReceipt ? LedgerEntryType.credit : LedgerEntryType.debit,
+          amount: updatedEntry.amount,
+          runningBalance: 0.0,
+        );
+      }
+      _recalculateCustomerLedger(updatedEntry.partyName);
+      await _saveAllToPrefs();
+    }
+  }
+
   // --- BACKUP / RESTORE / WIPE Methods ---
 
   Map<String, dynamic> exportAllData() {
     return {
-      'version': 1,
+      'version': 2,
       'exportDate': DateTime.now().toIso8601String(),
       'storeName': _storeName,
       'storeAddress': _storeAddress,
@@ -467,38 +786,107 @@ class DatabaseHelper {
     return const JsonEncoder.withIndent('  ').convert(exportAllData());
   }
 
+  /// Robust import with backward compatibility across all past and current app versions
   Future<void> importAllData(Map<String, dynamic> data) async {
     _invoices.clear();
     _ledgerEntries.clear();
     _quickEntries.clear();
     _inventory.clear();
 
-    _storeName = data['storeName'] ?? 'HP Bill';
-    _storeAddress = data['storeAddress'] ?? '';
+    _storeName = (data['storeName'] ?? data['store_name'] ?? 'HP Bill').toString();
+    _storeAddress = (data['storeAddress'] ?? data['store_address'] ?? '').toString();
 
-    if (data['inventory'] != null) {
-      for (var item in data['inventory']) {
-        _inventory.add(InventoryItem.fromMap(item));
+    // 1. Import Inventory
+    final rawInventory = data['inventory'] ?? data['inventory_list'] ?? data['items'] ?? data['products'];
+    if (rawInventory is List) {
+      for (var item in rawInventory) {
+        if (item is Map) {
+          _inventory.add(InventoryItem.fromMap(Map<String, dynamic>.from(item)));
+        }
       }
     }
 
-    if (data['invoices'] != null) {
-      for (var item in data['invoices']) {
-        _invoices.add(Invoice.fromMap(item));
+    // 2. Import Invoices (Normalizing legacy schemas)
+    final rawInvoices = data['invoices'] ?? data['bills'] ?? data['invoices_list'] ?? data['invoice_list'];
+    if (rawInvoices is List) {
+      for (var item in rawInvoices) {
+        if (item is Map) {
+          _invoices.add(Invoice.fromMap(Map<String, dynamic>.from(item)));
+        }
       }
     }
 
-    if (data['quickEntries'] != null) {
-      for (var item in data['quickEntries']) {
-        _quickEntries.add(QuickEntry.fromMap(item));
+    // 3. Import Quick Entries (Normalizing legacy schemas)
+    final rawQuick = data['quickEntries'] ?? data['quick_entries'] ?? data['quick_entries_list'] ?? data['transactions'];
+    if (rawQuick is List) {
+      for (var item in rawQuick) {
+        if (item is Map) {
+          _quickEntries.add(QuickEntry.fromMap(Map<String, dynamic>.from(item)));
+        }
       }
     }
 
-    if (data['ledgerEntries'] != null) {
-      for (var item in data['ledgerEntries']) {
-        _ledgerEntries.add(LedgerEntry.fromMap(item));
+    // 4. Import Ledger Entries
+    final rawLedger = data['ledgerEntries'] ?? data['ledger_entries'] ?? data['ledger_entries_list'] ?? data['ledger'];
+    if (rawLedger is List) {
+      for (var item in rawLedger) {
+        if (item is Map) {
+          _ledgerEntries.add(LedgerEntry.fromMap(Map<String, dynamic>.from(item)));
+        }
       }
     }
+
+    // 5. Deduplicate and ensure EVERY invoice has its ledger debit entry if missing
+    for (var inv in _invoices) {
+      final cleanName = inv.customerName.trim();
+      if (cleanName.isEmpty) continue;
+
+      final existingLedger = _ledgerEntries.where((e) =>
+          e.invoiceId == inv.id ||
+          (e.description.isNotEmpty && inv.invoiceNumber.isNotEmpty && e.description.contains(inv.invoiceNumber)) ||
+          e.id == 'L-${inv.id}'
+      ).firstOrNull;
+
+      if (existingLedger == null) {
+        _ledgerEntries.add(LedgerEntry(
+          id: 'L-${inv.id}',
+          customerName: cleanName,
+          date: inv.date,
+          description: 'Sales Bill ${inv.invoiceNumber}',
+          type: LedgerEntryType.debit,
+          amount: inv.grandTotal,
+          runningBalance: 0.0,
+          invoiceId: inv.id,
+          customerPhone: inv.customerPhone.trim().isEmpty ? null : inv.customerPhone.trim(),
+        ));
+      }
+    }
+
+    // 6. Ensure every Quick Entry has a linked ledger entry if not present
+    for (var qe in _quickEntries) {
+      if (qe.type != QuickEntryType.contra) {
+        final cleanName = qe.partyName.trim();
+        if (cleanName.isEmpty) continue;
+
+        final linkedId = 'L-QE-${qe.id}';
+        final existingLedger = _ledgerEntries.where((e) => e.id == linkedId).firstOrNull;
+        if (existingLedger == null) {
+          final isReceipt = qe.type == QuickEntryType.receipt;
+          _ledgerEntries.add(LedgerEntry(
+            id: linkedId,
+            customerName: cleanName,
+            date: qe.date,
+            description: '${qe.type.name.toUpperCase()} (${qe.mode.name.toUpperCase()}) - ${qe.remarks}',
+            type: isReceipt ? LedgerEntryType.credit : LedgerEntryType.debit,
+            amount: qe.amount,
+            runningBalance: 0.0,
+          ));
+        }
+      }
+    }
+
+    // 7. Recalculate all customer running balances with clean double-entry accounting
+    recalculateAllCustomerLedgers();
 
     if (_prefs != null) {
       await _prefs!.setString('storeName', _storeName);

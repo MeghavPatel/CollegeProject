@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hp_bill/providers/invoice_provider.dart';
 import 'package:hp_bill/providers/transaction_provider.dart';
 import 'package:hp_bill/screens/ledger_lookup_screen.dart';
+import 'package:hp_bill/services/master_password_service.dart';
 import 'package:hp_bill/services/print_service.dart';
 import 'package:hp_bill/theme/app_theme.dart';
 import 'package:intl/intl.dart';
@@ -56,7 +58,15 @@ class _OutstandingScreenState extends State<OutstandingScreen> {
     setState(() => _isGeneratingPdf = false);
   }
 
-  void _confirmSettlement(BuildContext context, TransactionProvider prov, OutstandingSummary item) {
+  void _confirmSettlement(BuildContext context, TransactionProvider prov, OutstandingSummary item) async {
+    final allowed = await MasterPasswordService.confirmMasterPassword(
+      context,
+      title: "Master Password Required",
+      message: "Enter master password to settle outstanding balance for ${item.customerName}.",
+    );
+    if (!allowed) return;
+
+    if (!context.mounted) return;
     showDialog(
       context: context,
       builder: (ctx) {
@@ -121,15 +131,18 @@ class _OutstandingScreenState extends State<OutstandingScreen> {
               child: const Text("Cancel"),
             ),
             ElevatedButton(
-              onPressed: () {
-                prov.deleteLedgerForCustomer(item.customerName);
+              onPressed: () async {
                 Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Outstanding record deleted successfully."),
-                    backgroundColor: Colors.redAccent,
-                  ),
-                );
+                await prov.deleteLedgerForCustomer(item.customerName);
+                if (context.mounted) {
+                  await context.read<InvoiceProvider>().fetchInvoices();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Outstanding record deleted successfully."),
+                      backgroundColor: Colors.redAccent,
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
               child: const Text("Delete"),

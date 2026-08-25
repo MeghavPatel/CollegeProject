@@ -1,12 +1,14 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hp_bill/models/ledger_entry.dart';
 import 'package:hp_bill/models/quick_entry.dart';
 import 'package:hp_bill/services/database_helper.dart';
+import 'package:hp_bill/services/firestore_invoice_service.dart';
 import 'package:uuid/uuid.dart';
 
 class OutstandingSummary {
   final String customerName;
-  final double balance; // Outstanding balance (Positive for Outstanding/Receivable, Negative for Advance/Payable)
+  final double balance;
   final DateTime lastTransactionDate;
 
   OutstandingSummary({
@@ -18,12 +20,17 @@ class OutstandingSummary {
 
 class TransactionProvider extends ChangeNotifier {
   final DatabaseHelper _db = DatabaseHelper.instance;
+  final FirestoreInvoiceService _cloud = FirestoreInvoiceService.instance;
 
   List<QuickEntry> _quickEntries = [];
   List<LedgerEntry> _selectedCustomerLedger = [];
   List<String> _customers = [];
   String? _activeSearchCustomer;
   bool _isLoading = false;
+
+  // Real-time stream subscriptions
+  StreamSubscription? _quickEntryStreamSub;
+  StreamSubscription? _ledgerStreamSub;
 
   // Getters
   List<QuickEntry> get quickEntries => _quickEntries;
@@ -43,7 +50,7 @@ class TransactionProvider extends ChangeNotifier {
   }
 
   double get cashInHand {
-    double cash = 15000.0; // Base cash-in-hand balance
+    double cash = 15000.0;
     for (var q in _quickEntries) {
       if (q.mode == AccountMode.cash) {
         if (q.type == QuickEntryType.receipt) cash += q.amount;
@@ -53,7 +60,65 @@ class TransactionProvider extends ChangeNotifier {
     return cash;
   }
 
-  // Load overall quick entries and customer lists
+  // =====================================================================
+  // REAL-TIME SYNC — Listen to Firestore for live updates across phones
+  // =====================================================================
+
+  void startRealtimeSync() {
+    _quickEntryStreamSub?.cancel();
+    _ledgerStreamSub?.cancel();
+
+    if (!_cloud.isAvailable) {
+      debugPrint("Firestore not available — skipping transaction real-time sync.");
+      return;
+    }
+
+    // Stream quick entries from cloud — full reconciliation (adds, updates, deletes)
+    _quickEntryStreamSub = _cloud.streamQuickEntries().listen(
+      (cloudEntries) async {
+        await _db.syncQuickEntriesFromCloud(cloudEntries);
+
+        _quickEntries = await _db.getQuickEntries();
+        _quickEntries.sort((a, b) => b.date.compareTo(a.date));
+        _customers = await _db.getUniqueCustomers();
+        notifyListeners();
+      },
+      onError: (e) => debugPrint("QuickEntry stream error: $e"),
+    );
+
+    // Stream ledger entries from cloud — full reconciliation (adds, updates, deletes)
+    _ledgerStreamSub = _cloud.streamLedgerEntries().listen(
+      (cloudLedger) async {
+        await _db.syncLedgerFromCloud(cloudLedger);
+
+        _customers = await _db.getUniqueCustomers();
+        if (_activeSearchCustomer != null) {
+          _selectedCustomerLedger = await _db.getLedger(_activeSearchCustomer!);
+        }
+        notifyListeners();
+      },
+      onError: (e) => debugPrint("Ledger stream error: $e"),
+    );
+
+    debugPrint("Real-time transaction sync started.");
+  }
+
+  void pauseRealtimeSync() {
+    _quickEntryStreamSub?.cancel();
+    _ledgerStreamSub?.cancel();
+  }
+
+  @override
+  void dispose() {
+    _quickEntryStreamSub?.cancel();
+    _ledgerStreamSub?.cancel();
+    super.dispose();
+  }
+
+  // =====================================================================
+  // FETCH TRANSACTIONS
+  // =====================================================================
+
   Future<void> fetchTransactions() async {
     _isLoading = true;
     notifyListeners();
@@ -66,7 +131,10 @@ class TransactionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Log a cash/bank quick entry
+  // =====================================================================
+  // QUICK ENTRY (Cash/Bank) — Local + Cloud
+  // =====================================================================
+
   Future<void> addQuickEntry({
     required QuickEntryType type,
     required AccountMode mode,
@@ -88,10 +156,18 @@ class TransactionProvider extends ChangeNotifier {
       isSynced: false,
     );
 
+    // Save locally
     await _db.saveQuickEntry(entry);
-    await fetchTransactions(); // Reload metrics
 
-    // If we have an active ledger open for this customer, reload it
+    // Sync to cloud (other phones will see this instantly via stream)
+    try {
+      await _cloud.saveQuickEntry(entry);
+    } catch (e) {
+      debugPrint("Cloud quick entry save notice: $e");
+    }
+
+    await fetchTransactions();
+
     if (_activeSearchCustomer != null &&
         _activeSearchCustomer!.toLowerCase() == partyName.toLowerCase()) {
       await fetchLedger(partyName);
@@ -101,7 +177,10 @@ class TransactionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Fetch Ledger statement for a customer
+  // =====================================================================
+  // LEDGER
+  // =====================================================================
+
   Future<void> fetchLedger(String customerName) async {
     _isLoading = true;
     _activeSearchCustomer = customerName;
@@ -119,40 +198,31 @@ class TransactionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Calculate Outstandings from REAL ledger data
+  // =====================================================================
+  // OUTSTANDING SUMMARIES
+  // =====================================================================
+
   List<OutstandingSummary> getOutstandingSummaries() {
     final Map<String, double> balances = {};
     final Map<String, DateTime> dates = {};
 
-    // Build from all ledger entries that exist in DB
     final allData = _db.exportAllData();
     final allEntries = allData['ledgerEntries'] as List<dynamic>? ?? [];
-    final allInvoices = allData['invoices'] as List<dynamic>? ?? [];
 
     for (var entryMap in allEntries) {
-      final customerName = entryMap['customerName'] as String? ?? '';
+      final customerName = (entryMap['customerName'] ?? entryMap['customer_name'] ?? '').toString().trim();
+      if (customerName.isEmpty) continue;
+
       final amount = (entryMap['amount'] as num?)?.toDouble() ?? 0.0;
-      final type = entryMap['type'] as String? ?? 'debit';
-      final date = DateTime.tryParse(entryMap['date'] ?? '') ?? DateTime.now();
-      final invoiceId = entryMap['invoiceId'] as String?;
+      final type = (entryMap['type'] ?? 'debit').toString().toLowerCase();
+      final date = DateTime.tryParse(entryMap['date']?.toString() ?? '') ?? DateTime.now();
 
       if (!balances.containsKey(customerName)) {
         balances[customerName] = 0.0;
       }
 
-      // Check if this is a paid invoice
-      bool isPaidInvoice = false;
-      if (invoiceId != null) {
-        final invMap = allInvoices.where((inv) => inv['id'] == invoiceId).firstOrNull;
-        if (invMap != null && invMap['isPaid'] == 1) {
-          isPaidInvoice = true;
-        }
-      }
-
       if (type == 'debit') {
-        if (!isPaidInvoice) {
-          balances[customerName] = balances[customerName]! + amount;
-        }
+        balances[customerName] = balances[customerName]! + amount;
       } else {
         balances[customerName] = balances[customerName]! - amount;
       }
@@ -164,7 +234,8 @@ class TransactionProvider extends ChangeNotifier {
 
     final List<OutstandingSummary> summaries = [];
     balances.forEach((name, balance) {
-      if (balance.abs() > 0.01) {
+      // Only show customers who owe money (unpaid / missed payments) in Outstanding
+      if (balance > 0.01) {
         summaries.add(OutstandingSummary(
           customerName: name,
           balance: balance,
@@ -173,30 +244,50 @@ class TransactionProvider extends ChangeNotifier {
       }
     });
 
-    // Sort by balance descending
-    summaries.sort((a, b) => b.balance.abs().compareTo(a.balance.abs()));
+    summaries.sort((a, b) => b.balance.compareTo(a.balance));
     return summaries;
   }
 
-  // Delete a quick entry
+  // =====================================================================
+  // DELETE OPERATIONS — Local + Cloud
+  // =====================================================================
+
   Future<void> deleteQuickEntry(String id) async {
     _isLoading = true;
     notifyListeners();
 
     await _db.deleteQuickEntry(id);
+
+    // Delete from cloud too
+    try {
+      await _cloud.deleteQuickEntry(id);
+    } catch (e) {
+      debugPrint("Cloud quick entry delete notice: $e");
+    }
+
     await fetchTransactions();
 
     _isLoading = false;
     notifyListeners();
   }
 
-  // Delete the ledger for a customer
   Future<void> deleteLedgerForCustomer(String customerName) async {
     _isLoading = true;
     notifyListeners();
 
+    // 1. Delete locally from db
     await _db.deleteLedgerForCustomer(customerName);
-    await fetchTransactions(); // Refresh customer lists and quick entries
+    _db.recalculateAllCustomerLedgers();
+
+    // 2. Delete from cloud
+    try {
+      await _cloud.deleteLedgerForCustomer(customerName);
+    } catch (e) {
+      debugPrint("Cloud ledger delete notice: $e");
+    }
+
+    // 3. Refresh local transactions & state
+    await fetchTransactions();
 
     if (_activeSearchCustomer != null &&
         _activeSearchCustomer!.toLowerCase() == customerName.toLowerCase()) {
@@ -207,30 +298,62 @@ class TransactionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Settle outstanding balance via checkmark tick
+  Future<void> deleteLedgerEntry(String entryId, String customerName) async {
+    _isLoading = true;
+    notifyListeners();
+
+    // 1. Remove from local DB
+    await _db.removeLedgerEntryById(entryId);
+    _db.recalculateAllCustomerLedgers();
+
+    // 2. Delete from cloud
+    try {
+      await _cloud.deleteLedgerEntry(entryId);
+    } catch (e) {
+      debugPrint("Cloud delete ledger entry notice: $e");
+    }
+
+    // 3. Refresh local transactions & active ledger
+    await fetchTransactions();
+    if (_activeSearchCustomer != null &&
+        _activeSearchCustomer!.toLowerCase() == customerName.toLowerCase()) {
+      await fetchLedger(customerName);
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  // =====================================================================
+  // SETTLE OUTSTANDING
+  // =====================================================================
+
   Future<void> settleOutstanding(String customerName, double amount) async {
     _isLoading = true;
     notifyListeners();
 
+    // 1. Add credit receipt entry so ledger reflects settlement
+    await addQuickEntry(
+      type: QuickEntryType.receipt,
+      mode: AccountMode.cash,
+      partyName: customerName,
+      amount: amount,
+      remarks: "Settled via Outstanding Tick",
+    );
+
+    // 2. Mark any unpaid invoices for this customer as paid
     final allInvoices = await _db.getInvoices();
     final customerUnpaidInvoices = allInvoices.where((inv) =>
       inv.customerName.toLowerCase().trim() == customerName.toLowerCase().trim() && !inv.isPaid
     ).toList();
 
-    if (customerUnpaidInvoices.isNotEmpty) {
-      // Toggle unpaid invoices to paid status to clear them!
-      for (var inv in customerUnpaidInvoices) {
-        await _db.toggleInvoicePaymentStatus(inv.id);
+    for (var inv in customerUnpaidInvoices) {
+      await _db.toggleInvoicePaymentStatus(inv.id);
+      try {
+        await _cloud.updatePaymentStatus(inv.id, true);
+      } catch (e) {
+        debugPrint("Cloud payment status notice: $e");
       }
-    } else {
-      // If there are no unpaid invoices, add a generic cash receipt quick entry to settle the balance
-      await addQuickEntry(
-        type: QuickEntryType.receipt,
-        mode: AccountMode.cash,
-        partyName: customerName,
-        amount: amount,
-        remarks: "Settled via Outstanding Tick",
-      );
     }
 
     await fetchTransactions();
@@ -239,7 +362,10 @@ class TransactionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Create customer account with opening balance
+  // =====================================================================
+  // ACCOUNT MANAGEMENT — Local + Cloud
+  // =====================================================================
+
   Future<void> startOpeningAccount({
     required String name,
     required String phone,
@@ -261,7 +387,128 @@ class TransactionProvider extends ChangeNotifier {
     );
 
     await _db.addLedgerEntry(entry);
+
+    // Sync to cloud
+    try {
+      await _cloud.saveLedgerEntry(entry);
+    } catch (e) {
+      debugPrint("Cloud ledger save notice: $e");
+    }
+
     await fetchTransactions();
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<String?> getCustomerPhone(String customerName) async {
+    return await _db.getCustomerPhone(customerName);
+  }
+
+  LedgerEntry? getOpeningAccountEntry(String customerName) {
+    return _db.getOpeningAccountEntry(customerName);
+  }
+
+  Future<void> updateCustomerDetails({
+    required String oldName,
+    required String newName,
+    String? phone,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+
+    await _db.updateCustomerDetails(oldName: oldName, newName: newName, phone: phone);
+    await fetchTransactions();
+
+    if (_activeSearchCustomer != null &&
+        _activeSearchCustomer!.toLowerCase().trim() == oldName.toLowerCase().trim()) {
+      await fetchLedger(newName);
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> updateOpeningAccount({
+    required String customerName,
+    required double amount,
+    required LedgerEntryType type,
+    String? phone,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+
+    await _db.updateOpeningAccount(
+      customerName: customerName,
+      amount: amount,
+      type: type,
+      phone: phone,
+    );
+
+    // Sync updated opening account to Cloud
+    final updatedOp = _db.getOpeningAccountEntry(customerName);
+    if (updatedOp != null) {
+      try {
+        await _cloud.saveLedgerEntry(updatedOp);
+      } catch (e) {
+        debugPrint("Cloud opening account update notice: $e");
+      }
+    }
+
+    await fetchTransactions();
+
+    if (_activeSearchCustomer != null &&
+        _activeSearchCustomer!.toLowerCase().trim() == customerName.toLowerCase().trim()) {
+      await fetchLedger(customerName);
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> updateLedgerEntry(LedgerEntry entry) async {
+    _isLoading = true;
+    notifyListeners();
+
+    await _db.updateLedgerEntry(entry);
+
+    // Sync to cloud
+    try {
+      await _cloud.updateLedgerEntry(entry);
+    } catch (e) {
+      debugPrint("Cloud ledger update notice: $e");
+    }
+
+    await fetchTransactions();
+
+    if (_activeSearchCustomer != null &&
+        _activeSearchCustomer!.toLowerCase().trim() == entry.customerName.toLowerCase().trim()) {
+      await fetchLedger(entry.customerName);
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> updateQuickEntry(QuickEntry entry) async {
+    _isLoading = true;
+    notifyListeners();
+
+    await _db.updateQuickEntry(entry);
+
+    // Sync to cloud
+    try {
+      await _cloud.updateQuickEntry(entry);
+    } catch (e) {
+      debugPrint("Cloud quick entry update notice: $e");
+    }
+
+    await fetchTransactions();
+
+    if (_activeSearchCustomer != null &&
+        _activeSearchCustomer!.toLowerCase().trim() == entry.partyName.toLowerCase().trim()) {
+      await fetchLedger(entry.partyName);
+    }
 
     _isLoading = false;
     notifyListeners();

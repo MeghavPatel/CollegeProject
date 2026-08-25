@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:hp_bill/models/invoice.dart';
+import 'package:hp_bill/models/ledger_entry.dart';
 import 'package:hp_bill/services/database_helper.dart';
 import 'package:hp_bill/services/print_service.dart';
 import 'package:intl/intl.dart';
@@ -14,7 +15,7 @@ class ShareService {
 
   final currencyFormatter = NumberFormat.currency(locale: 'en_IN', symbol: 'Rs. ');
 
-  /// Saves the PDF to a secure temporary directory and triggers the OS native share sheet
+  /// Saves the invoice PDF to a temporary file and triggers the OS native share sheet with the actual PDF document
   Future<void> shareInvoicePdf(Invoice invoice) async {
     try {
       final pdfBytes = await PrintService.instance.generateA4InvoicePdf(invoice);
@@ -27,8 +28,33 @@ class ShareService {
       final xFile = XFile(file.path, mimeType: 'application/pdf');
       await Share.shareXFiles(
         [xFile],
-        text: 'Invoice ${invoice.invoiceNumber} from ${invoice.customerName}.',
+        text: 'Invoice ${invoice.invoiceNumber} for ${invoice.customerName}',
         subject: 'Invoice ${invoice.invoiceNumber} - ${invoice.customerName}',
+      );
+    } catch (e) {
+      // Gracefully handle error
+    }
+  }
+
+  /// Saves the Ledger PDF to a temporary file and triggers the OS native share sheet with the actual PDF document
+  Future<void> shareLedgerPdf({
+    required String customerName,
+    required List<LedgerEntry> entries,
+    required String filterLabel,
+  }) async {
+    try {
+      final pdfBytes = await PrintService.instance.generateLedgerPdf(customerName, entries, filterLabel);
+      final tempDir = await getTemporaryDirectory();
+      final fileName = 'Ledger_${customerName.replaceAll(' ', '_')}_$filterLabel.pdf';
+      final file = File('${tempDir.path}/$fileName');
+
+      await file.writeAsBytes(pdfBytes, flush: true);
+
+      final xFile = XFile(file.path, mimeType: 'application/pdf');
+      await Share.shareXFiles(
+        [xFile],
+        text: 'Ledger Statement for $customerName ($filterLabel)',
+        subject: 'Ledger Statement - $customerName',
       );
     } catch (e) {
       // Gracefully handle error
