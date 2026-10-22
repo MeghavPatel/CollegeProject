@@ -1,11 +1,10 @@
 # CollegeProject
-This is made with collaboration of Meghav Patel , Pratham Patel , Jainam  Panchal and Khush Patel
-hellooolpfkoegjeijd
+This is made with collaboration of Meghav Patel , Pratham Patel , Khush Patel and Jainam  Panchal 
 
 
 
-zsxdcfvxdyfvgbdvuccrtcuvuyofuyotuttcck
 
 
 
-cuftrtudufitogygygyilgu
+
+
